@@ -7,6 +7,7 @@
 //
 
 #import "GrammarCompiler.h"
+#import "RegularExpressionWrapper.h"
 
 @implementation GrammarCompiler
 - (void)compile: (Grammar*)aGrammar {
@@ -50,25 +51,12 @@
   return compiledKeywords;
 }
 
-- (NSRegularExpression*)compileRegexFromString: (NSString*) aPattern withGrammar: (Grammar*)aGrammar{
+- (RegularExpressionWrapper*)compileRegexFromString: (NSString*) aPattern withGrammar: (Grammar*)aGrammar{
   return [self compileRegexFromString:aPattern withGrammar:aGrammar global:NO];
 }
 
-- (NSString*)fixJSRegex: (NSString*) aPattern {
-  NSMutableString* ret = [NSMutableString stringWithString:aPattern];
-  [ret replaceOccurrencesOfString:@"{" withString:@"\\{" options:0 range:NSMakeRange(0, [ret length])];
-  
-  return ret;
-}
-
-- (NSRegularExpression*)compileRegexFromString: (NSString*)aPattern withGrammar: (Grammar*)aGrammar global: (BOOL)isGlobal{
-  NSRegularExpressionOptions options = 0;
-  if ([self isGrammarCaseInsensitive:aGrammar]) options |= NSRegularExpressionCaseInsensitive;
-  aPattern = [self fixJSRegex:aPattern];
-  
-  NSRegularExpression* regex = [[NSRegularExpression alloc] initWithPattern:aPattern options:0 error:0];
-  if (!regex) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Cannot compile pattern" userInfo:NULL];
-  return regex;
+- (RegularExpressionWrapper*)compileRegexFromString: (NSString*)aPattern withGrammar: (Grammar*)aGrammar global: (BOOL)isGlobal{
+  return [[RegularExpressionWrapper alloc] initWithPattern:aPattern caseInsensitive:[self isGrammarCaseInsensitive:aGrammar] isGlobal:isGlobal];
 }
 
 - (NSMutableDictionary*)inheritFromParent: (NSDictionary*) aParent forObject: (NSDictionary*) aObject {
@@ -135,7 +123,7 @@
   if(aMode[SHL_ILLEGAL_KEY]) [terminator addObject:aMode[SHL_ILLEGAL_KEY]];
   if ([terminator count] != 0) {
     NSString* pattern = [terminator componentsJoinedByString:@"|"];
-    NSRegularExpression* regex = [self compileRegexFromString:pattern withGrammar:aGrammar global:YES];
+    RegularExpressionWrapper* regex = [self compileRegexFromString:pattern withGrammar:aGrammar global:YES];
     aMode[SHL_TERMINATORS_KEY] = regex;
   }
   
