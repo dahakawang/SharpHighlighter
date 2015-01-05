@@ -40,7 +40,7 @@
 }
 
 - (NSString*)toString {
-  NSString* format = [NSString stringWithFormat:@"/%@/m%@%@/", _pattern, _isCaseInsensitive? @"i" : @"", _isGlobal? @"g" : @""];
+  NSString* format = [NSString stringWithFormat:@"/%@/m%@%@", _pattern, _isCaseInsensitive? @"i" : @"", _isGlobal? @"g" : @""];
   return format;
 }
 
