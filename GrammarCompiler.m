@@ -116,8 +116,8 @@
   
   NSMutableArray* terminator = [[NSMutableArray alloc]init];
   for (NSDictionary* contain in aMode[SHL_CONTAINS_KEY]) {
-    NSString* terminatorStr = [NSString stringWithFormat:@"\\.?(%@)\\.?", contain[SHL_BEGIN_KEY]];
-    if (contain[SHL_BEGINKEYWORDS_KEY]) terminatorStr = contain[SHL_BEGIN_KEY];
+    NSString* terminatorStr = contain[SHL_BEGIN_KEY];
+    if (contain[SHL_BEGINKEYWORDS_KEY]) terminatorStr = [NSString stringWithFormat:@"\\.?(%@)\\.?", contain[SHL_BEGIN_KEY]];
     
     [terminator addObject:terminatorStr];
   }
