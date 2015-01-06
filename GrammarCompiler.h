@@ -23,7 +23,7 @@
 #define SHL_CONTAINS_KEY @"contains"
 #define SHL_BEGIN_KEY @"begin"
 #define SHL_BEGIN_RE_KEY @"beginRe"
-#define SHL_BEGINKEYWORDS_KEY @"begin"
+#define SHL_BEGINKEYWORDS_KEY @"beginKeywords"
 #define SHL_END_KEY @"end"
 #define SHL_END_RE_KEY @"endRe"
 #define SHL_TERMINATOR_END_KEY @"terminator_end"
