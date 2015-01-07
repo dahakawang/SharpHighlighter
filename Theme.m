@@ -8,6 +8,32 @@
 
 #import "Theme.h"
 
-@implementation Theme
+@implementation Theme{
+  NSDictionary* _theme;
+}
+
+- (instancetype)initWithString: (NSString*) aString {
+  if (self = [super init]) {
+    _theme = [self parseThemeFromString:aString];
+  }
+  return self;
+}
+
+- (instancetype)initWithFile: (NSString*) filePath {
+  NSString* data = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:NULL];
+  if (data == nil) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Cannot load theme data file" userInfo:NULL];
+  
+  return [self initWithString:data];
+}
+
+- (NSDictionary*)attributesForClass: (NSString*) className {
+  if (!_theme[className]) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:[NSString stringWithFormat:@"Current theme dose not define styles for class {%@}", className] userInfo:NULL];
+  
+  return _theme[className];
+}
+
+- (NSDictionary*)parseThemeFromString: (NSString*)themeStr {
+  return nil;
+}
 
 @end
