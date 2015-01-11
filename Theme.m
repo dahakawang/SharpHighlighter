@@ -8,6 +8,7 @@
 
 #import "Theme.h"
 #import "ThemeParser.h"
+#import "AttributeTranslator.h"
 
 @implementation Theme{
   NSDictionary* _theme;
@@ -35,7 +36,13 @@
 
 - (NSDictionary*)parseThemeFromString: (NSString*)themeStr {
   NSDictionary* styles = [ThemeParser parseThemeData:themeStr];
-  return styles;
+  NSMutableDictionary* translatedStyles = [[NSMutableDictionary alloc] init];
+  AttributeTranslator* translator = [AttributeTranslator sharedTranslator];
+  
+  for (NSString* selector in styles) {
+    translatedStyles[selector] = [translator getStyleFromDefinition:styles[selector]];
+  }
+  return translatedStyles;
 }
 
 - (NSString*)description {
