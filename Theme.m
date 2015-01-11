@@ -7,6 +7,7 @@
 //
 
 #import "Theme.h"
+#import "ThemeParser.h"
 
 @implementation Theme{
   NSDictionary* _theme;
@@ -33,7 +34,16 @@
 }
 
 - (NSDictionary*)parseThemeFromString: (NSString*)themeStr {
-  return nil;
+  NSDictionary* styles = [ThemeParser parseThemeData:themeStr];
+  return styles;
+}
+
+- (NSString*)description {
+  return [_theme description];
+}
+
+- (NSString*)debugDescription {
+  return [_theme debugDescription];
 }
 
 @end
