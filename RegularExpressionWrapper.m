@@ -39,6 +39,10 @@
   return self;
 }
 
+- (NSArray*)matchText: (NSString*) aText inRange: (NSRange)range{
+  return [_regex matchesInString:aText options:0 range:range];
+}
+
 - (NSString*)toString {
   NSString* format = [NSString stringWithFormat:@"/%@/m%@%@", _pattern, _isCaseInsensitive? @"i" : @"", _isGlobal? @"g" : @""];
   return format;
