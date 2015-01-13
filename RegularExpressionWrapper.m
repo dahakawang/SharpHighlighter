@@ -43,6 +43,12 @@
   return [_regex matchesInString:aText options:0 range:range];
 }
 
+- (BOOL)isMatchingText: (NSString*)aText {
+  NSRange textRange = NSMakeRange(0, [aText length]);
+  NSTextCheckingResult* result = [_regex firstMatchInString:aText options:0 range:textRange];
+  return (result.range.location == textRange.location) && (result.range.length == textRange.length);
+}
+
 - (NSString*)toString {
   NSString* format = [NSString stringWithFormat:@"/%@/m%@%@", _pattern, _isCaseInsensitive? @"i" : @"", _isGlobal? @"g" : @""];
   return format;

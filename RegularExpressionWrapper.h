@@ -10,5 +10,6 @@
 
 @interface RegularExpressionWrapper : NSObject
 - (instancetype)initWithPattern: (NSString*) aPattern caseInsensitive: (BOOL) caseInsensitive isGlobal: (BOOL)isGlobal;
-- (NSArray*)matchText: (NSString*) aText inRange: (NSRange)range;
+- (NSArray*)matchText: (NSString*)aText inRange: (NSRange)range;
+- (BOOL)isMatchingText: (NSString*)aText;
 @end
