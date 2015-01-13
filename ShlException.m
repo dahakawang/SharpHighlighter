@@ -12,4 +12,8 @@
 - (instancetype)initWithReason:(NSString *)aReason userInfo:(NSDictionary *)aUserInfo {
   return [super initWithName:@"SHLException" reason:aReason userInfo:aUserInfo];
 }
+
++ (instancetype)exeptionWithReason:(NSString *)aReason userInfo:(NSDictionary *)aUserInfo {
+  return [[self alloc] initWithReason:aReason userInfo:aUserInfo];
+}
 @end

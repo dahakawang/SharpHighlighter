@@ -10,4 +10,5 @@
 
 @interface ShlException : NSException
 - (instancetype)initWithReason:(NSString *)aReason userInfo:(NSDictionary *)aUserInfo;
++ (instancetype)exeptionWithReason:(NSString *)aReason userInfo:(NSDictionary *)aUserInfo;
 @end
