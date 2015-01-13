@@ -15,4 +15,4 @@
 - (instancetype)initWithRange: (NSRange)range andclassName: (NSString*)className;
 @end
 
-HighlightAction* MakeAction(NSrange range, NSString* className);
+HighlightAction* MakeAction(NSRange range, NSString* className);
