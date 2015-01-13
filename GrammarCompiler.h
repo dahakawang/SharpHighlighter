@@ -32,6 +32,11 @@
 #define SHL_STARTS_KEY @"starts"
 #define SHL_TERMINATORS_KEY @"terminators"
 
+#define SHL_EXCLUDE_BEGIN_KEY @"excludeBegin"
+#define SHL_EXCLUDE_END_KEY @"excludeEnd"
+#define SHL_RETURN_BEGIN_KEY @"returnBegin"
+#define SHL_RETURN_END_KEY @"returnEnd"
+
 
 @interface GrammarCompiler : NSObject
 - (void)compile: (Grammar*)aGrammar;
