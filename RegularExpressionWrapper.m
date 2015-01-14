@@ -28,7 +28,7 @@
     _isCaseInsensitive = caseInsensitive;
     _pattern = aPattern;
     
-    NSRegularExpressionOptions options = 0;
+    NSRegularExpressionOptions options = NSRegularExpressionAnchorsMatchLines;
     if (caseInsensitive) options |= NSRegularExpressionCaseInsensitive;
     aPattern = [self fixJSRegex:aPattern];
     
