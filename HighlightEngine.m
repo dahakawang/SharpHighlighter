@@ -79,7 +79,12 @@
     NSDictionary* newMode = nil;
     
     if ([matches count] == 0){
-      //1 end by end of string,  2. error
+      if (!currentMode[SHL_END_KEY]) {
+        [self processKeywordsForString:aText withinRange:NSMakeRange(nextProcessIndex, range.location + range.length - nextProcessIndex) withMode:currentMode action:action];
+        return NSMakeRange(nextProcessIndex, range.location + range.length - nextProcessIndex);
+      }
+      
+      @throw [ShlException exeptionWithReason:@"and unknown error has occured" userInfo:NULL];
     }
     
     NSRange lexemeRange = ((NSTextCheckingResult*)matches[0]).range;
