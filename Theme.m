@@ -29,8 +29,6 @@
 }
 
 - (NSDictionary*)attributesForClass: (NSString*) className {
-  if (!_theme[className]) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:[NSString stringWithFormat:@"Current theme dose not define styles for class {%@}", className] userInfo:NULL];
-  
   return _theme[className];
 }
 
