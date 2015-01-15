@@ -135,7 +135,10 @@
       }
       
       [modeStack removeObjectAtIndex: [modeStack count] - 1]; //balance the mode stack
-      [action insertObject:MakeAction(curModeRange, newMode[SHL_CLASS_NAME_KEY]) atIndex:currentActionSize];
+      if (newMode[SHL_CLASS_NAME_KEY]) {
+        [action insertObject:MakeAction(curModeRange, newMode[SHL_CLASS_NAME_KEY]) atIndex:currentActionSize];
+      }
+      
       
     } else {
       // TODO may need to information to debug!!!
