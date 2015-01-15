@@ -80,9 +80,9 @@
 - (id)translateColorFromString: (NSString*)def {
   float r, g, b;
   NSString* definition = [def lowercaseString];
-  r = [self parseHexFromString:[definition substringWithRange:NSMakeRange(1, 2)]];
-  g = [self parseHexFromString:[definition substringWithRange:NSMakeRange(3, 2)]];
-  b = [self parseHexFromString:[definition substringWithRange:NSMakeRange(5, 2)]];
+  r = [self parseHexFromString:[definition substringWithRange:NSMakeRange(1, 2)]] / 255;
+  g = [self parseHexFromString:[definition substringWithRange:NSMakeRange(3, 2)]] / 255;
+  b = [self parseHexFromString:[definition substringWithRange:NSMakeRange(5, 2)]] / 255;
   
 #if TARGET_OS_MAC
   NSColor* color =  [NSColor colorWithRed:r green:g blue:b alpha:1];
