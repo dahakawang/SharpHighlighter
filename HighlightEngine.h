@@ -8,7 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "Grammar.h"
+#import "Theme.h"
 
 @interface HighlightEngine : NSObject
-- (NSAttributedString*)highlightText: (NSString*) aText withGrammar: (Grammar*) aGrammar ignoreIllegal: (BOOL)ignoreIllegal;
+- (instancetype)initWithTheme: (Theme*)theme;
+- (NSArray*)highlightText: (NSString*) aText withGrammar: (Grammar*) aGrammar ignoreIllegal: (BOOL)ignoreIllegal;
 @end

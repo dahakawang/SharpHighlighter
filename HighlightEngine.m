@@ -13,17 +13,23 @@
 #import "ShlException.h"
 #import "HighlightAction.h"
 
-@implementation HighlightEngine
-- (NSAttributedString*)highlightText: (NSString*) aText withGrammar: (Grammar*) aGrammar ignoreIllegal: (BOOL)ignoreIllegal withContinuation: (NSDictionary*)continuation {
-  return [[NSAttributedString alloc]initWithString:@"sss"];
+@implementation HighlightEngine {
+  Theme* _theme;
 }
 
-- (NSAttributedString*)highlightText: (NSString*) aText withGrammar: (Grammar*) aGrammar ignoreIllegal: (BOOL)ignoreIllegal {
+- (instancetype)initWithTheme: (Theme*)theme {
+  if (self = [super init]) {
+    _theme = theme;
+  }
+  return self;
+}
+
+- (NSArray*)highlightText: (NSString*) aText withGrammar: (Grammar*) aGrammar ignoreIllegal: (BOOL)ignoreIllegal {
   NSMutableArray* action = [[NSMutableArray alloc] init];
   NSMutableArray* modeStack = [[NSMutableArray alloc] initWithArray:@[[aGrammar getTopLevelMode]]];
   [self highlight:aText inRange:NSMakeRange(0, [aText length]) withModeStack:modeStack andAction:action];
   
-  return [self highlightText:aText withGrammar:aGrammar ignoreIllegal:ignoreIllegal withContinuation:nil];
+  return action;
 }
 
 - (void)processKeywordsForString: (NSString*)aText withinRange: (NSRange) range withMode:(NSDictionary*)mode action: (NSMutableArray*)action {
