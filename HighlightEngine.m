@@ -27,7 +27,7 @@
 - (NSArray*)highlightText: (NSString*) aText withGrammar: (Grammar*) aGrammar ignoreIllegal: (BOOL)ignoreIllegal {
   NSMutableArray* action = [[NSMutableArray alloc] init];
   NSMutableArray* modeStack = [[NSMutableArray alloc] initWithArray:@[[aGrammar getTopLevelMode]]];
-  [self highlight:aText inRange:NSMakeRange(0, [aText length]) withModeStack:modeStack andAction:action];
+  [self highlight:aText inRange:NSMakeRange(0, [aText length]) skipCount:0 withModeStack:modeStack andAction:action];
   
   return action;
 }
@@ -74,20 +74,21 @@
 }
 
 
-- (NSRange)highlight: (NSString*)aText inRange:(NSRange)range withModeStack: (NSMutableArray*)modeStack andAction: (NSMutableArray*)action {
+- (NSRange)highlight: (NSString*)aText inRange:(NSRange)range skipCount: (NSUInteger)count withModeStack: (NSMutableArray*)modeStack andAction: (NSMutableArray*)action {
   NSDictionary* currentMode = modeStack[[modeStack count] - 1];
   
   // process sub-modes
-  long nextProcessIndex = range.location;
-  while (nextProcessIndex < range.location + range.length) {
+  long nextModeProcessIndex = range.location + count;
+  long nextKeyWordIndex = range.location;
+  while (nextModeProcessIndex < range.location + range.length) {
     RegularExpressionWrapper* terminatorsRegex = currentMode[SHL_TERMINATORS_KEY];
-    NSArray* matches = [terminatorsRegex matchText:aText inRange:NSMakeRange(nextProcessIndex, range.location + range.length - nextProcessIndex)];
+    NSArray* matches = [terminatorsRegex matchText:aText inRange:NSMakeRange(nextModeProcessIndex, range.location + range.length - nextModeProcessIndex)];
     NSDictionary* newMode = nil;
     
     if ([matches count] == 0){
       if (!currentMode[SHL_END_KEY]) {
-        [self processKeywordsForString:aText withinRange:NSMakeRange(nextProcessIndex, range.location + range.length - nextProcessIndex) withMode:currentMode action:action];
-        return NSMakeRange(nextProcessIndex, range.location + range.length - nextProcessIndex);
+        [self processKeywordsForString:aText withinRange:NSMakeRange(nextKeyWordIndex, range.location + range.length - nextKeyWordIndex) withMode:currentMode action:action];
+        return NSMakeRange(nextModeProcessIndex, range.location + range.length - nextModeProcessIndex);
       }
       
       @throw [ShlException exeptionWithReason:@"and unknown error has occured" userInfo:NULL];
@@ -96,7 +97,7 @@
     NSRange lexemeRange = ((NSTextCheckingResult*)matches[0]).range;
     NSString* lexeme = [aText substringWithRange: lexemeRange];
     
-    [self processKeywordsForString:aText withinRange:NSMakeRange(nextProcessIndex, lexemeRange.location - nextProcessIndex) withMode:currentMode action:action];
+    [self processKeywordsForString:aText withinRange:NSMakeRange(nextKeyWordIndex, lexemeRange.location - nextKeyWordIndex) withMode:currentMode action:action];
     
     long currentActionSize = [action count];
     /* When an illegal character is detected */
@@ -110,18 +111,18 @@
     /* When a new sub mode begin pattern is detected*/
     } else if ([self isCurrentMode:currentMode openingNewModeByLexeme:lexeme newMode:&newMode]) {
       [modeStack addObject:newMode];
-      NSRange workingRange = NSMakeRange(lexemeRange.location + lexemeRange.length, 0);
+      NSRange workingRange = NSMakeRange(lexemeRange.location, range.length + range.location - lexemeRange.location);
+      long skip_count = lexemeRange.length; // by default, the sub-model will bypass the matched begin pattern
       if (newMode[SHL_RETURN_BEGIN_KEY]) {
-        workingRange.location = lexemeRange.location;
+        skip_count = 0;
       }
-      workingRange.length = range.length + range.location - workingRange.location;
-
-      NSRange subModeEndRange = [self highlight:aText inRange:workingRange withModeStack:modeStack andAction:action];
+    
+      NSRange subModeEndRange = [self highlight:aText inRange:workingRange skipCount:skip_count withModeStack:modeStack andAction:action];
       
       if (newMode[SHL_RETURN_END_KEY]) {
-        nextProcessIndex = subModeEndRange.location;
+        nextKeyWordIndex = nextModeProcessIndex = subModeEndRange.location;
       } else {
-        nextProcessIndex = subModeEndRange.location + subModeEndRange.length;
+        nextKeyWordIndex = nextModeProcessIndex = subModeEndRange.location + subModeEndRange.length;
       }
       
       NSRange curModeRange = NSMakeRange(lexemeRange.location, 0);
