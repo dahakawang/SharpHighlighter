@@ -14,8 +14,7 @@
 @end
 
 @interface Translator : NSObject
-- (NSString*)getName;
-- (void)addDefinition: (NSString*)definition ToStyle: (NSMutableDictionary*)style;
+- (BOOL)addDefinition: (NSDictionary*)definitions ToStyle: (NSMutableDictionary*)style;
 - (id)translateColorFromString: (NSString*)def;
 @end
 
@@ -28,10 +27,6 @@
 
 @end
 
-@interface FontWeightTranslator : Translator
-
-@end
-
-@interface FontStyleTranslator : Translator
+@interface FontTranslator : Translator
 
 @end

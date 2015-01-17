@@ -10,7 +10,7 @@
 #import "AttributeTranslator.h"
 
 @implementation AttributeTranslator {
-  NSMutableDictionary* property;
+  NSMutableArray* property;
 }
 
 + (AttributeTranslator*)sharedTranslator {
@@ -22,12 +22,8 @@
 - (NSDictionary*)getStyleFromDefinition: (NSDictionary*)definition {
   NSMutableDictionary* style = [[NSMutableDictionary alloc] init];
   
-  for (NSString* name in definition) {
-    if (property[name]) {
-      [property[name] addDefinition:definition[name] ToStyle:style];
-    } else {
-      NSLog(@"property %@ not supported", name);
-    }
+  for (Translator* translator in property) {
+    [translator addDefinition:definition ToStyle:style];
   }
   
   return style;
@@ -42,7 +38,7 @@
 
 - (void)setup {
   NSArray* translatorNames = @[@"ColorTranslator", @"BackgroundTranslator"];
-  property = [[NSMutableDictionary alloc] init];
+  property = [[NSMutableArray alloc] init];
   
   for (NSString* className in translatorNames) {
     [self registerClassByName:className];
@@ -53,7 +49,7 @@
 - (void)registerClassByName: (NSString*)className {
   Class clazz = NSClassFromString(className);
   Translator* translator = [[clazz alloc] init];
-  property[[translator getName]] = translator;
+  [property addObject:translator];
 }
 @end
 
@@ -61,11 +57,8 @@
 
 
 @implementation Translator
-- (NSString*)getName {
-  @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Not implemented" userInfo:NULL];
-}
 
-- (void)addDefinition: (NSString*)definition ToStyle: (NSMutableDictionary*)style {
+- (BOOL)addDefinition: (NSString*)definition ToStyle: (NSMutableDictionary*)style {
   @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Not implemented" userInfo:NULL];
 }
 
@@ -95,23 +88,38 @@
 @end
 
 
-@implementation ColorTranslator
-- (NSString*)getName {
-  return @"color";
-}
 
-- (void)addDefinition: (NSString*)definition ToStyle: (NSMutableDictionary*)style {
-  style[NSForegroundColorAttributeName] = [self translateColorFromString:definition];
+
+@implementation ColorTranslator
+- (BOOL)addDefinition: (NSDictionary*)definition ToStyle: (NSMutableDictionary*)style {
+  NSString* color = definition[@"color"];
+  if (!color) return NO;
+  
+  style[NSForegroundColorAttributeName] = [self translateColorFromString:color];
+  return YES;
 }
 @end
 
 
-@implementation BackgroundTranslator : Translator
-- (NSString*)getName {
-  return @"background";
-}
 
-- (void)addDefinition: (NSString*)definition ToStyle: (NSMutableDictionary*)style {
-  style[NSBackgroundColorAttributeName] = [self translateColorFromString:definition];
+
+@implementation BackgroundTranslator : Translator
+- (BOOL)addDefinition: (NSDictionary*)definition ToStyle: (NSMutableDictionary*)style {
+  NSString* color = definition[@"background"];
+  if (!color) return NO;
+  
+  style[NSBackgroundColorAttributeName] = [self translateColorFromString:color];
+  return YES;
+}
+@end
+
+
+
+
+@implementation FontTranslator : Translator
+- (BOOL)addDefinition:(NSDictionary *)definitions ToStyle:(NSMutableDictionary *)style {
+  
+  style[NSFontAttributeName] = nil;
+  return NO;
 }
 @end
