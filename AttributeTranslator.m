@@ -15,7 +15,7 @@
 
 + (AttributeTranslator*)sharedTranslator {
   static AttributeTranslator* instance = nil;
-  if (!instance) instance = [[AttributeTranslator alloc] init];
+  if (!instance) instance = [[AttributeTranslator alloc] init]; //TODO consider adding a mutex?
   return instance;
 }
 
