@@ -11,5 +11,5 @@
 #import "core/HighlightAction.h"
 
 @interface Renderer : NSObject
-- (id)renderString: (NSString*)sourceCode withTheme: (Theme*)theme action: (NSArray*)action;
+- (id)renderString: (NSString*)sourceCode withTheme: (Theme*)theme action: (NSArray*)actions;
 @end
