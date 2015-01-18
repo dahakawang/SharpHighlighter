@@ -7,9 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "renderer/ThemeCompiler.h"
 
 @interface Theme : NSObject
 - (instancetype)initWithString: (NSString*) aString;
 - (instancetype)initWithFile: (NSString*) filePath;
 - (NSDictionary*)attributesForClass: (NSString*) className;
+- (void)compileWithCompiler: (ThemeCompiler*)compiler;
 @end
