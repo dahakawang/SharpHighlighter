@@ -10,7 +10,7 @@
 #import "GrammarCompiler.h"
 #import "Grammar.h"
 #import "RegularExpressionWrapper.h"
-#import "ShlException.h"
+#import "exception/ShlException.h"
 #import "HighlightAction.h"
 
 @implementation HighlightEngine {
