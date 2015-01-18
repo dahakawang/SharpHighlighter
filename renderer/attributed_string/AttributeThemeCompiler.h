@@ -7,10 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "renderer/ThemeCompiler.h"
 
-@interface AttributeTranslator : NSObject
-+ (AttributeTranslator*)sharedTranslator;
-- (NSDictionary*)getStyleFromDefinition: (NSDictionary*)definition;
+@interface AttributeThemeCompiler : ThemeCompiler
 @end
 
 @interface Translator : NSObject

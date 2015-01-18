@@ -7,50 +7,39 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "AttributeTranslator.h"
+#import "AttributeThemeCompiler.h"
 
-@implementation AttributeTranslator {
-  NSMutableArray* property;
-}
+static NSMutableArray* translators;
 
-+ (AttributeTranslator*)sharedTranslator {
-  static AttributeTranslator* instance = nil;
-  if (!instance) instance = [[AttributeTranslator alloc] init]; //TODO consider adding a mutex?
-  return instance;
+@implementation AttributeThemeCompiler
+
++ (void)initialize {
+  translators = [[NSMutableArray alloc] init];
+  [translators addObject:[[ColorTranslator alloc] init]];
+  [translators addObject:[[BackgroundTranslator alloc] init]];
+  [translators addObject:[[FontTranslator alloc] init]];
 }
 
 - (NSDictionary*)getStyleFromDefinition: (NSDictionary*)definition {
   NSMutableDictionary* style = [[NSMutableDictionary alloc] init];
   
-  for (Translator* translator in property) {
+  for (Translator* translator in translators) {
     [translator addDefinition:definition ToStyle:style];
   }
   
   return style;
 }
 
-- (instancetype)init {
-  if (self = [super init]) {
-    [self setup];
-  }
-  return self;
-}
-
-- (void)setup {
-  NSArray* translatorNames = @[@"ColorTranslator", @"BackgroundTranslator"];
-  property = [[NSMutableArray alloc] init];
+- (NSDictionary*)compileTheme:(NSDictionary *)theme {
+  NSMutableDictionary* style = [[NSMutableDictionary alloc] initWithCapacity:[theme count]];
   
-  for (NSString* className in translatorNames) {
-    [self registerClassByName:className];
+  for (NSString* key in theme) {
+    style[key] = [self getStyleFromDefinition:theme[key]];
   }
   
+  return style;
 }
 
-- (void)registerClassByName: (NSString*)className {
-  Class clazz = NSClassFromString(className);
-  Translator* translator = [[clazz alloc] init];
-  [property addObject:translator];
-}
 @end
 
 
@@ -119,7 +108,7 @@
 @implementation FontTranslator : Translator
 - (BOOL)addDefinition:(NSDictionary *)definitions ToStyle:(NSMutableDictionary *)style {
   
-  style[NSFontAttributeName] = nil;
+//  style[NSFontAttributeName] = nil;
   return NO;
 }
 @end
