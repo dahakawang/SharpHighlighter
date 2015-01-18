@@ -45,7 +45,11 @@ NSString* trim(NSString* str) {
   
   NSArray*selectors = [selectorStr componentsSeparatedByString:@","];
   for (NSString* selector in selectors) {
-    [selectorArray addObject:trim(selector)];
+    NSString* trimedSelector = trim(selector);
+    if ([trimedSelector characterAtIndex:0] == '.') {
+      trimedSelector = [trimedSelector substringFromIndex:1];
+    }
+    [selectorArray addObject:trimedSelector];
   }
 
   return selectorArray;
