@@ -7,9 +7,22 @@
 //
 
 #import "AttributedStringRenderer.h"
+#import "AttributeThemeCompiler.h"
 
 @implementation AttributedStringRenderer
-- (id)renderString:(NSString *)sourceCode withTheme:(Theme *)theme action:(NSArray *)action {
-  return nil;
+- (id)renderString:(NSString *)sourceCode withTheme:(Theme *)theme action:(NSArray *)actions {
+  AttributeThemeCompiler* themeCompiler = [[AttributeThemeCompiler alloc] init];
+  [theme compileWithCompiler:themeCompiler];
+  
+  NSMutableAttributedString* highlightedStr = [[NSMutableAttributedString alloc] initWithString:sourceCode];
+  for (HighlightAction* action in actions) {
+    NSDictionary* property = [theme attributesForClass:action.className];
+    if (property) {
+      [highlightedStr setAttributes:property range:action.range];
+    }
+  }
+
+  
+  return highlightedStr;
 }
 @end
