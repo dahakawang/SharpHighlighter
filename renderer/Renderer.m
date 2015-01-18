@@ -9,5 +9,7 @@
 #import "Renderer.h"
 
 @implementation Renderer
-
+- (id)renderString:(NSString *)sourceCode withTheme:(Theme *)theme action:(NSArray *)action {
+  @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:@"Not Implemented" userInfo:NULL];
+}
 @end

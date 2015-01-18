@@ -9,5 +9,7 @@
 #import "ThemeCompiler.h"
 
 @implementation ThemeCompiler
-
+- (NSDictionary*)compileTheme:(NSDictionary *)theme {
+  @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:@"Not Implemented" userInfo:NULL];
+}
 @end
