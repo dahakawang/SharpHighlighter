@@ -11,9 +11,9 @@ Pod::Spec.new do |s|
   s.author             = { "David" => "DevilDavidWang@gmail.com" }
   s.ios.deployment_target = "5.0"
   s.osx.deployment_target = "10.7"
-  s.source       = { :git => "https://github.com/dahakawang/SharpHighlighter.git", :tag => "0.0.1" }
+  #s.source       = { :git => "https://github.com/dahakawang/SharpHighlighter.git", :tag => "0.0.1" }
 
-  s.source_files  = "SharpHighlighter"
+  s.source_files  = "SharpHighlighter/**/*.{h,m}"
   # s.public_header_files = "Classes/**/*.h"
 
   # ――― Resources ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
