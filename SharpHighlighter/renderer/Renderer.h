@@ -7,8 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "theme/theme.h"
-#import "core/HighlightAction.h"
+#import "theme.h"
+#import "HighlightAction.h"
 
 @interface Renderer : NSObject
 - (id)renderString: (NSString*)sourceCode withTheme: (Theme*)theme action: (NSArray*)actions;

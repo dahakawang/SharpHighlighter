@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "Grammar.h"
-#import "theme/Theme.h"
+#import "Theme.h"
 
 @interface HighlightEngine : NSObject
 - (instancetype)initWithTheme: (Theme*)theme;

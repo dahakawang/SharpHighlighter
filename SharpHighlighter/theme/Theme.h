@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "renderer/ThemeCompiler.h"
+#import "ThemeCompiler.h"
 
 @interface Theme : NSObject
 - (instancetype)initWithString: (NSString*) aString;

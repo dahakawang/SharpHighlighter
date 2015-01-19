@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 maxtrixcube. All rights reserved.
 //
 
-#import "renderer/Renderer.h"
+#import "Renderer.h"
 
 @interface AttributedStringRenderer : Renderer
 
