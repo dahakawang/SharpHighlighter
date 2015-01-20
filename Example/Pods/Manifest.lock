@@ -1,0 +1,14 @@
+PODS:
+  - SharpHighlighter (0.0.1)
+
+DEPENDENCIES:
+  - SharpHighlighter (from `../`)
+
+EXTERNAL SOURCES:
+  SharpHighlighter:
+    :path: ../
+
+SPEC CHECKSUMS:
+  SharpHighlighter: 6c1a4c2305f1973eedd54962a81369d736702f49
+
+COCOAPODS: 0.35.0

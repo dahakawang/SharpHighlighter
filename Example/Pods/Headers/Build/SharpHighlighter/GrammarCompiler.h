@@ -1,0 +1,1 @@
+../../../../../SharpHighlighter/core/GrammarCompiler.h

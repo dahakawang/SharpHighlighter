@@ -1,0 +1,1 @@
+../../../../../SharpHighlighter/renderer/ThemeCompiler.h
