@@ -1,5 +1,13 @@
 PODS:
-  - SharpHighlighter (0.0.1)
+  - SharpHighlighter (0.0.1):
+    - SharpHighlighter/Core (= 0.0.1)
+    - SharpHighlighter/Exception (= 0.0.1)
+    - SharpHighlighter/Renderer (= 0.0.1)
+    - SharpHighlighter/Theme (= 0.0.1)
+  - SharpHighlighter/Core (0.0.1)
+  - SharpHighlighter/Exception (0.0.1)
+  - SharpHighlighter/Renderer (0.0.1)
+  - SharpHighlighter/Theme (0.0.1)
 
 DEPENDENCIES:
   - SharpHighlighter (from `../`)
@@ -9,6 +17,6 @@ EXTERNAL SOURCES:
     :path: ../
 
 SPEC CHECKSUMS:
-  SharpHighlighter: 6c1a4c2305f1973eedd54962a81369d736702f49
+  SharpHighlighter: 9316a3bd4ba31ff3e0ea364ba0530b10cdf86367
 
 COCOAPODS: 0.35.0

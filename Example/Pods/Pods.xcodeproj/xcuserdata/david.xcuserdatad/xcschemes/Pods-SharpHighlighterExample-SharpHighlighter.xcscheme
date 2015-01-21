@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "72EBA13E36E3A22A27B47869"
+               BlueprintIdentifier = "9829B3922FA0DB55C5083D8C"
                BuildableName = "libPods-SharpHighlighterExample-SharpHighlighter.a"
                BlueprintName = "Pods-SharpHighlighterExample-SharpHighlighter"
                ReferencedContainer = "container:Pods.xcodeproj">
