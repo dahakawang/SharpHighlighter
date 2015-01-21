@@ -37,6 +37,7 @@
 #define SHL_RETURN_BEGIN_KEY @"returnBegin"
 #define SHL_RETURN_END_KEY @"returnEnd"
 #define SHL_CLASS_NAME_KEY @"className"
+#define SHL_SYNTAX_NAME_KEY @"name"
 
 @interface GrammarCompiler : NSObject
 - (void)compile: (Grammar*)aGrammar;
