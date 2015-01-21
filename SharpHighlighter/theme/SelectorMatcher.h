@@ -8,6 +8,15 @@
 
 #import <Foundation/Foundation.h>
 
-@interface SelectorMatcher : NSObject
+@interface SelectorStylePair : NSObject
+@property (nonatomic, strong) NSArray* selector;
+@property (nonatomic, strong) NSDictionary* style;
 
+- (instancetype)initWithSelector: (NSString*)selector andStyle: (NSDictionary*)style;
+@end
+
+
+@interface SelectorMatcher : NSObject
+- (instancetype)initWithDictionary: (NSDictionary*)dic;
+- (NSDictionary*)matchStyleFromClass: (NSString*)className;
 @end
