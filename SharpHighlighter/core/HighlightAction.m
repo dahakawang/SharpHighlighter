@@ -17,7 +17,3 @@
   return self;
 }
 @end
-
-HighlightAction* MakeAction(NSRange range, NSString* className) {
-  return [[HighlightAction alloc] initWithRange:range andclassName:className];
-}

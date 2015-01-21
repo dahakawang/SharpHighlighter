@@ -16,7 +16,7 @@
   
   NSMutableAttributedString* highlightedStr = [[NSMutableAttributedString alloc] initWithString:sourceCode];
   for (HighlightAction* action in actions) {
-    NSDictionary* property = [theme attributesForClass:action.className];
+    NSDictionary* property = [theme attributesForSelector:action.className];
     if (property) {
       [highlightedStr setAttributes:property range:action.range];
     }

@@ -12,6 +12,6 @@
 @interface Theme : NSObject
 - (instancetype)initWithString: (NSString*) aString;
 - (instancetype)initWithFile: (NSString*) filePath;
-- (NSDictionary*)attributesForClass: (NSString*) className;
+- (NSDictionary*)attributesForSelector: (NSString*) selector;
 - (void)compileWithCompiler: (ThemeCompiler*)compiler;
 @end

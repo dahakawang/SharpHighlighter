@@ -13,6 +13,25 @@
 #import "ShlException.h"
 #import "HighlightAction.h"
 
+
+HighlightAction* MakeAction(NSRange range, NSArray* modeStack, NSString* name) {
+  NSMutableArray* className = [[NSMutableArray alloc] init];
+  
+  [className addObject: modeStack[0][SHL_SYNTAX_NAME_KEY]];
+  for (long it = 0; it < [modeStack count]; it++) {
+    if (modeStack[it][SHL_CLASS_NAME_KEY]) {
+      [className addObject:modeStack[it][SHL_CLASS_NAME_KEY]];
+    }
+  }
+  if (name != nil) {
+    [className addObject:name];
+  }
+  
+  NSString* classname = [className componentsJoinedByString:@" "];
+  return [[HighlightAction alloc] initWithRange:range andclassName:classname];
+}
+
+
 @implementation HighlightEngine {
   Theme* _theme;
 }
@@ -32,7 +51,9 @@
   return action;
 }
 
-- (void)processKeywordsForString: (NSString*)aText withinRange: (NSRange) range withMode:(NSDictionary*)mode action: (NSMutableArray*)action {
+- (void)processKeywordsForString: (NSString*)aText withinRange: (NSRange) range withModeStack:(NSArray*)modeStack action: (NSMutableArray*)action {
+  NSDictionary* mode = modeStack[[modeStack count] - 1];
+  
   RegularExpressionWrapper* regex = mode[SHL_LEXEMES_RE_KEY];
   NSArray* matches = [regex matchText:aText inRange:range];
   
@@ -41,7 +62,7 @@
     NSDictionary* keywordList = mode[SHL_KEYWORDS_KEY];
     if (keywordList[keyword]) {
       NSString* className = keywordList[keyword][0]; //TODO handle relevance
-      [action addObject: MakeAction(match.range, className)];
+      [action addObject: MakeAction(match.range, modeStack, className)];
     }
   }
 }
@@ -87,7 +108,7 @@
     
     if ([matches count] == 0){
       if (!currentMode[SHL_END_KEY]) {
-        [self processKeywordsForString:aText withinRange:NSMakeRange(nextKeyWordIndex, range.location + range.length - nextKeyWordIndex) withMode:currentMode action:action];
+        [self processKeywordsForString:aText withinRange:NSMakeRange(nextKeyWordIndex, range.location + range.length - nextKeyWordIndex) withModeStack:modeStack action:action];
         return NSMakeRange(nextModeProcessIndex, range.location + range.length - nextModeProcessIndex);
       }
       
@@ -97,7 +118,7 @@
     NSRange lexemeRange = ((NSTextCheckingResult*)matches[0]).range;
     NSString* lexeme = [aText substringWithRange: lexemeRange];
     
-    [self processKeywordsForString:aText withinRange:NSMakeRange(nextKeyWordIndex, lexemeRange.location - nextKeyWordIndex) withMode:currentMode action:action];
+    [self processKeywordsForString:aText withinRange:NSMakeRange(nextKeyWordIndex, lexemeRange.location - nextKeyWordIndex) withModeStack:modeStack action:action];
     
     long currentActionSize = [action count];
     /* When an illegal character is detected */
@@ -135,10 +156,12 @@
         curModeRange.length = subModeEndRange.location + subModeEndRange.length - curModeRange.location;
       }
       
-      [modeStack removeObjectAtIndex: [modeStack count] - 1]; //balance the mode stack
       if (newMode[SHL_CLASS_NAME_KEY]) {
-        [action insertObject:MakeAction(curModeRange, newMode[SHL_CLASS_NAME_KEY]) atIndex:currentActionSize];
+        // at this time, the modeStack has not been popped, so it's still the submode's stack
+        [action insertObject:MakeAction(curModeRange, modeStack, nil) atIndex:currentActionSize];
       }
+      [modeStack removeObjectAtIndex: [modeStack count] - 1]; //balance the mode stack
+
       
       
     } else {

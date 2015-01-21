@@ -8,9 +8,11 @@
 
 #import "Theme.h"
 #import "ThemeParser.h"
+#import "SelectorMatcher.h"
 
 @implementation Theme{
   NSDictionary* _theme;
+  SelectorMatcher* _matcher;
 }
 
 - (instancetype)initWithString: (NSString*) aString {
@@ -27,18 +29,25 @@
   return [self initWithString:data];
 }
 
-- (NSDictionary*)attributesForClass: (NSString*) className {
-  return _theme[className];
+- (NSDictionary*)attributesForSelector: (NSString*) selector {
+  if (_matcher == nil) {
+    _matcher = [[SelectorMatcher alloc] initWithDictionary:_theme];
+  }
+  
+  return [_matcher matchStyleFromClass:selector];
 }
 
 - (NSDictionary*)parseThemeFromString: (NSString*)themeStr {
   NSDictionary* styles = [ThemeParser parseThemeData:themeStr];
- 
+  
   return styles;
 }
 
 - (void)compileWithCompiler: (ThemeCompiler*)compiler {
-  _theme = [compiler compileTheme:_theme];
+  if (compiler) {
+    _theme = [compiler compileTheme:_theme];
+    _matcher = [[SelectorMatcher alloc] initWithDictionary:_theme]; //The matcher will be refreshed
+  }
 }
 
 - (NSString*)description {
