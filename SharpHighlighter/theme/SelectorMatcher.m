@@ -18,6 +18,18 @@
   return self;
 }
 
+- (NSString*)toString {
+  return [self.selector componentsJoinedByString:@" "];
+}
+
+- (NSString*)description {
+  return [self toString];
+}
+
+- (NSString*)debugDescription {
+  return [self toString];
+}
+
 @end
 
 
