@@ -51,13 +51,13 @@
   XCTAssertTrue(s == nil);
 }
 
-- (void)testWildcald {
+- (void)testWildcard {
   SelectorMatcher* matcher = [[SelectorMatcher alloc] initWithDictionary:selectors1];
   id s = [matcher matchStyleFromClass:@"hljs css pick"];
   XCTAssertEqual(s, @4);
 }
 
-- (void)testWildcaldInMiddle {
+- (void)testWildcardInMiddle {
   SelectorMatcher* matcher = [[SelectorMatcher alloc] initWithDictionary:selectors2];
   id s = [matcher matchStyleFromClass:@"hljs np title"];
   XCTAssertEqual(s, @1);
@@ -72,7 +72,7 @@
   XCTAssertEqual(s, @4);
 }
 
-- (void)testWildcaldHasLessPriority {
+- (void)testWildcardHasLessPriority {
   SelectorMatcher* matcher = [[SelectorMatcher alloc] initWithDictionary:selectors1];
   id s = [matcher matchStyleFromClass:@"hljs css title"];
   XCTAssertEqual(s, @3);
