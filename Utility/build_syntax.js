@@ -68,7 +68,7 @@ function shadow_copy(obj) {
 }
 
 function remove_cyclic_ref(obj, path){
-	if(typeof obj != "object") return obj;
+	if(! (obj instanceof Object) || (obj instanceof RegExp)) return obj;
 	var new_obj = shadow_copy(obj); // we do not modify this object directly, because this may be a **shared object** that are referenced in other place
 	obj.visited = true;
 
@@ -87,6 +87,10 @@ function remove_cyclic_ref(obj, path){
 }
 
 var hljs = require("./tmp/build/lib/index.js");
+function replacer(key, value) {
+	if (value instanceof RegExp) return value.source;
+	else return value;
+}
 
 function get_defs() {
 	var lang_defs = [];
@@ -100,7 +104,7 @@ function get_defs() {
 			lang_hash["name"] = lang_names[i];
 			if (has_cyclic_ref) console.error("WARNING: language " + lang_names[i] + " contains cyclic reference");
 
-			var json = JSON.stringify(lang_hash, null, "  ");
+			var json = JSON.stringify(lang_hash, replacer, "  ");
 			lang_defs.push(json);
 		}
 		catch(e){
