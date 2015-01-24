@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#git clone https://github.com/isagalaev/highlight.js.git tmp
+git clone https://github.com/isagalaev/highlight.js.git tmp
 (cd tmp; git checkout 8.4; npm install; node tools/build.js -t node;)
 
 if [ ! -d ../Themes ]
