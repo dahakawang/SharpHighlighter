@@ -17,7 +17,8 @@
 
 - (NSString*)fixJSRegex: (NSString*) aPattern {
   NSMutableString* ret = [NSMutableString stringWithString:aPattern];
-  [ret replaceOccurrencesOfString:@"{" withString:@"\\{" options:0 range:NSMakeRange(0, [ret length])]; //This should be done is highlight.js grammar translation scripts
+  [ret replaceOccurrencesOfString:@"{" withString:@"\\{" options:0 range:NSMakeRange(0, [ret length])]; //TODO This should be done in highlight.js grammar translation scripts
+  [ret replaceOccurrencesOfString:@"}" withString:@"\\}" options:0 range:NSMakeRange(0, [ret length])]; //TODO This should be done in highlight.js grammar translation scripts
   
   return ret;
 }
