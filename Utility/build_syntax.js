@@ -36,47 +36,94 @@ function list_language(input_dir) {
 	return filepath;
 }
 
-function detect_circle(obj){
-	if(typeof(obj) != "object") return;
+has_cyclic_ref = false;
 
-	if (obj.visit == true) {
-		console.log("detected");
-		return true;
-	}
-
-	for(var key in obj){
-		obj.visit = true;
-		if (detect_circle(obj[key])) {
-			console.log(key);
-			obj.visit = null;
-			return true;
+function find_ref(obj, path) {
+	has_cyclic_ref = true;
+	var ref = ["ref"];
+	var i = 0;
+	var found = false;
+	for (i = 0; i < path.length; i++) {
+		ref.push(path[i].key); //push path element name
+		if (path[i].obj == obj) {
+			found = true;
+			break;
 		}
 	}
-	obj.visit = null;
+
+	if (!found) {
+		report_error("there declared to be a cyclic reference in the path " + path + " but we cannot found it");
+	}
+	return ref.join(":");
 }
 
-function get_defs(lang) {
+function shadow_copy(obj) {
+	var result = {};
+	if (obj.constructor == Array) result = [];
+
+	for (var key in obj) {
+		result[key] = obj[key];
+	}
+	return result;
+}
+
+function remove_cyclic_ref(obj, path){
+	if(typeof obj != "object") return obj;
+	var new_obj = shadow_copy(obj); // we do not modify this object directly, because this may be a **shared object** that are referenced in other place
+	obj.visited = true;
+
+	for(var key in new_obj){
+		if (obj[key] == null) continue;
+		if (obj[key].visited){
+			new_obj[key] = find_ref(obj[key], path);
+		} else {
+			var child = remove_cyclic_ref(obj[key], path.concat({"key":key, "obj":obj[key]}));
+			new_obj[key] = child;
+		}
+	}
+
+	delete obj.visited;
+	return new_obj;
+}
+
+var hljs = require("./tmp/build/lib/index.js");
+
+function get_defs() {
 	var lang_defs = [];
-	var hljs = require("./tmp/build/lib/index.js");
 	var lang_names = hljs.listLanguages();
 
 	for (var i = 0; i < lang_names.length; i++){
-		var l = hljs.getLanguage(lang_names[i]);
+		var lang_hash = hljs.getLanguage(lang_names[i]);
 		try{
-			var json = JSON.stringify(l);
-			lang_defs.push(l);
+			has_cyclic_ref = false;
+			lang_hash = remove_cyclic_ref(lang_hash, []);
+			lang_hash["name"] = lang_names[i];
+			if (has_cyclic_ref) console.error("WARNING: language " + lang_names[i] + " contains cyclic reference");
+
+			var json = JSON.stringify(lang_hash, null, "  ");
+			lang_defs.push(json);
 		}
 		catch(e){
-			//console.log(l);
-			detect_circle(l);
-			console.log(l);
+			console.error(e.stack);
 			report_error(e);
+			console.log("Language: " + lang_names[i]);
 		}
 	}
 	return lang_defs;
 }
 
+function get_names() {
+	return hljs.listLanguages();
+}
+
+function write_syntax(names, defs) {
+	for (var i = 0; i < names.length; i++) {
+		var file = output_dir + "/" + names[i] + ".json";
+		fs.writeFileSync(file, defs[i]);
+	}
+}
+
 parse_args(process.argv);
 var lang_defs = get_defs();
-console.log(lang_defs[0]);
-console.log(lang_defs.length);
+var lang_names = get_names();
+write_syntax(lang_names, lang_defs);
