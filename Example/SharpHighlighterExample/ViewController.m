@@ -19,33 +19,39 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   
-  NSString* sourceCode = [NSString stringWithContentsOfFile:@"/Users/david/Desktop/compiler.m" encoding:NSUTF8StringEncoding error:NULL];
-  if (!sourceCode) {
-    @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"cannot open file" userInfo:NULL];
+  @try {
+    NSString* sourceCode = [NSString stringWithContentsOfFile:@"/Users/david/work/Project/TMHighlighter/TMHighlighter/lib/Utility/tmp/test/detect/css/default.txt" encoding:NSUTF8StringEncoding error:NULL];
+    if (!sourceCode) {
+      @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"cannot open file" userInfo:NULL];
+    }
+    
+    Grammar* grammar = [[Grammar alloc] initWithJsonFile:@"/Users/david/work/Project/TMHighlighter/TMHighlighter/lib/Themes/css.json"];
+    GrammarCompiler* compiler = [[GrammarCompiler alloc] init];
+    [compiler compile:grammar];
+    
+    HighlightEngine* engine = [[HighlightEngine alloc]init];
+    NSArray* actions = [engine highlightText:sourceCode withGrammar:grammar ignoreIllegal:NO];
+    
+    
+    Theme* theme = [[Theme alloc] initWithFile:@"/Users/david/work/Project/highlight.js/xcode.theme"];
+    
+    AttributedStringRenderer* renderer = [[AttributedStringRenderer alloc] init];
+    NSAttributedString* highlightedStr =  [renderer renderString:sourceCode withTheme:theme action:actions];
+    
+    [self.txtView.textStorage setAttributedString:highlightedStr];
+    
+    
+    //  NSData* data = [highlightedStr dataFromRange:NSMakeRange(0, [highlightedStr length]) documentAttributes:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} error:NULL];
+    //  if (!data) {
+    //    @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"cannot generate RTF" userInfo:NULL];
+    //  }
+    //
+    //  [data writeToFile:@"/Users/david/Desktop/code.rtf" atomically:YES];
+
   }
-  
-  Grammar* grammar = [[Grammar alloc] initWithJsonFile:@"/Users/david/work/Project/highlight.js/objc.json"];
-  GrammarCompiler* compiler = [[GrammarCompiler alloc] init];
-  [compiler compile:grammar];
-  
-  HighlightEngine* engine = [[HighlightEngine alloc]init];
-  NSArray* actions = [engine highlightText:sourceCode withGrammar:grammar ignoreIllegal:NO];
-  
-  
-  Theme* theme = [[Theme alloc] initWithFile:@"/Users/david/work/Project/highlight.js/xcode.theme"];
-  
-  AttributedStringRenderer* renderer = [[AttributedStringRenderer alloc] init];
-  NSAttributedString* highlightedStr =  [renderer renderString:sourceCode withTheme:theme action:actions];
-  
-  [self.txtView.textStorage setAttributedString:highlightedStr];
-  
-  
-//  NSData* data = [highlightedStr dataFromRange:NSMakeRange(0, [highlightedStr length]) documentAttributes:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} error:NULL];
-//  if (!data) {
-//    @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"cannot generate RTF" userInfo:NULL];
-//  }
-//  
-//  [data writeToFile:@"/Users/david/Desktop/code.rtf" atomically:YES];
+  @catch (NSException *exception) {
+    NSLog(@"%@", [exception callStackSymbols]);
+  }
 
   
 
