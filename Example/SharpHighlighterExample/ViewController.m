@@ -51,6 +51,7 @@
   }
   @catch (NSException *exception) {
     NSLog(@"%@", [exception callStackSymbols]);
+    NSLog(@"%@", [exception reason]);
   }
 
   
