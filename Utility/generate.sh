@@ -3,12 +3,12 @@
 git clone https://github.com/isagalaev/highlight.js.git tmp
 (cd tmp; git checkout 8.4; npm install; node tools/build.js -t node;)
 
-if [ ! -d ../Themes ]
+if [ ! -d ../Languages ]
 then
-	mkdir ../Themes
+	mkdir ../Languages
 fi
 
-node build_syntax.js -i tmp/src/languages -o ../Themes
+node build_syntax.js -i tmp/src/languages -o ../Languages
 if [ $? != 0 ]
 then
 	echo "Error occured"
