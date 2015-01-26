@@ -91,6 +91,7 @@
       NSString* terminatorStr = [NSString stringWithFormat:@"%@%@%@", aMode[SHL_TERMINATOR_END_KEY], aMode[SHL_END_KEY]? @"|" : @"", aParent[SHL_TERMINATOR_END_KEY]];
       aMode[SHL_TERMINATOR_END_KEY] = terminatorStr;
     }
+    aMode[SHL_TERMINATOR_END_RE_KEY] = [self compileRegexFromString:aMode[SHL_TERMINATOR_END_KEY] withGrammar:aGrammar];
   }
   
   if (aMode[SHL_ILLEGAL_KEY]) aMode[SHL_ILLEGAL_RE_KEY] = [self compileRegexFromString:aMode[SHL_ILLEGAL_KEY] withGrammar:aGrammar];

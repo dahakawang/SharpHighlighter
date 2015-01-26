@@ -27,6 +27,7 @@
 #define SHL_END_KEY @"end"
 #define SHL_END_RE_KEY @"endRe"
 #define SHL_TERMINATOR_END_KEY @"terminator_end"
+#define SHL_TERMINATOR_END_RE_KEY @"terminator_endRe"
 #define SHL_ENDS_WITH_PARENT_KEY @"endsWithParent"
 #define SHL_VARIANTS_KEY @"variants"
 #define SHL_STARTS_KEY @"starts"
