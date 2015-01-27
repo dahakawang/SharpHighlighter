@@ -101,7 +101,7 @@ HighlightAction* MakeAction(NSRange range, NSArray* modeStack, NSString* name) {
 }
 
 
-- (void)ProcessNewMode:(NSDictionary *)newMode modeStack:(NSMutableArray *)modeStack lexemeRange:(NSRange)lexemeRange range:(NSRange)range action:(NSMutableArray *)action aText:(NSString *)aText nextModeProcessIndex_p:(long *)nextModeProcessIndex_p nextKeyWordIndex_p:(long *)nextKeyWordIndex_p {
+- (NSRange)ProcessNewMode:(NSDictionary *)newMode modeStack:(NSMutableArray *)modeStack lexemeRange:(NSRange)lexemeRange range:(NSRange)range action:(NSMutableArray *)action aText:(NSString *)aText nextModeProcessIndex_p:(long *)nextModeProcessIndex_p nextKeyWordIndex_p:(long *)nextKeyWordIndex_p {
   long currentActionSize = [action count];
   [modeStack addObject:newMode];
   NSRange workingRange = NSMakeRange(lexemeRange.location, range.length + range.location - lexemeRange.location);
@@ -133,6 +133,8 @@ HighlightAction* MakeAction(NSRange range, NSArray* modeStack, NSString* name) {
     [action insertObject:MakeAction(curModeRange, modeStack, nil) atIndex:currentActionSize];
   }
   [modeStack removeObjectAtIndex: [modeStack count] - 1]; //balance the mode stack
+  
+  return NSMakeRange(*nextModeProcessIndex_p, 0);
 }
 
 - (NSRange)highlight: (NSString*)aText inRange:(NSRange)range skipCount: (NSUInteger)count withModeStack: (NSMutableArray*)modeStack andAction: (NSMutableArray*)action {
@@ -175,11 +177,11 @@ HighlightAction* MakeAction(NSRange range, NSArray* modeStack, NSString* name) {
       
     /* When a new sub mode begin pattern is detected*/
     } else if ([self isCurrentMode:currentMode openingNewModeByLexeme:lexeme newMode:&newMode]) {
-      [self ProcessNewMode:newMode modeStack:modeStack lexemeRange:lexemeRange range:range action:action aText:aText nextModeProcessIndex_p:&nextModeProcessIndex nextKeyWordIndex_p:&nextKeyWordIndex];
+      NSRange newRange = [self ProcessNewMode:newMode modeStack:modeStack lexemeRange:lexemeRange range:range action:action aText:aText nextModeProcessIndex_p:&nextModeProcessIndex nextKeyWordIndex_p:&nextKeyWordIndex];
       
       while (newMode[SHL_STARTS_KEY]) {
         newMode = newMode[SHL_STARTS_KEY];
-        [self ProcessNewMode:newMode modeStack:modeStack lexemeRange:lexemeRange range:range action:action aText:aText nextModeProcessIndex_p:&nextModeProcessIndex nextKeyWordIndex_p:&nextKeyWordIndex];
+        newRange = [self ProcessNewMode:newMode modeStack:modeStack lexemeRange:newRange range:range action:action aText:aText nextModeProcessIndex_p:&nextModeProcessIndex nextKeyWordIndex_p:&nextKeyWordIndex];
       }
 
 
