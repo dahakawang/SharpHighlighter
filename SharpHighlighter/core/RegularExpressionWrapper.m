@@ -18,7 +18,9 @@
 - (NSString*)fixJSRegex: (NSString*) aPattern {
   NSMutableString* ret = [NSMutableString stringWithString:aPattern];
   [ret replaceOccurrencesOfString:@"{" withString:@"\\{" options:0 range:NSMakeRange(0, [ret length])]; //TODO This should be done in highlight.js grammar translation scripts
+  [ret replaceOccurrencesOfString:@"\\\\{" withString:@"\\{" options:0 range:NSMakeRange(0, [ret length])];
   [ret replaceOccurrencesOfString:@"}" withString:@"\\}" options:0 range:NSMakeRange(0, [ret length])]; //TODO This should be done in highlight.js grammar translation scripts
+  [ret replaceOccurrencesOfString:@"\\\\}" withString:@"\\}" options:0 range:NSMakeRange(0, [ret length])]; //TODO this is an ugly workaround
   
   return ret;
 }
@@ -33,7 +35,7 @@
     if (caseInsensitive) options |= NSRegularExpressionCaseInsensitive;
     aPattern = [self fixJSRegex:aPattern];
     
-    _regex = [[NSRegularExpression alloc] initWithPattern:aPattern options:options error:0];
+    _regex = [[NSRegularExpression alloc] initWithPattern:aPattern options:options error:NULL];
     if (!_regex) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Cannot compile pattern" userInfo:NULL];
   }
   
