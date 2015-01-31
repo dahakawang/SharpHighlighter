@@ -94,7 +94,7 @@
     aMode[SHL_TERMINATOR_END_RE_KEY] = [self compileRegexFromString:aMode[SHL_TERMINATOR_END_KEY] withGrammar:aGrammar];
   }
   
-  if (aMode[SHL_ILLEGAL_KEY]) aMode[SHL_ILLEGAL_RE_KEY] = [self compileRegexFromString:aMode[SHL_ILLEGAL_KEY] withGrammar:aGrammar];
+  if (aMode[SHL_ILLEGAL_KEY] && ![aMode[SHL_ILLEGAL_KEY] isEqualToString:@""]) aMode[SHL_ILLEGAL_RE_KEY] = [self compileRegexFromString:aMode[SHL_ILLEGAL_KEY] withGrammar:aGrammar];
   if (!aMode[SHL_RELEVANCE_KEY]) aMode[SHL_RELEVANCE_KEY] = @1;
   if (!aMode[SHL_CONTAINS_KEY]) aMode[SHL_CONTAINS_KEY] = @[];
   
@@ -123,7 +123,7 @@
     [terminator addObject:terminatorStr];
   }
   if(aMode[SHL_TERMINATOR_END_KEY]) [terminator addObject:aMode[SHL_TERMINATOR_END_KEY]];
-  if(aMode[SHL_ILLEGAL_KEY]) [terminator addObject:aMode[SHL_ILLEGAL_KEY]];
+  if(aMode[SHL_ILLEGAL_KEY] && ![aMode[SHL_ILLEGAL_KEY] isEqualToString:@""]) [terminator addObject:aMode[SHL_ILLEGAL_KEY]];
   if ([terminator count] != 0) {
     NSString* pattern = [terminator componentsJoinedByString:@"|"];
     RegularExpressionWrapper* regex = [self compileRegexFromString:pattern withGrammar:aGrammar global:YES];
