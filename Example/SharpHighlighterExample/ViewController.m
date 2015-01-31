@@ -18,14 +18,15 @@
 
 - (void)viewDidLoad {
   [super viewDidLoad];
+  NSString* name = @"applescript";
   
   @try {
-    NSString* sourceCode = [NSString stringWithContentsOfFile:@"/Users/david/work/Project/TMHighlighter/TMHighlighter/lib/Utility/tmp/test/detect/css/default.txt" encoding:NSUTF8StringEncoding error:NULL];
+    NSString* sourceCode = [NSString stringWithContentsOfFile: [NSString stringWithFormat:@"/Users/david/work/Project/TMHighlighter/TMHighlighter/lib/Utility/tmp/test/detect/%@/default.txt", name] encoding:NSUTF8StringEncoding error:NULL];
     if (!sourceCode) {
       @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"cannot open file" userInfo:NULL];
     }
     
-    Grammar* grammar = [[Grammar alloc] initWithJsonFile:@"/Users/david/work/Project/TMHighlighter/TMHighlighter/lib/Themes/css.json"];
+    Grammar* grammar = [[Grammar alloc] initWithJsonFile:[NSString stringWithFormat:@"/Users/david/work/Project/TMHighlighter/TMHighlighter/lib/Languages/%@.json", name] ];
     GrammarCompiler* compiler = [[GrammarCompiler alloc] init];
     [compiler compile:grammar];
     
