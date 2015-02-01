@@ -53,12 +53,15 @@ HighlightAction* MakeAction(NSRange range, NSArray* modeStack, NSString* name) {
 
 - (void)processKeywordsForString: (NSString*)aText withinRange: (NSRange) range withModeStack:(NSArray*)modeStack action: (NSMutableArray*)action {
   NSDictionary* mode = modeStack[[modeStack count] - 1];
+  NSDictionary* grammar = modeStack[0];
+  BOOL isIgnoreCase = (BOOL)grammar[SHL_CASE_INSENSITIVE];
   
   RegularExpressionWrapper* regex = mode[SHL_LEXEMES_RE_KEY];
   NSArray* matches = [regex matchText:aText inRange:range];
   
   for (NSTextCheckingResult* match in matches) {
     NSString* keyword = [aText substringWithRange:match.range];
+    if (isIgnoreCase) keyword = [keyword lowercaseString];
     NSDictionary* keywordList = mode[SHL_KEYWORDS_KEY];
     if (keywordList[keyword]) {
       NSString* className = keywordList[keyword][0]; //TODO handle relevance
