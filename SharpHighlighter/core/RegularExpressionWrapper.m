@@ -15,14 +15,63 @@
   NSRegularExpression* _regex;
 }
 
-- (NSString*)fixJSRegex: (NSString*) aPattern {
-  NSMutableString* ret = [NSMutableString stringWithString:aPattern];
-  [ret replaceOccurrencesOfString:@"{" withString:@"\\{" options:0 range:NSMakeRange(0, [ret length])]; //TODO This should be done in highlight.js grammar translation scripts
-  [ret replaceOccurrencesOfString:@"\\\\{" withString:@"\\{" options:0 range:NSMakeRange(0, [ret length])];
-  [ret replaceOccurrencesOfString:@"}" withString:@"\\}" options:0 range:NSMakeRange(0, [ret length])]; //TODO This should be done in highlight.js grammar translation scripts
-  [ret replaceOccurrencesOfString:@"\\\\}" withString:@"\\}" options:0 range:NSMakeRange(0, [ret length])]; //TODO this is an ugly workaround
+- (BOOL)shouldEscapeToken: (NSString*)token inString: (NSString*)str range: (NSRange)range {
+  int offset = 0;
+  unichar end = 0;
+  if ([token isEqualToString:@"{"]) {
+    offset = 1;
+    end = '}';
+  } else if ([token isEqualToString:@"}"]) {
+    offset = -1;
+    end = '{';
+  }
   
-  return ret;
+  long pos = range.location + range.length - 1 + offset;
+  while (pos >= 0 && pos < str.length) {
+    pos += offset;
+    unichar ch = [str characterAtIndex:pos];
+    if (ch == end) {
+      return NO;
+    }
+    
+    if (!(ch == ',' || (ch >= '0' && ch <= '9'))) {
+      return YES;
+    }
+  }
+  
+  return YES;
+}
+
+- (void)EscapeToken:(NSString *)token str:(NSMutableString *)str {
+  NSAssert([token length] == 1, @"Length of token should be 1");
+  
+  NSString* escapedToken = [NSString stringWithFormat:@"\\%@", token];
+  NSString* pattern = [NSString stringWithFormat:@"\\\\*%@", escapedToken];
+  NSRegularExpression* regex = [[NSRegularExpression alloc] initWithPattern:pattern options:NSRegularExpressionAnchorsMatchLines error:NULL];
+  
+  NSUInteger lastIndex = 0;
+  NSRange found = NSMakeRange(0, 1);
+  
+  while (found.length != 0) {
+    found = [regex firstMatchInString:str options:0 range:NSMakeRange(lastIndex, str.length - lastIndex)].range;
+    lastIndex = found.location + found.length;
+    
+    if (found.length % 2 == 1) { //even number of \ before {, so this token is not escaped
+      if ( [self shouldEscapeToken:token inString:str range:found]) {
+        [str replaceOccurrencesOfString:token withString:escapedToken options:0 range:found];
+        lastIndex = found.location + found.length + 1;
+      }
+    }
+  }
+}
+
+- (NSString*)fixJSRegex: (NSString*) aPattern {
+  NSMutableString* str = [NSMutableString stringWithString:aPattern];
+  
+  [self EscapeToken:@"{" str:str];
+  [self EscapeToken:@"}" str:str];
+  
+  return str;
 }
 
 - (instancetype)initWithPattern: (NSString*) aPattern caseInsensitive: (BOOL) caseInsensitive isGlobal: (BOOL)isGlobal {
