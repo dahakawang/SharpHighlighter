@@ -94,7 +94,7 @@ function replacer(key, value) {
 
 function get_defs() {
 	var lang_defs = [];
-	var lang_names = hljs.listLanguages();
+	var lang_names = get_names();
 
 	for (var i = 0; i < lang_names.length; i++){
 		var lang_hash = hljs.getLanguage(lang_names[i]);
@@ -117,7 +117,7 @@ function get_defs() {
 }
 
 function get_names() {
-	return hljs.listLanguages();
+	return ["objectivec", "cpp", "makefile", "xml", "javascript", "css", "cs", "java"];
 }
 
 function write_syntax(names, defs) {
