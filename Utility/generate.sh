@@ -3,10 +3,12 @@
 git clone https://github.com/isagalaev/highlight.js.git tmp
 (cd tmp; git checkout 8.4; npm install; node tools/build.js -t node;)
 
-if [ ! -d ../Languages ]
+if [ -d ../Languages ]
 then
-	mkdir ../Languages
+	rm -rf ../Languages
 fi
+
+mkdir ../Languages
 
 node build_syntax.js -i tmp/src/languages -o ../Languages
 if [ $? != 0 ]
