@@ -195,7 +195,9 @@ HighlightAction* MakeAction(NSRange range, NSArray* modeStack, NSString* name) {
       
     } else {
       // TODO may need to information to debug!!!
-      @throw [ShlException exeptionWithReason:@"Unknown error when parsing the text" userInfo:NULL];
+      NSLog(@"Unknown error when parsing the text");
+      nextModeProcessIndex++;
+      nextKeyWordIndex++;
     }
 }
   
