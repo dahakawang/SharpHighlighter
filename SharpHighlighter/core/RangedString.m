@@ -43,9 +43,16 @@
 
 
 
+- (RangedString*)newWithBegin: (NSUInteger)begin andEnd: (NSUInteger)end {
+  NSRange newRange = NSMakeRange(begin, end - begin);
+  return [[RangedString alloc] initWithString:_backend andRange:newRange];
+}
+
+
+
 - (RangedString*)newWithBegin:(NSUInteger)start {
   [self ensureWithinCurrentRange:start];
-  NSRange newRange = NSMakeRange(_range.location + start, _range.location+_range.length-start);
+  NSRange newRange = NSMakeRange(start, _range.location+_range.length-start);
   
   return [[RangedString alloc] initWithString:_backend andRange:newRange];
 }
@@ -93,6 +100,42 @@
 
 - (NSString*)debugDescription {
   return [NSString stringWithFormat:@"[%lu,%lu]%@", (unsigned long)_range.location, _range.length, [self toNSString]];
+}
+
+
+
+- (NSUInteger)location {
+  return _range.location;
+}
+
+
+
+- (NSUInteger)length {
+  return _range.length;
+}
+
+
+
+- (NSUInteger)endLocation {
+  return _range.location + _range.length;
+}
+
+
+
+- (NSRange)range {
+  return _range;
+}
+
+
+
+- (NSString*)rangedString {
+  return [_backend substringWithRange:_range];
+}
+
+
+
+- (NSString*)string {
+  return _backend;
 }
 
 

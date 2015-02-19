@@ -10,8 +10,13 @@
 #import "RegularExpressionWrapper.h"
 
 @interface RangedString : NSObject
+@property (readonly, nonatomic) NSUInteger location, length, endLocation;
+@property (readonly, nonatomic) NSRange range;
+@property (readonly, nonatomic) NSString* string, *rangedString;
+
 - (instancetype)initWithString:(NSString*)str;
 - (RangedString*)newWithRange: (NSRange)range;
+- (RangedString*)newWithBegin: (NSUInteger)begin andEnd: (NSUInteger)end;
 - (RangedString*)newWithBegin:(NSUInteger)begin;
 - (RangedString*)newWithEnd: (NSUInteger)end;
 - (NSRange)toNSRange;
