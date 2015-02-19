@@ -140,18 +140,23 @@ HighlightAction* MakeAction(NSRange range, NSArray* modeStack, NSString* name) {
   return NSMakeRange(*nextModeProcessIndex_p, 0);
 }
 
-- (NSRange)highlight: (NSString*)aText inRange:(NSRange)range skipCount: (NSUInteger)count withModeStack: (NSMutableArray*)modeStack andAction: (NSMutableArray*)action {
+- (NSDictionary *)getCurrentMode:(NSMutableArray *)modeStack {
   NSDictionary* currentMode = modeStack[[modeStack count] - 1];
+  return currentMode;
+}
+
+- (NSRange)highlight: (NSString*)aText inRange:(NSRange)range skipCount: (NSUInteger)count withModeStack: (NSMutableArray*)modeStack andAction: (NSMutableArray*)action {
+  NSDictionary *currentMode = [self getCurrentMode:modeStack];
   
   // process sub-modes
   long nextModeProcessIndex = range.location + count;
   long nextKeyWordIndex = range.location;
   while (nextModeProcessIndex < range.location + range.length) {
     RegularExpressionWrapper* terminatorsRegex = currentMode[SHL_TERMINATORS_KEY];
-    NSArray* matches = [terminatorsRegex matchText:aText inRange:NSMakeRange(nextModeProcessIndex, range.location + range.length - nextModeProcessIndex)];
-    NSDictionary* newMode = nil;
+
+    NSTextCheckingResult* match = [terminatorsRegex firstMatchInString:aText range:NSMakeRange(nextModeProcessIndex, range.location + range.length - nextModeProcessIndex)];
     
-    if ([matches count] == 0){
+    if (match == nil){
       if (!currentMode[SHL_END_KEY]) {
         [self processKeywordsForString:aText withinRange:NSMakeRange(nextKeyWordIndex, range.location + range.length - nextKeyWordIndex) withModeStack:modeStack action:action];
         return NSMakeRange(nextModeProcessIndex, range.location + range.length - nextModeProcessIndex);
@@ -160,7 +165,8 @@ HighlightAction* MakeAction(NSRange range, NSArray* modeStack, NSString* name) {
       @throw [ShlException exeptionWithReason:@"and unknown error has occured" userInfo:NULL];
     }
     
-    NSRange lexemeRange = ((NSTextCheckingResult*)matches[0]).range;
+    NSDictionary* newMode = nil;
+    NSRange lexemeRange = match.range;
     NSString* lexeme = [aText substringWithRange: lexemeRange];
     
     [self processKeywordsForString:aText withinRange:NSMakeRange(nextKeyWordIndex, lexemeRange.location - nextKeyWordIndex) withModeStack:modeStack action:action];
