@@ -48,11 +48,23 @@ BOOL isSameNSRange(NSRange n1, NSRange n2) {
   
   RangedString* sub3 = [string newWithEnd:5];
   XCTAssert([[sub3 toNSString] isEqualToString:@"today"]);
+  
+  
+  RangedString* sub4 = [string newWithBegin:0 andEnd:5];
+  XCTAssert([[sub4 toNSString] isEqualToString:@"today"]);
+  
+  
+  RangedString* string1 = [string newWithBegin:6 andEnd:19];
+  RangedString* sub5 = [string1 newWithBegin:9];
+  XCTAssert([[sub5 toNSString] isEqualToString:@"a good day"]);
+  
+  RangedString* sub6 = [string1 newWithEnd:10];
+  XCTAssert([[sub6 toNSString] isEqualToString:@"is a"]);
 }
 
 - (void)testNewSeriesException {
   RangedString* string = [[RangedString alloc] initWithString:@"today is a good day, and i'm really happy."];
-  
+
   XCTAssertThrows([string newWithRange:NSMakeRange(0, 100)]);
   XCTAssertThrows([string newWithBegin:-1]);
   XCTAssertNoThrow([string newWithBegin:4]);
@@ -60,6 +72,7 @@ BOOL isSameNSRange(NSRange n1, NSRange n2) {
   XCTAssertThrows([string newWithEnd:-1]);
   XCTAssertNoThrow([string newWithEnd:20]);
   XCTAssertThrows([string newWithEnd:120]);
+  
 }
 
 - (void)testMatches {
