@@ -9,10 +9,16 @@
 #import <Cocoa/Cocoa.h>
 #import <XCTest/XCTest.h>
 #import <RangedString.h>
+#import <RegularExpressionWrapper.h>
 
 @interface RangedStringTest : XCTestCase
 
 @end
+
+
+BOOL isSameNSRange(NSRange n1, NSRange n2) {
+  return n1.location == n2.location && n1.length == n2.length;
+}
 
 @implementation RangedStringTest
 
@@ -20,47 +26,51 @@
   [super setUp];
 }
 
+
+
 - (void)testCreateOne {
   RangedString* string = [[RangedString alloc] initWithString:@"abcd"];
   
   XCTAssert([[string toNSString] isEqualToString:@"abcd"]);
+  XCTAssert(isSameNSRange([string toNSRange], NSMakeRange(0, 4)));
 }
 
 
-- (void)testSubString {
+- (void)testNewSeries {
   RangedString* string = [[RangedString alloc] initWithString:@"today is a good day, and i'm really happy."];
   
-  RangedString* sub1 = [string substringWithRange:NSMakeRange(0, 5)];
-  RangedString* sub2 = [string substringWithRange:NSMakeRange(21, 21)];
-  
+  RangedString* sub1 = [string newWithRange:NSMakeRange(0, 5)];
   XCTAssert([[sub1 toNSString] isEqualToString:@"today"]);
-  XCTAssert([[sub2 toNSString] isEqualToString:@"and i'm really happy."]);
   
-  RangedString* sub3 = [sub2 substringWithRange:NSMakeRange(4, 3)];
-  XCTAssert([[sub3 toNSString] isEqualToString:@"i'm"]);
   
+  RangedString* sub2 = [string newWithBegin:6];
+  XCTAssert([[sub2 toNSString] isEqualToString:@"is a good day, and i'm really happy."]);
+  
+  RangedString* sub3 = [string newWithEnd:5];
+  XCTAssert([[sub3 toNSString] isEqualToString:@"today"]);
 }
 
-- (void)testSubStringWillFailWhenRangeOutOfBound {
-  RangedString* str = [[RangedString alloc] initWithString:@"this is a test"];
-  XCTAssertNoThrow([str substringWithRange:NSMakeRange(2, 10)]);
-  XCTAssertThrows([str substringWithRange:NSMakeRange(0, 15)]);
+- (void)testNewSeriesException {
+  RangedString* string = [[RangedString alloc] initWithString:@"today is a good day, and i'm really happy."];
   
-  RangedString* str2 = [str substringWithRange:NSMakeRange(2, 10)];
-  XCTAssert([[str2 toNSString] isEqualToString:@"is is a te"]);
-  XCTAssertThrows([str2 substringWithRange:NSMakeRange(5, 6)]);
-  XCTAssertNoThrow([str2 substringWithRange:NSMakeRange(5, 5)]);
+  XCTAssertThrows([string newWithRange:NSMakeRange(0, 100)]);
+  XCTAssertThrows([string newWithBegin:-1]);
+  XCTAssertNoThrow([string newWithBegin:4]);
+  XCTAssertThrows([string newWithBegin:100]);
+  XCTAssertThrows([string newWithEnd:-1]);
+  XCTAssertNoThrow([string newWithEnd:20]);
+  XCTAssertThrows([string newWithEnd:120]);
 }
 
-
-- (void)testTranslateToGlobalRange {
-  RangedString* str = [[RangedString alloc] initWithString:@"this is a test"];
-  [str translateToGlobalRange:NSMakeRange(0, 14)];
+- (void)testMatches {
+  RangedString* string = [[RangedString alloc] initWithString:@"today is a good day, and i'm really happy."];
   
-  RangedString* str1 = [str substringWithRange:NSMakeRange(4, 9)];
-  XCTAssert([str1 translateToGlobalRange:NSMakeRange(0, 1)].length == 1) ;
-  XCTAssert([str1 translateToGlobalRange:NSMakeRange(0, 1)].location == 4) ;
+  RegularExpressionWrapper* regex = [[RegularExpressionWrapper alloc] initWithPattern:@"today" caseInsensitive:NO isGlobal:YES];
+
+  NSTextCheckingResult* result = [string findFirstMatch:regex];
+  XCTAssert(result != nil);
+  XCTAssert(isSameNSRange(result.range, NSMakeRange(0, 5)));
+  
   
 }
-
 @end

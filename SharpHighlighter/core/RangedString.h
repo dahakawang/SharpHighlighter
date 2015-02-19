@@ -11,12 +11,12 @@
 
 @interface RangedString : NSObject
 - (instancetype)initWithString:(NSString*)str;
-- (RangedString*)substringWithRange:(NSRange)range;
-- (RangedString*)substringFrom:(NSUInteger)start;
-- (RangedString*)substringTo: (NSUInteger)end;
-- (NSRange)translateToGlobalRange: (NSRange)range;
-- (BOOL)findFirstMatch: (RegularExpressionWrapper*) pattern result: (NSRange*)range;
-- (BOOL)findFirstMatch: (RegularExpressionWrapper*) pattern from: (NSUInteger)start result: (NSRange*)range;
+- (RangedString*)newWithRange: (NSRange)range;
+- (RangedString*)newWithBegin:(NSUInteger)begin;
+- (RangedString*)newWithEnd: (NSUInteger)end;
+- (NSRange)toNSRange;
 - (NSString*)toNSString;
-- (NSUInteger)length;
+
+- (NSTextCheckingResult*)findFirstMatch: (RegularExpressionWrapper*) pattern;
+- (NSArray*)findMatches: (RegularExpressionWrapper*) pattern;
 @end

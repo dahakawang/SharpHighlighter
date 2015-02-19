@@ -14,6 +14,8 @@
   NSRange _range;
 }
 
+
+
 - (instancetype)initWithString:(NSString*)str {
   if (self=[super init]) {
     _backend = str;
@@ -22,89 +24,90 @@
   return self;
 }
 
+
+
 - (instancetype)initWithString:(NSString*)str andRange:(NSRange)range {
   if (self=[super init]) {
     _backend = str;
+    [self ensureRange:range];
     _range = range;
   }
   return self;
 }
 
-- (NSRange)convertToInternal:(NSRange)external {
-  NSRange internal = NSMakeRange(_range.location + external.location, external.length);
-  
-  if (internal.location+internal.length > _range.location+_range.length) {
-    @throw NSRangeException;
-  }
-  return internal;
+
+
+- (RangedString*)newWithRange: (NSRange)range {
+  return [[RangedString alloc] initWithString:_backend andRange:range];
 }
 
-- (NSRange)convertToExternal:(NSRange)internal {
-  NSRange external = NSMakeRange(internal.location-_range.location, internal.length);
-  
-  NSAssert(internal.location >= _range.location && internal.location+internal.length<=_range.location+_range.length, @"invalid internal range");
-  return external;
-}
 
-- (RangedString*)substringWithRange: (NSRange)range {
-  NSRange newRange = [self convertToInternal:range];
-  
-  return [[RangedString alloc] initWithString:_backend andRange:newRange];
-}
 
-- (RangedString*)substringFrom:(NSUInteger)start {
-  NSRange newRange = [self convertToInternal:NSMakeRange(start, _range.length-start)];
-  
-  return [[RangedString alloc] initWithString:_backend andRange:newRange];
-}
-
-- (RangedString*)substringTo: (NSUInteger)end {
-  NSRange newRange = [self convertToInternal:NSMakeRange(0, end+1)];
+- (RangedString*)newWithBegin:(NSUInteger)start {
+  [self ensureWithinCurrentRange:start];
+  NSRange newRange = NSMakeRange(_range.location + start, _range.location+_range.length-start);
   
   return [[RangedString alloc] initWithString:_backend andRange:newRange];
 }
 
 
-- (BOOL)findFirstMatch: (RegularExpressionWrapper*) pattern  result: (NSRange*)range {
-  NSTextCheckingResult* result = [pattern firstMatchInString:_backend range:_range];
-  if (result == nil) {
-    return NO;
-  } else {
-    *range = [self convertToExternal:result.range];
-    return YES;
-  }
-}
 
-- (BOOL)findFirstMatch: (RegularExpressionWrapper*) pattern from: (NSUInteger)start  result: (NSRange*)range {
-  NSRange newRange = [self convertToInternal:NSMakeRange(_range.location + start, _range.length - start)];
+- (RangedString*)newWithEnd: (NSUInteger)end {
+  [self ensureWithinCurrentRange:end];
+  NSRange newRange = NSMakeRange(_range.location, end - _range.location);
   
-  NSTextCheckingResult* result = [pattern firstMatchInString:_backend range:newRange];
-  if (result == nil) {
-    return NO;
-  } else {
-    *range = [self convertToExternal:result.range];
-    return YES;
-  }
+  return [[RangedString alloc] initWithString:_backend andRange:newRange];
 }
 
-- (NSRange)translateToGlobalRange: (NSRange)range {
-  return [self convertToInternal:range];
+
+
+- (NSTextCheckingResult*)findFirstMatch: (RegularExpressionWrapper*) pattern {
+  return [pattern firstMatchInString:_backend range:_range];
 }
 
-- (NSUInteger)length {
-  return _range.length;
+
+
+- (NSArray*)findMatches: (RegularExpressionWrapper*) pattern {
+  return [pattern matchText:_backend inRange:_range];
 }
+
+
+
+- (NSString*)toNSString {
+  return [_backend substringWithRange:_range];
+}
+
+
+
+- (NSRange)toNSRange {
+  return _range;
+}
+
+
 
 - (NSString*)description {
   return [self toNSString];
 }
 
+
+
 - (NSString*)debugDescription {
   return [NSString stringWithFormat:@"[%lu,%lu]%@", (unsigned long)_range.location, _range.length, [self toNSString]];
 }
 
-- (NSString*)toNSString {
-  return [_backend substringWithRange:_range];
+
+
+- (void)ensureRange:(NSRange)range {
+  if (range.location + range.length > _backend.length) {
+    @throw NSRangeException;
+  }
+}
+
+
+- (void)ensureWithinCurrentRange:(NSUInteger)point {
+  if (point < _range.location || point >= _range.location+_range.length) {
+    @throw NSRangeException;
+  }
 }
 
 @end
