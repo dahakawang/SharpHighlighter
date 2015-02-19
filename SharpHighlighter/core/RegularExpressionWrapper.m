@@ -95,6 +95,10 @@
   return [_regex matchesInString:aText options:0 range:range];
 }
 
+- (NSTextCheckingResult*)firstMatchInString:(NSString *)aText range: (NSRange)range {
+  return [_regex firstMatchInString:aText options:0 range:range];
+}
+
 - (BOOL)isMatchingText: (NSString*)aText {
   NSRange textRange = NSMakeRange(0, [aText length]);
   NSTextCheckingResult* result = [_regex firstMatchInString:aText options:0 range:textRange];
