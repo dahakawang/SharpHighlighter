@@ -142,14 +142,14 @@
 
 - (void)ensureRange:(NSRange)range {
   if (range.location + range.length > _backend.length) {
-    @throw NSRangeException;
+    @throw [NSException exceptionWithName:NSRangeException reason:@"out of range" userInfo:NULL];
   }
 }
 
 
 - (void)ensureWithinCurrentRange:(NSUInteger)point {
   if (point < _range.location || point >= _range.location+_range.length) {
-    @throw NSRangeException;
+    @throw [NSException exceptionWithName:NSRangeException reason:@"out of range" userInfo:NULL];
   }
 }
 
