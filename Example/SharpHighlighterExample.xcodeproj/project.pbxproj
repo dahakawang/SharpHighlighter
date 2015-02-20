@@ -13,6 +13,7 @@
 		63905BDB1A6D649A00EB123F /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63905BDA1A6D649A00EB123F /* Images.xcassets */; };
 		63905BDE1A6D649B00EB123F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 63905BDC1A6D649B00EB123F /* Main.storyboard */; };
 		639F2D0A1A6FDAF6005B1C1C /* SelectorMatcherTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 639F2D091A6FDAF6005B1C1C /* SelectorMatcherTest.m */; };
+		63B885431A95D54A004968F3 /* RangedStringTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 63B885421A95D54A004968F3 /* RangedStringTest.m */; };
 		FCAAB30E505F88E3F565C0E7 /* libPods-SharpHighlighterExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 21CEC1E8C4BD15BC1CE8E51F /* libPods-SharpHighlighterExample.a */; };
 /* End PBXBuildFile section */
 
@@ -41,6 +42,7 @@
 		63905BE31A6D649B00EB123F /* SharpHighlighterExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SharpHighlighterExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		63905BE81A6D649B00EB123F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		639F2D091A6FDAF6005B1C1C /* SelectorMatcherTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SelectorMatcherTest.m; path = ../../Test/theme/SelectorMatcherTest.m; sourceTree = "<group>"; };
+		63B885421A95D54A004968F3 /* RangedStringTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RangedStringTest.m; path = ../../Test/Core/RangedStringTest.m; sourceTree = "<group>"; };
 		F7FEA4B0D6537B4A8046E389 /* Pods-SharpHighlighterExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SharpHighlighterExample.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SharpHighlighterExample/Pods-SharpHighlighterExample.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -109,6 +111,7 @@
 		63905BE61A6D649B00EB123F /* SharpHighlighterExampleTests */ = {
 			isa = PBXGroup;
 			children = (
+				63B885411A95D4FD004968F3 /* Core */,
 				639F2D081A6FDA8C005B1C1C /* Theme */,
 				63905BE71A6D649B00EB123F /* Supporting Files */,
 			);
@@ -129,6 +132,14 @@
 				639F2D091A6FDAF6005B1C1C /* SelectorMatcherTest.m */,
 			);
 			name = Theme;
+			sourceTree = "<group>";
+		};
+		63B885411A95D4FD004968F3 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				63B885421A95D54A004968F3 /* RangedStringTest.m */,
+			);
+			name = Core;
 			sourceTree = "<group>";
 		};
 		6DEA6B313AAB16AA77258909 /* Frameworks */ = {
@@ -293,6 +304,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				639F2D0A1A6FDAF6005B1C1C /* SelectorMatcherTest.m in Sources */,
+				63B885431A95D54A004968F3 /* RangedStringTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

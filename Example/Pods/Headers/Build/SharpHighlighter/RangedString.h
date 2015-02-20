@@ -1,0 +1,1 @@
+../../../../../SharpHighlighter/core/RangedString.h
