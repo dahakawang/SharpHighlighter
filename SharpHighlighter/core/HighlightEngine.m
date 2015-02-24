@@ -125,8 +125,12 @@ static HighlightAction* makeAction(NSRange range, NSArray* modeStack, NSString* 
     nextKeyWordIndex = nextModeProcessIndex; //Index catch up with each other
   }
   
-  /* we should never reatch here */
-  @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:@"" userInfo:NULL];
+  // Mode should be ended by lexeme so we never retches here
+  // Unless it's a top level mode, which dosen't have end lexeme
+  if (![self isCurrentRootMode:modeStack]){
+    @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:[NSString stringWithFormat:@"mode dose not end properly(%@)", [self getModeDesc: modeStack ] ] userInfo:NULL];
+  }
+  return NSMakeRange(nextModeProcessIndex, 0);
 }
 
 #pragma mark Process and adding actions
@@ -335,6 +339,11 @@ static HighlightAction* makeAction(NSRange range, NSArray* modeStack, NSString* 
 - (BOOL)isAnIlllegalLexeme: (NSString*)lexeme mode: (NSDictionary*)currentMode {
   RegularExpressionWrapper* regex = currentMode[SHL_ILLEGAL_RE_KEY];
   return [regex isMatchingText:lexeme];
+}
+
+
+- (NSString*)getModeDesc: (NSArray*)modeStack {
+  return @"";
 }
 
 @end
