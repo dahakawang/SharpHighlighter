@@ -34,7 +34,7 @@
     NSArray* actions = [engine highlightText:sourceCode withGrammar:grammar ignoreIllegal:NO];
     
     
-    Theme* theme = [[Theme alloc] initWithFile:@"/Users/david/work/Project/highlight.js/xcode.theme"];
+    Theme* theme = [[Theme alloc] initWithFile:@"/Users/david/work/Project/TMHighlighter/TMHighlighter/lib/Theme/xcode.theme"];
     
     AttributedStringRenderer* renderer = [[AttributedStringRenderer alloc] init];
     NSAttributedString* highlightedStr =  [renderer renderString:sourceCode withTheme:theme action:actions];
