@@ -63,7 +63,7 @@
       "end": "$",
       "contains": [
         {
-          "className": "title",
+          "className": "include",
           "variants": [
             {
               "begin": "\"",
@@ -93,7 +93,7 @@
       ]
     },
     {
-      "className": "variable",
+      "className": "property",
       "begin": "\\.[a-zA-Z_][a-zA-Z0-9_]*",
       "relevance": 0
     }
