@@ -1,6 +1,6 @@
 {
   "name": "objectivec",
-  "aliases": [ "mm", "m", "h"],
+  "aliases": [ "m", "mm", "h"],
   "keywords": {
     "keyword": "int float while char export sizeof typedef const struct for union unsigned long volatile static bool mutable if do return goto void enum else break extern asm case short default double register explicit signed typename this switch continue wchar_t inline readonly assign readwrite self @synchronized id typeof nonatomic super unichar IBOutlet IBAction strong weak copy in out inout bycopy byref oneway __strong __weak __block __autoreleasing @private @protected @public @try @property @end @throw @catch @finally @autoreleasepool @synthesize @dynamic @selector @optional @required",
     "literal": "false true FALSE TRUE nil YES NO NULL",
@@ -17,26 +17,38 @@
     {
       "className": "comment",
       "begin": "/\\*",
-      "end": "\\*/",
-      "contains": [
-        "self"
-      ]
+      "end": "\\*/"
     },
     {
       "className": "number",
       "begin": "(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",
       "relevance": 0
     },
+
     {
       "className": "string",
       "variants": [
         {
           "begin": "\"",
-          "end": "\""
-        }
+          "end": "\"",
+          "illegal": "\\n",
+          "contains": [
+            {
+              "begin": "\\\\[\\s\\S]",
+              "relevance": 0
+            }
+          ]
+        },
         {
           "begin": "@\"",
           "end": "\"",
+          "illegal": "\\n",
+          "contains": [
+            {
+              "begin": "\\\\[\\s\\S]",
+              "relevance": 0
+            }
+          ]
         },
         {
           "begin": "'",
