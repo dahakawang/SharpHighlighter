@@ -59,7 +59,7 @@
     },
     {
       "className": "preprocessor",
-      "begin": "#",
+      "begin": "#include|#import",
       "end": "$",
       "contains": [
         {
@@ -67,11 +67,52 @@
           "variants": [
             {
               "begin": "\"",
-              "end": "\""
+              "end": "\"",
             },
             {
               "begin": "<",
               "end": ">"
+            }
+          ]
+        },
+        {
+          "className": "comment",
+          "begin": "//",
+          "end": "$",
+          "contains": [
+            {
+              "begin": "\\b(a|an|the|are|I|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such)\\b"
+            },
+            {
+              "className": "label",
+              "begin": "XXX",
+              "end": "$",
+              "endsWithParent": true,
+              "relevance": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "className": "preprocessor",
+      "begin": "#",
+      "end": "$",
+      "contains": [
+        {
+          "className": "comment",
+          "begin": "//",
+          "end": "$",
+          "contains": [
+            {
+              "begin": "\\b(a|an|the|are|I|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such)\\b"
+            },
+            {
+              "className": "label",
+              "begin": "XXX",
+              "end": "$",
+              "endsWithParent": true,
+              "relevance": 0
             }
           ]
         }
