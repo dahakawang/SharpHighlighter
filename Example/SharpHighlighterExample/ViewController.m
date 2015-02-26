@@ -18,7 +18,7 @@
 
 - (void)viewDidLoad {
   [super viewDidLoad];
-  NSString* name = @"objectivec";
+  NSString* name = @"cpp";
   
   @try {
     NSString* sourceCode = [NSString stringWithContentsOfFile: [NSString stringWithFormat:@"/Users/david/work/Project/TMHighlighter/TMHighlighter/lib/Test/fixture/detect/%@/default.txt", name] encoding:NSUTF8StringEncoding error:NULL];
