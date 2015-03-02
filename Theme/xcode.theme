@@ -3,7 +3,8 @@
   font-family: Courier
 }
 
-.comment {
+.comment,
+.javadoc {
   color: #007900;
 }
 
