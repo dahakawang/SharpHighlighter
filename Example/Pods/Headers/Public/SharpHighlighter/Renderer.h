@@ -1,1 +1,0 @@
-../../../../../SharpHighlighter/renderer/Renderer.h

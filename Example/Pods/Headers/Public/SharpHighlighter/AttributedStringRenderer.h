@@ -1,1 +1,0 @@
-../../../../../SharpHighlighter/renderer/attributed_string/AttributedStringRenderer.h

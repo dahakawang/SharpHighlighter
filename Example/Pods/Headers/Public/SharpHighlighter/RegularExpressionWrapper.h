@@ -1,1 +1,0 @@
-../../../../../SharpHighlighter/core/RegularExpressionWrapper.h
