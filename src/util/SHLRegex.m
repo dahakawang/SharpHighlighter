@@ -65,7 +65,7 @@
 
 - (NSString*)translateErrorMessage: (NSInteger)code errInfo:(OnigErrorInfo*)errInfo {
   int length = 0;
-  OnigUChar* buffer = malloc(ONIG_MAX_ERROR_MESSAGE_LEN);
+  OnigUChar buffer[ONIG_MAX_ERROR_MESSAGE_LEN];
   
   if (errInfo != nil){
       length = onig_error_code_to_str(buffer, code, errInfo);
@@ -75,7 +75,6 @@
   
   NSString* errorMessage = [NSString stringWithCString:(char*)buffer encoding:NSASCIIStringEncoding];
 
-  free(buffer);
   return errorMessage;
 }
 @end
