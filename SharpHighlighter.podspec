@@ -35,6 +35,10 @@ Pod::Spec.new do |s|
 	util.source_files = "src/util/**/*.{h,m}"
   end
 
+  s.subspec 'core' do |util|
+	util.source_files = "src/core/**/*.{h,m}"
+  end
+
   s.subspec 'Onigmo' do |oni|
   	oni.public_header_files = "vendor/Onigmo/include"
 	oni.vendored_libraries = "vendor/Onigmo/lib/libonig.a"
