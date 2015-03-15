@@ -1,0 +1,11 @@
+---
+- name: C
+  extension: [.c, .h]
+  definition: c.tmbundle/Syntaxes/C.plist
+  dependency: c.tmbundle/Syntaxes/Platform.tmLanguage
+
+- name: C++
+  extension: [.cpp, .c++, .cc, .cp, .cxx, .h, .h++, .hh, .hpp, .hxx, .inl, .ipp, .tcc, .tpp]
+  definition: c.tmbundle/Syntaxes/C++.plist
+  dependency: c.tmbundle/Syntaxes/Platform.tmLanguage
+
