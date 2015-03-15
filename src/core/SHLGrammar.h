@@ -7,7 +7,31 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SHLRegex.h"
 
-@interface Grammar : NSObject
+@interface SHLScope : NSObject
+@property (nonatomic) NSString* name;
+@property (nonatomic) NSMutableArray* patterns;
+@property (nonatomic) SHLRegex* terminators;
+
+@end
+
+@interface SHLGrammar : SHLScope
+@property (nonatomic) NSString* title;
+@property (nonatomic) NSMutableArray* extensions;
+@property (nonatomic) SHLRegex* foldingStart;
+@property (nonatomic) SHLRegex* foldingStop;
+@property (nonatomic) NSMutableArray* repository;
+
+@end
+
+@interface SHLGrammarRule : SHLScope
+@property (nonatomic) NSString* contentName;
+@property (nonatomic) SHLRegex* match;
+@property (nonatomic) NSMutableArray* captures;
+@property (nonatomic) SHLRegex* begin;
+@property (nonatomic) NSMutableArray* beginCaptures;
+@property (nonatomic) SHLRegex* end;
+@property (nonatomic) NSMutableArray* endCaptures;
 
 @end

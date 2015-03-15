@@ -6,8 +6,20 @@
 //  Copyright (c) 2015 maxtrixcube. All rights reserved.
 //
 
-#import "Grammar.h"
+#import "SHLGrammar.h"
 
-@implementation Grammar
+@implementation SHLScope
 
 @end
+
+
+@implementation SHLGrammar
+
+@end
+
+
+@implementation SHLGrammarRule
+
+@end
+
+
