@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #include <oniguruma.h>
 
-#define SHLREGEX_DOMAIN @"SHLRegex"
+#define SHLREGEX_DOMAIN @"net.davidvoid.SharpHighlighter.SHLRegex"
 #define SHLREGEX_RUNTIME_ERROR_CODE 1
 #define SHLREGEX_INVALID_CHAR 2
 #define SHLREGEX_ONI_ERROR 3
