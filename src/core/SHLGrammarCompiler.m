@@ -8,6 +8,24 @@
 
 #import "SHLGrammarCompiler.h"
 
+
+#define SHL_SCOPE_NAME_KEY @"scopeName"
+#define SHL_FILE_TYPES_KEY @"fileTypes"
+#define SHL_FOLD_START_KEY @"foldingStartMarker"
+#define SHL_FOLD_STOP_KEY @"foldingStopMarker"
+#define SHL_PATTERNS_KEY @"patterns"
+#define SHL_REPOSITORY_KEY @"repository"
+#define SHL_NAME_KEY @"name"
+#define SHL_MATCH_KEY @"match"
+#define SHL_BEGIN_KEY @"begin"
+#define SHL_END_KEY @"end"
+#define SHL_CONTENT_NAME_KEY @"contentName"
+#define SHL_CAPTURE_KEY @"captures"
+#define SHL_BEGIN_CAPTURE_KEY @"beginCaptures"
+#define SHL_END_CAPTURE_KEY @"endCaptures"
+#define SHL_INCLUDE_KEY @"include"
+
+
 @implementation SHLGrammarCompiler
 
 - (SHLGrammar*)compile:(NSString *)jsonString error:(NSError *__autoreleasing *)error {
