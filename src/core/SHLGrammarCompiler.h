@@ -11,6 +11,7 @@
 
 #define SHLGRAMMARCOMPILER_DOMAIN @"net.davidvoid.SharpHighlighter.SHLGrammarCompiler"
 #define SHLGRAMMARCOMPILER_INVALID_JSON 1
+#define SHLGRAMMARCOMPILER_INVALID_REGEX 2
 
 @interface SHLGrammarCompiler : NSObject
 - (SHLGrammar*)compile: (NSString*)jsonString error: (NSError**)error;
