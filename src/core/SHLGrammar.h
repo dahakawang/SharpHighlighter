@@ -13,6 +13,7 @@
 @property (nonatomic) NSString* name;
 @property (nonatomic) NSMutableArray* patterns;
 @property (nonatomic) SHLRegex* terminators;
+@property (nonatomic) BOOL compiled;
 
 @end
 
@@ -21,7 +22,7 @@
 @property (nonatomic) NSMutableArray* extensions;
 @property (nonatomic) SHLRegex* foldingStart;
 @property (nonatomic) SHLRegex* foldingStop;
-@property (nonatomic) NSMutableDictionary* repository;
+@property (nonatomic) NSDictionary* repository;
 
 @end
 
