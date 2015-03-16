@@ -21,7 +21,7 @@
 @property (nonatomic) NSMutableArray* extensions;
 @property (nonatomic) SHLRegex* foldingStart;
 @property (nonatomic) SHLRegex* foldingStop;
-@property (nonatomic) NSMutableArray* repository;
+@property (nonatomic) NSMutableDictionary* repository;
 
 @end
 
