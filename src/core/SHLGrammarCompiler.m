@@ -7,6 +7,7 @@
 //
 
 #import "SHLGrammarCompiler.h"
+#import "SHLFantomObject.h"
 
 
 #define SHL_SCOPE_NAME_KEY @"scopeName"
@@ -77,10 +78,10 @@
   
   
   for (SHLScope* scope in grammar.repository) {
-    [self processScope:scope error:error];
+    [self processScope:scope grammar:grammar error:error];
     if (error != nil) return nil;
   }
-  [self processScope:grammar error:error];
+  [self processScope:grammar grammar:grammar error:error];
   
   return grammar;
 }
@@ -101,6 +102,11 @@
 
 - (SHLGrammarRule*)compileRule: (NSDictionary*)map error:(NSError**)error {
   SHLGrammarRule* rule = [[SHLGrammarRule alloc] init];
+  
+  if (map[SHL_INCLUDE_KEY] != nil) {
+    rule.include = map[SHL_INCLUDE_KEY];
+    return rule;
+  }
   rule.name = map[SHL_NAME_KEY];
   rule.contentName = map[SHL_CONTENT_NAME_KEY];
   rule.match = [self compileRegex:map[SHL_MATCH_KEY] error:error];
@@ -143,8 +149,34 @@
   
 }
 
-- (void)processScope: (SHLScope*)scope error: (NSError**)error {
+- (void)processScope: (SHLScope*)scope grammar: (SHLGrammar*)grammar error: (NSError**)error {
+  if (scope.compiled) return;
   
+  for (int idx = 0; idx < [scope.patterns count]; idx++) {
+    SHLFantomObject* weak_wrapper = [self resolveInclude: scope.patterns[idx] parent: scope grammar: grammar];
+    if (weak_wrapper != nil) scope.patterns[idx] = weak_wrapper;
+  }
+  
+  //TODO compile terminators
+}
+
+- (SHLFantomObject*)resolveInclude: (SHLScope*)patterns parent:(SHLScope*)parent grammar:(SHLGrammar*)grammar {
+  if (patterns.include == nil) return nil; // this is not a include rule
+  
+  if ([patterns.include isEqualToString:@"$self"]) {
+    return [[SHLFantomObject alloc] initWithObject:parent];
+    
+  } else if ([patterns.include characterAtIndex:0] == '#') {
+    NSString* repoName = [patterns.include substringFromIndex:1];
+    SHLScope* stockedScope = grammar.repository[repoName];
+    NSAssert(stockedScope != nil, @"reference to a not existed sotcked rule in repository");
+    return [[SHLFantomObject alloc] initWithObject:stockedScope];
+    
+  } else {
+    // TODO return sub language
+    
+    return nil;
+  }
 }
 
 - (void)storeError: (NSError**)error code: (NSInteger)code msg: (NSString*)msg cause: (NSError*)cause {
