@@ -14,6 +14,7 @@
 @property (nonatomic) NSMutableArray* patterns;
 @property (nonatomic) SHLRegex* terminators;
 @property (nonatomic) BOOL compiled;
+@property (nonatomic) NSString* include;
 
 @end
 
