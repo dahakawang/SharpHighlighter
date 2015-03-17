@@ -20,7 +20,7 @@
 
 @interface SHLGrammar : SHLScope
 @property (nonatomic) NSString* title;
-@property (nonatomic) NSMutableArray* extensions;
+@property (nonatomic) NSArray* extensions;
 @property (nonatomic) SHLRegex* foldingStart;
 @property (nonatomic) SHLRegex* foldingStop;
 @property (nonatomic) NSDictionary* repository;
