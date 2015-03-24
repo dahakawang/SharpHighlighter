@@ -110,13 +110,10 @@
   rule.name = map[SHL_NAME_KEY];
   rule.contentName = map[SHL_CONTENT_NAME_KEY];
   rule.match = [self compileRegex:map[SHL_MATCH_KEY] error:error];
-  if (error != nil) return nil;
   rule.captures = map[SHL_CAPTURE_KEY];
   rule.begin = [self compileRegex:map[SHL_BEGIN_KEY] error:error];
-  if (error != nil) return nil;
   rule.beginCaptures = map[SHL_BEGIN_CAPTURE_KEY];
   rule.end = [self compileRegex:map[SHL_END_KEY] error:error];
-  if (error != nil) return nil;
   rule.endCaptures = map[SHL_END_CAPTURE_KEY];
   
   
@@ -137,10 +134,7 @@
   
   NSError* underlyingError = nil;
   SHLRegex* result = [[SHLRegex alloc] initWithPatern:regex option:0 error:&underlyingError];
-  if (result == nil) {
-    [self storeError:error code:SHLGRAMMARCOMPILER_INVALID_REGEX msg:[NSString stringWithFormat:@"the pattern (%@) is not a valid regular expression", regex] cause:underlyingError];
-    return nil;
-  }
+  NSAssert(result != nil, @"invalid pattern encountered");
   
   return result;
 }
