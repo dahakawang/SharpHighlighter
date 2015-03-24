@@ -1,0 +1,3 @@
+[submodule "vendor/Onigmo/vendor"]
+    path = vendor/Onigmo/vendor
+    url = https://github.com/textmate/Onigmo.git
