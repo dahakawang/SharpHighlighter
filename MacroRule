@@ -6,4 +6,4 @@ CXXFLAGS	=	-g -std=c++1y -fvisibility=hidden -stdlib=libc++ -pipe -fPIC -gdwarf-
 LIB			= 	-L $(ROOT)/vendor/lib
 INCLUDE		=	-I $(ROOT)/vendor/textmate/build/include \
 				-I $(ROOT)/vendor/textmate/Shared/include
-LINKFLAG    = -liconv -ltm -framework CoreFoundation -framework Carbon -framework Security
+LINKFLAG    = -lOnigmo -liconv -ltm -framework CoreFoundation -framework Carbon -framework Security
