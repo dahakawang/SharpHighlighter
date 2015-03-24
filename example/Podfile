@@ -1,9 +1,0 @@
-source 'https://github.com/CocoaPods/Specs.git'
-
-target 'SharpHighlighter', :exclusive => true do
-  pod "SharpHighlighter", :path => "../"
-end
-
-target 'SharpHighlighterTests', :exclusive => true do
-  pod "SharpHighlighter", :path => "../"
-end
