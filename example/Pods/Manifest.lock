@@ -1,0 +1,20 @@
+PODS:
+  - SharpHighlighter (0.1.0):
+    - SharpHighlighter/core (= 0.1.0)
+    - SharpHighlighter/Onigmo (= 0.1.0)
+    - SharpHighlighter/util (= 0.1.0)
+  - SharpHighlighter/core (0.1.0)
+  - SharpHighlighter/Onigmo (0.1.0)
+  - SharpHighlighter/util (0.1.0)
+
+DEPENDENCIES:
+  - SharpHighlighter (from `../`)
+
+EXTERNAL SOURCES:
+  SharpHighlighter:
+    :path: ../
+
+SPEC CHECKSUMS:
+  SharpHighlighter: dc3e7c692a0dc25a047d066c3afd8e856d14857e
+
+COCOAPODS: 0.35.0
