@@ -1,0 +1,3 @@
+[submodule "vendor/Onigmo"]
+	path = vendor/Onigmo
+	url = https://github.com/dahakawang/Onigmo.git
