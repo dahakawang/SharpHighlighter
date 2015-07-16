@@ -21,12 +21,12 @@ public:
 
     wstring include;
     wstring begin;
-    map<wstring, map<wstring, wstring>> begin_captures;
+    map<wstring, map<wstring, wstring> > begin_captures;
     wstring end;
-    map<wstring, map<wstring, wstring>> end_captures;
+    map<wstring, map<wstring, wstring> > end_captures;
     wstring content_name;
     wstring match;
-    map<wstring, map<wstring, wstring>> captures;
+    map<wstring, map<wstring, wstring> > captures;
 };
 
 }
