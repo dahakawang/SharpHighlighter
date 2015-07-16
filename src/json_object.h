@@ -3,7 +3,9 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
+using std::vector;
 using std::wstring;
 using std::map;
 
