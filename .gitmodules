@@ -1,3 +1,6 @@
 [submodule "vendor/Onigmo"]
 	path = vendor/Onigmo
 	url = https://github.com/dahakawang/Onigmo.git
+[submodule "vendor/json-parser"]
+	path = vendor/json-parser
+	url = git@github.com:dahakawang/json-parser.git
