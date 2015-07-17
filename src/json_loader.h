@@ -17,9 +17,7 @@ public:
     JsonObject load(const string& json);
 
 private:
-    static void process_toplevel(JsonObject& root, json_value* value);
-    static void for_fields(json_value* value, function<void(const string&, json_value*)> process);
-    
+    static void process_toplevel(JsonObject& root, const json_value* value);
 };
 
 }
