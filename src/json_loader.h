@@ -1,6 +1,7 @@
 #ifndef _JSON_LOADER_
 #define _JSON_LOADER_
 
+#include <json.h>
 #include <string>
 #include <functional>
 
