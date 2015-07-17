@@ -84,4 +84,8 @@ void JsonLoader::process_toplevel(JsonObject& root, const json_value* value) {
     });
 }
 
+void process(JsonObject& root, const json_value* value) {
+    
+}
+
 }
