@@ -3,4 +3,4 @@
 	url = https://github.com/dahakawang/Onigmo.git
 [submodule "vendor/json-parser"]
 	path = vendor/json-parser
-	url = git@github.com:dahakawang/json-parser.git
+	url = https://github.com/dahakawang/json-parser.git
