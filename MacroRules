@@ -1,5 +1,5 @@
 CC=g++
 CFLAGS=-g -std=c++11
-INCLUDE_PATH=-I$(ROOT)/vendor/json-parser
+INCLUDE_PATH=-I$(ROOT)/vendor/json-parser -I$(ROOT)/vendor/utf8-cpp/source
 LIB_PATH=-L$(ROOT)/vendor/json-parser
 LIBS=-ljsonparser
