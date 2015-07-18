@@ -96,6 +96,8 @@ void JsonLoader::process(JsonObject& root, const json_value* value) {
 
     for_fields(value, [&root](const string& key, const json_value* value){
         if (key == "include") {
+            ensure_string(value, "include should be a string");
+            root.include = get_string(value);
 
         } else if (key == "scopeName") {
             ensure_string(value, "scopeName should be a string");
@@ -112,8 +114,23 @@ void JsonLoader::process(JsonObject& root, const json_value* value) {
             root.name = get_string(value);
 
         } else if (key == "patterns") {
+            ensure_array(value, "patterns should be an array");
+            for_each(value, [&root](const json_value* value) {
+                ensure_object(value, "patterns can only contains objects");
+                JsonObject pattern;
+                process(pattern, value);
+                root.patterns.push_back(pattern);
+            });
             
-        } else if (key == "reporitory") {
+        } else if (key == "repository") {
+            ensure_object(value, "repository should be a key-value map");
+            for_fields(value, [&root](const string& key, const json_value* value){
+                ensure_object(value, "repository item can only be an object");
+                JsonObject repo_item;
+                process(repo_item, value);
+                root.repository[to_wide(key)] = repo_item;
+            });
+
         } else if (key == "match") {
             ensure_string(value, "match should be a regex");
             root.match = get_string(value);
