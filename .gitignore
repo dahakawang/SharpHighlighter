@@ -3,3 +3,5 @@ UserInterfaceState.xcuserstate
 xcuserdata
 grammar
 *.o
+tags
+src/run
