@@ -21,6 +21,8 @@ struct Range {
 
     Range(int pos, int len):position(pos), length(len) {};
     Range():position(0),length(0) {};
+
+    string substr(const string& str) { return str.substr(position, length); };
 };
 
 class Match {
@@ -29,6 +31,7 @@ public:
 
     Match(shared_ptr<OnigRegion> region, shared_ptr<regex_t> regex, const string& target);
     bool operator==(const Match& lh) const;
+    bool operator!=(const Match& lh) const { return !(*this == lh); };
     Range operator[](int capture_index) const;
     Range operator[](const string& name) const;
 
