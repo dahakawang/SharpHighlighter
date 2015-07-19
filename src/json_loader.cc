@@ -41,32 +41,24 @@ static void for_each(const json_value* value, function<void(const json_value*)> 
     }
 }
 
-static inline wstring to_wide(const string& utf8) {
-    wstring utf16;
-    utf8::utf8to16(utf8.begin(), utf8.end(), back_inserter(utf16));
 
-    return utf16;
-}
-
-static inline wstring get_string(const json_value* value) {
-    string utf8(value->u.string.ptr);
-    
-    return to_wide(utf8);
+static inline string get_string(const json_value* value) {
+    return value->u.string.ptr;
 }
 
 
-static inline map<wstring, map<wstring, wstring> > get_captures(const json_value* value) {
-    map<wstring, map<wstring, wstring> > capture_list;
+static inline map<string, map<string, string> > get_captures(const json_value* value) {
+    map<string, map<string, string> > capture_list;
 
     for_fields(value, [&capture_list](const string& key, const json_value* value) {
         ensure_object(value, "every capture definition should be an object");
 
-        map<wstring, wstring>  capture;
+        map<string, string>  capture;
         for_fields(value, [&capture](const string& key, const json_value* value) {
-            capture[to_wide(key)] = get_string(value);
+            capture[key] = get_string(value);
         });
 
-        capture_list[to_wide(key)] = capture;
+        capture_list[key] = capture;
     });
     
     return capture_list;
@@ -128,7 +120,7 @@ void JsonLoader::process(JsonObject& root, const json_value* value) {
                 ensure_object(value, "repository item can only be an object");
                 JsonObject repo_item;
                 process(repo_item, value);
-                root.repository[to_wide(key)] = repo_item;
+                root.repository[key] = repo_item;
             });
 
         } else if (key == "match") {
