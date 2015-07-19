@@ -3,6 +3,7 @@
 
 #include "json_object.h"
 #include "json_loader.h"
+#include "regex.h"
 
 using namespace std;
 
@@ -42,6 +43,15 @@ int main() {
     shl::JsonLoader loader;
     shl::JsonObject object = loader.load(buf);
 
+    string target = "TEST 123";
+    shl::Regex regex("\\w+ \\d+");
+    shl::Match m = regex.match(target, 0);
+    if (m != shl::Match::NOT_MATCHED) {
+        cout << m[0].position << m[0].length << endl;
+        cout << m[0].substr(target) << endl;
+    } else {
+        cout << "cannot found" << endl;
+    }
 
     fclose(file);
 
