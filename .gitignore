@@ -5,3 +5,4 @@ grammar
 *.o
 tags
 src/run
+*.swp
