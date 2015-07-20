@@ -12,6 +12,7 @@ public:
     Grammar load(const string& buffer);
     void process(const JsonObject& object, Grammar& grammar);
     void compile_grammar(const JsonObject& root, Grammar& grammar, const JsonObject& object, Pattern& pattern);
+    map<int, string> get_captures(const map<string, map<string, string> > raw_capture);
 
 };
 
