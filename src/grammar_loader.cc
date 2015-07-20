@@ -78,6 +78,9 @@ Pattern* GrammarLoader::find_include(const JsonObject& root, Grammar& grammar, P
     if (include_name == "$self") {
         return &pattern;
 
+    } else if (include_name == "$base") {
+        return &grammar;
+
     // repository reference
     } else if (include_name[0] == '#'){
         string repo_name = include_name.substr(1);
