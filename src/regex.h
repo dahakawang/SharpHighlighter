@@ -45,6 +45,7 @@ private:
 
 class Regex {
 public:
+    Regex() {};
     Regex(const string& regex);
     Regex(const string& regex, OnigOptionType option);
     const string& source() const;
