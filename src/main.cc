@@ -4,6 +4,8 @@
 #include "json_object.h"
 #include "json_loader.h"
 #include "regex.h"
+#include "grammar.h"
+#include "grammar_loader.h"
 
 using namespace std;
 
@@ -40,18 +42,13 @@ int main() {
     buffer = read_all(file, size);
 
     string buf(buffer, buffer + size);
-    shl::JsonLoader loader;
-    shl::JsonObject object = loader.load(buf);
+    shl::GrammarLoader loader;
+    shl::Grammar g = loader.load(buf);
 
-    string target = "TEST 123";
-    shl::Regex regex("\\w+ \\d+");
-    shl::Match m = regex.match(target, 0);
-    if (m != shl::Match::NOT_MATCHED) {
-        cout << m[0].position << m[0].length << endl;
-        cout << m[0].substr(target) << endl;
-    } else {
-        cout << "cannot found" << endl;
+    for(auto it = g.repository.begin(); it != g.repository.end(); it++) {
+        cout << it->first << endl;
     }
+
 
     fclose(file);
 
