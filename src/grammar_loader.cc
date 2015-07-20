@@ -25,6 +25,10 @@ void GrammarLoader::process(const JsonObject& object, Grammar& grammar) {
 
 void GrammarLoader::compile_grammar(const JsonObject& root, Grammar& grammar, const JsonObject& object, Pattern& pattern) {
     pattern.name = object.name;
+    pattern.patterns = vector<Pattern>(object.patterns.size());
+    for (int idx = 0; idx < pattern.patterns.size(); idx++) {
+        compile_grammar(root, grammar, object.patterns[idx], pattern.patterns[idx]);
+    }
 
     if (!object.include.empty()) {
         Pattern* included = find_include(root, grammar, pattern, object.include);
@@ -38,15 +42,10 @@ void GrammarLoader::compile_grammar(const JsonObject& root, Grammar& grammar, co
         pattern.begin = Regex(object.begin);
         pattern.begin_captures = get_captures(object.begin_captures);
 
-        if(!object.end.empty()) throw InvalidGrammarException("should have end for a begin/end pattern");
+        if(object.end.empty()) throw InvalidGrammarException("should have end for a begin/end pattern");
         pattern.end = Regex(object.end);
         pattern.end_captures = get_captures(object.end_captures);
         pattern.content_name = object.content_name;
-
-        pattern.patterns = vector<Pattern>(object.patterns.size());
-        for (int idx = 0; idx < pattern.patterns.size(); idx++) {
-            compile_grammar(root, grammar, object.patterns[idx], pattern.patterns[idx]);
-        }
     }
 }
 
@@ -81,15 +80,16 @@ Pattern* GrammarLoader::find_include(const JsonObject& root, Grammar& grammar, P
 
     // repository reference
     } else if (include_name[0] == '#'){
+        string repo_name = include_name.substr(1);
         // if the stocked resource is already added, then return the address directly
-        auto stock_res = grammar.repository.find(include_name);
+        auto stock_res = grammar.repository.find(repo_name);
         if (stock_res != grammar.repository.end()) return &stock_res->second;
 
-        auto it = root.repository.find(include_name);
-        if (it == root.repository.end()) throw InvalidGrammarException("can't find the name in repository");
-        grammar.repository[include_name] = Pattern();
-        compile_grammar(root, grammar, it->second, grammar.repository[include_name]);
-        return &grammar.repository[include_name];
+        auto it = root.repository.find(repo_name);
+        if (it == root.repository.end()) throw InvalidGrammarException(string("can't find the name in repository: ") + repo_name);
+        grammar.repository[repo_name] = Pattern();
+        compile_grammar(root, grammar, it->second, grammar.repository[repo_name]);
+        return &grammar.repository[repo_name];
 
     // external grammar reference
     } else {
