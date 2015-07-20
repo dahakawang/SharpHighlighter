@@ -27,7 +27,7 @@ void GrammarLoader::compile_grammar(const JsonObject& root, Grammar& grammar, co
     pattern.name = object.name;
 
     if (!object.include.empty()) {
-        Pattern* included = nullptr;//find_include(object.include);
+        Pattern* included = find_include(root, grammar, pattern, object.include);
         pattern.include = included;
     } else if (!object.match.empty()) {
         pattern.is_match = true;
@@ -42,6 +42,11 @@ void GrammarLoader::compile_grammar(const JsonObject& root, Grammar& grammar, co
         pattern.end = Regex(object.end);
         pattern.end_captures = get_captures(object.end_captures);
         pattern.content_name = object.content_name;
+
+        pattern.patterns = vector<Pattern>(object.patterns.size());
+        for (int idx = 0; idx < pattern.patterns.size(); idx++) {
+            compile_grammar(root, grammar, object.patterns[idx], pattern.patterns[idx]);
+        }
     }
 }
 
@@ -65,7 +70,32 @@ map<int, string> GrammarLoader::get_captures(const map<string, map<string, strin
         string name = to_capture_name(raw_it->second);
     }
 
-
     return captures;
 }
+
+Pattern* GrammarLoader::find_include(const JsonObject& root, Grammar& grammar, Pattern& pattern, const string& include_name) {
+    
+    // self reference
+    if (include_name == "$self") {
+        return &pattern;
+
+    // repository reference
+    } else if (include_name[0] == '#'){
+        // if the stocked resource is already added, then return the address directly
+        auto stock_res = grammar.repository.find(include_name);
+        if (stock_res != grammar.repository.end()) return &stock_res->second;
+
+        auto it = root.repository.find(include_name);
+        if (it == root.repository.end()) throw InvalidGrammarException("can't find the name in repository");
+        grammar.repository[include_name] = Pattern();
+        compile_grammar(root, grammar, it->second, grammar.repository[include_name]);
+        return &grammar.repository[include_name];
+
+    // external grammar reference
+    } else {
+        throw InvalidGrammarException("include another grammar is not supported yet");
+    }
+
+}
+
 }
