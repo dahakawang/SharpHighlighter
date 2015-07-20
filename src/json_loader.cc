@@ -2,6 +2,7 @@
 #include <utf8.h>
 #include <string>
 #include <functional>
+#include <memory>
 #include <iostream>
 
 #include "json_object.h"
@@ -10,6 +11,7 @@
 
 using std::string;
 using std::function;
+using std::shared_ptr;
 
 namespace shl {
 
@@ -65,17 +67,17 @@ static inline map<string, map<string, string> > get_captures(const json_value* v
 }
 
 
-static inline JsonValueGuard parse_json(const string& json) {
+static inline shared_ptr<json_value> parse_json(const string& json) {
     json_value* value = json_parse((const json_char*)json.c_str(), json.size());
     if (value == nullptr) throw InvalidGrammarException("grammar is not a valid json object");
-    return JsonValueGuard(value);
+    return shared_ptr<json_value>(value, [](json_value* ptr) { json_value_free(ptr); });
 }
 
 JsonObject JsonLoader::load(const string& json) {
     ensure_utf8(json);
 
     JsonObject object;
-    JsonValueGuard value = parse_json(json);
+    auto value = parse_json(json); // pointer is protected by shared_ptr
 
     process(object, value.get());
 
