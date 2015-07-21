@@ -22,7 +22,7 @@ public:
 
 private:
     Option _option;
-    void tokenize(const string& text, const Pattern& pattern, const Match& begin_lexeme, stack<const Pattern*>& stack, vector<pair<Range, Scope> >& tokens);
+    Match tokenize(const string& text, const Pattern& pattern, const Match& begin_lexeme, stack<const Pattern*>& stack, vector<pair<Range, Scope> >& tokens);
     bool next_lexeme(const string& text, const Match& begin_lexeme, const Pattern& pattern, const Pattern** found, Match& match);
 };
 

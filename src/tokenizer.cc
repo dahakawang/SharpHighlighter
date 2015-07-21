@@ -70,25 +70,29 @@ bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const
     }
 
     // When no lexeme found
-    if (_option & OPTION_TOLERATE_ERROR == 0) {
-       throw InvalidSourceException("scope not properly closed"); 
-    } else {
+    if (_option & OPTION_TOLERATE_ERROR) {
         *found = nullptr;
         return false;
+    } else {
+       throw InvalidSourceException("scope not properly closed"); 
     }
 }
 
-void Tokenizer::tokenize(const string& text, const Pattern& pattern, const Match& begin_lexeme, stack<const Pattern*>& stack, vector<pair<Range, Scope> >& tokens) {
+Match Tokenizer::tokenize(const string& text, const Pattern& pattern, const Match& begin_lexeme, stack<const Pattern*>& stack, vector<pair<Range, Scope> >& tokens) {
     stack.push(&pattern);
 
     const Pattern* found_pattern;
-    Match match;
+    Match last_lexeme, match;
+    last_lexeme = begin_lexeme;
     while(next_lexeme(text, begin_lexeme, pattern, &found_pattern, match)) {
-        
+
+        last_lexeme = match;
     }
 
 
     stack.pop();
+
+    return last_lexeme;
 }
 
 }
