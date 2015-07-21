@@ -21,6 +21,7 @@ struct Range {
 
     Range(int pos, int len):position(pos), length(len) {};
     Range():position(0),length(0) {};
+    int end() {return position + length;};
 
     string substr(const string& str) { return str.substr(position, length); };
 };
@@ -29,6 +30,7 @@ class Match {
 public:
     static Match NOT_MATCHED;
 
+    Match():_matched(false) {};
     Match(shared_ptr<OnigRegion> region, shared_ptr<regex_t> regex, const string& target);
     bool operator==(const Match& lh) const;
     bool operator!=(const Match& lh) const { return !(*this == lh); };
@@ -39,8 +41,6 @@ private:
     vector<Range> _captures;
     map<string, Range> _named_captures;
     bool _matched;
-
-    Match():_matched(false) {};
 };
 
 class Regex {
@@ -49,6 +49,7 @@ public:
     Regex(const string& regex);
     Regex(const string& regex, OnigOptionType option);
     const string& source() const;
+    bool empty() const { return _source.empty(); };
     Match match(const string& target, int start) const;
 
 private:
