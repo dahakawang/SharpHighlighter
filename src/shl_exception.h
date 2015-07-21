@@ -20,6 +20,11 @@ public:
     explicit InvalidGrammarException(const string& msg):ShlException(msg){};
 };
 
+class InvalidSourceException : public ShlException {
+public:
+    explicit InvalidSourceException(const string& msg):ShlException(msg){};
+};
+
 
 class InvalidRegexException : public ShlException {
 public:
