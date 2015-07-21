@@ -6,6 +6,7 @@
 #include "regex.h"
 #include "grammar.h"
 #include "grammar_loader.h"
+#include "scope.h"
 
 using namespace std;
 
@@ -45,12 +46,10 @@ int main() {
     shl::GrammarLoader loader;
     shl::Grammar g = loader.load(buf);
 
-    for(auto it = g.repository.begin(); it != g.repository.end(); it++) {
-        cout << it->first << endl;
-    }
 
+    shl::Scope s(" a quick dog jump        over   the    dog    ");
+    cout << '\'' <<  s.name() << '\''<< endl;
 
     fclose(file);
 
-        
 }
