@@ -81,4 +81,10 @@ void Regex::init(const string& regex, OnigOptionType option) {
     _source = regex;
 }
 
+Match Match::make_dummy(int position, int length) {
+    Match m;
+    m._matched = true;
+    m._captures.push_back(Range(position, length));
+}
+
 }
