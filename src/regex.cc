@@ -85,6 +85,8 @@ Match Match::make_dummy(int position, int length) {
     Match m;
     m._matched = true;
     m._captures.push_back(Range(position, length));
+
+    return m;
 }
 
 }
