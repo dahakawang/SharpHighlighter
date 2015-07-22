@@ -93,7 +93,7 @@ vector<string> get_name(vector<const Pattern*>& stack, const string& name) {
     return names;
 }
 
-void process_name(vector<pair<Range, Scope> >& tokens, const Range& range, vector<const Pattern*>& stack, const string& name) {
+void Tokenizer::add_scope(vector<pair<Range, Scope> >& tokens, const Range& range, vector<const Pattern*>& stack, const string& name) {
     if (name.empty()) return;
 
     Scope scope(get_name(stack, name));
@@ -104,6 +104,20 @@ inline void append_back(vector<pair<Range, Scope> >& target, const vector<pair<R
     std::move(source.begin(), source.end(), std::back_inserter(target));
 }
 
+void Tokenizer::process_capture(vector<pair<Range, Scope> >& tokens, const Match& match, vector<const Pattern*>& stack, const map<int, string>& capture) {
+    for (auto& pair : capture) {
+        unsigned int capture_num = pair.first;
+        const string& name = pair.second;
+        if (match.size() > capture_num) {
+            add_scope(tokens, match[capture_num], stack, name);
+        } else {
+            if (_option & OPTION_TOLERATE_ERROR == 0) {
+                throw InvalidSourceException("capture number out of range");
+            }
+        }
+    }
+}
+
 Match Tokenizer::tokenize(const string& text, const Pattern& pattern, const Match& begin_lexeme, vector<const Pattern*>& stack, vector<pair<Range, Scope> >& tokens) {
     stack.push_back(&pattern);
 
@@ -112,7 +126,8 @@ Match Tokenizer::tokenize(const string& text, const Pattern& pattern, const Matc
     last_lexeme = begin_lexeme;
     while(next_lexeme(text, begin_lexeme, pattern, &found_pattern, match)) {
         if (found_pattern->is_match_rule) {
-            process_name(tokens, match[0], stack, found_pattern->name);
+            add_scope(tokens, match[0], stack, found_pattern->name);
+            process_capture(tokens, match, stack, found_pattern->captures);
 
         } else {
             vector<pair<Range, Scope> > child_tokens;
@@ -120,11 +135,14 @@ Match Tokenizer::tokenize(const string& text, const Pattern& pattern, const Matc
             Match end_match = tokenize(text, *found_pattern, match, stack, child_tokens);
             
             Range name_range = Range(match[0].position, end_match[0].end() - match[0].position);
-            process_name(tokens, name_range, stack, found_pattern->name);
+            add_scope(tokens, name_range, stack, "");
+            process_capture(tokens, match, stack, found_pattern->begin_captures);
+
             Range content_range = Range(match[0].end(), end_match[0].position - match[0].end());
-            process_name(tokens, content_range, stack, found_pattern->content_name);
+            add_scope(tokens, content_range, stack, found_pattern->content_name);
             
             append_back(tokens, child_tokens);
+            process_capture(tokens, match, stack, found_pattern->end_captures);
             
         }
 
