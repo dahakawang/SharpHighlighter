@@ -1,10 +1,12 @@
 #include <vector>
 #include <utility>
 #include <algorithm>
+#include <functional>
 #include "tokenizer.h"
 #include "shl_exception.h"
 
 using std::stack;
+using std::function;
 
 namespace shl {
 
@@ -16,6 +18,15 @@ vector<pair<Range, Scope> > Tokenizer::tokenize(const Grammar& grammar, const st
     tokenize(text, grammar, Match::make_dummy(0,0), pattern_stack, tokens);
 
     return tokens;
+}
+
+void for_all_subpatterns(const Pattern& root, function<void(const Pattern&)>& callback) {
+    const Pattern& pattern = (root.include != nullptr)? *root.include : root;
+    if (!pattern.begin.empty()) callback(pattern);
+
+    for (auto& pat : pattern.patterns) {
+        for_all_subpatterns(pat, callback);
+    }
 }
 
 /**
