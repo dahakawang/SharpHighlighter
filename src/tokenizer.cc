@@ -1,4 +1,5 @@
-#include <stack>
+#include <vector>
+#include <utility>
 #include "tokenizer.h"
 #include "shl_exception.h"
 
@@ -8,7 +9,7 @@ namespace shl {
 
 vector<pair<Range, Scope> > Tokenizer::tokenize(const Grammar& grammar, const string& text) {
     vector<pair<Range, Scope> > tokens;
-    stack<const Pattern*> pattern_stack;
+    vector<const Pattern*> pattern_stack;
 
     tokens.push_back(std::make_pair(Range(0, text.size()), Scope(grammar.name)));
     tokenize(text, grammar, Match::make_dummy(0,0), pattern_stack, tokens);
@@ -19,8 +20,8 @@ vector<pair<Range, Scope> > Tokenizer::tokenize(const Grammar& grammar, const st
 /**
  * Find the next lexeme iteratively
  *
- * This method find the next lexeme by matching all begin field of its sub-patterns
- * as well as its own end field, whichever comes first will be seleteced
+ * This method find the next lexeme by matching all begin field of the sub-patterns
+ * of current rule, and its own end field, whichever comes first will be seleteced
  *
  * When true returned, found will contain the selected next pattern, and match will hold 
  * the results. When false returned, there are 3 scenarios:
@@ -78,19 +79,42 @@ bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const
     }
 }
 
-Match Tokenizer::tokenize(const string& text, const Pattern& pattern, const Match& begin_lexeme, stack<const Pattern*>& stack, vector<pair<Range, Scope> >& tokens) {
-    stack.push(&pattern);
+vector<string> get_name(vector<const Pattern*>& stack, const string& name) {
+    vector<string> names;
+
+    for(auto pattern : stack) {
+        names.push_back(pattern->name);
+    }
+    names.push_back(name);
+
+    return names;
+}
+
+void add_token(vector<pair<Range, Scope> >& tokens, const Range& range, vector<const Pattern*>& stack, const string& name) {
+    if (name.empty()) return;
+
+    Scope scope(get_name(stack, name));
+    tokens.push_back(std::make_pair(range, scope));
+}
+
+Match Tokenizer::tokenize(const string& text, const Pattern& pattern, const Match& begin_lexeme, vector<const Pattern*>& stack, vector<pair<Range, Scope> >& tokens) {
+    stack.push_back(&pattern);
 
     const Pattern* found_pattern;
     Match last_lexeme, match;
     last_lexeme = begin_lexeme;
     while(next_lexeme(text, begin_lexeme, pattern, &found_pattern, match)) {
+        if (found_pattern->is_match) {
+            add_token(tokens, match[0], stack, found_pattern->name);
+        } else {
+            
+        }
 
         last_lexeme = match;
     }
 
 
-    stack.pop();
+    stack.pop_back();
 
     return last_lexeme;
 }
