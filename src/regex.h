@@ -19,6 +19,7 @@ struct Range {
     int position;
     int length;
 
+    Range(const Range& obj) = default;
     Range(int pos, int len):position(pos), length(len) {};
     Range():position(0),length(0) {};
     int end() {return position + length;};
