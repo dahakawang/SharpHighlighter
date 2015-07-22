@@ -1,3 +1,4 @@
+#include <cctype>
 #include <string>
 #include <vector>
 #include <sstream>
@@ -39,6 +40,24 @@ vector<string> strtok(const string& str) {
     
 Scope::Scope(const string& scope) {
     _scope = strtok(scope);
+}
+
+string trim(const string& str) {
+    const char* s = str.c_str();
+    string::size_type start, end;
+    start = 0;
+    end = str.size();
+
+    while(start < end && isblank(s[start])) start++;
+    while(end > start && isblank(s[end-1])) end--;
+
+    return str.substr(start, end - start);
+}
+
+Scope::Scope(const vector<string>& scope) {
+    for (auto& name : scope) {
+        if(!name.empty()) _scope.push_back(name);
+    }
 }
 
 string Scope::name() const {

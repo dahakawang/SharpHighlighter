@@ -11,7 +11,7 @@ namespace shl {
 
 class Scope {
 public:
-    Scope(const vector<string>& scope):_scope(scope) {};
+    Scope(const vector<string>& scope);
     Scope(const string& scope);
     string name() const;
 
