@@ -111,7 +111,7 @@ void Tokenizer::process_capture(vector<pair<Range, Scope> >& tokens, const Match
         if (match.size() > capture_num) {
             add_scope(tokens, match[capture_num], stack, name);
         } else {
-            if (_option & OPTION_TOLERATE_ERROR == 0) {
+            if ((_option & OPTION_TOLERATE_ERROR) == 0) {
                 throw InvalidSourceException("capture number out of range");
             }
         }
