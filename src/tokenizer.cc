@@ -104,7 +104,7 @@ Match Tokenizer::tokenize(const string& text, const Pattern& pattern, const Matc
     Match last_lexeme, match;
     last_lexeme = begin_lexeme;
     while(next_lexeme(text, begin_lexeme, pattern, &found_pattern, match)) {
-        if (found_pattern->is_match) {
+        if (found_pattern->is_match_rule) {
             add_token(tokens, match[0], stack, found_pattern->name);
         } else {
             

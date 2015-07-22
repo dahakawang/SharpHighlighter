@@ -14,7 +14,7 @@ namespace shl {
 
 class Pattern {
 public:
-    bool is_match;
+    bool is_match_rule;
     string name;
     Regex begin;
     map<int, string> captures;

@@ -34,11 +34,11 @@ void GrammarLoader::compile_grammar(const JsonObject& root, Grammar& grammar, co
         Pattern* included = find_include(root, grammar, pattern, object.include);
         pattern.include = included;
     } else if (!object.match.empty()) {
-        pattern.is_match = true;
+        pattern.is_match_rule = true;
         pattern.begin = Regex(object.match);
         pattern.captures = get_captures(object.captures);
     } else if (!object.begin.empty()) {
-        pattern.is_match = false;
+        pattern.is_match_rule = false;
         pattern.begin = Regex(object.begin);
         pattern.begin_captures = get_captures(object.begin_captures);
 
