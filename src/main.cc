@@ -55,5 +55,8 @@ int main() {
 
     string source = read_file("test/linker_md.c");
 
+    shl::Tokenizer tokenizer;
+    auto tokens = tokenizer.tokenize(g, source);
+
 
 }
