@@ -7,6 +7,7 @@
 #include "grammar.h"
 #include "grammar_loader.h"
 #include "scope.h"
+#include "tokenizer.h"
 
 using namespace std;
 
@@ -34,22 +35,25 @@ char* read_all(FILE* file, int& size) {
     return buffer;
 }
 
-int main() {
-    FILE* file = fopen("test/c.json", "rb");
+string read_file(const string& path) {
+    FILE* file = fopen(path.c_str(), "rb");
     if(file == nullptr) error("error open file");
 
     char* buffer;
     int size;
     buffer = read_all(file, size);
 
-    string buf(buffer, buffer + size);
-    shl::GrammarLoader loader;
-    shl::Grammar g = loader.load(buf);
-
-
-    shl::Scope s(" a quick dog jump        over   the    dog    ");
-    cout << '\'' <<  s.name() << '\''<< endl;
-
     fclose(file);
+    return string(buffer, buffer + size);
+}
+
+
+int main() {
+    string syntax_data = read_file("test/c.json");
+    shl::GrammarLoader loader;
+    shl::Grammar g = loader.load(syntax_data);
+
+    string source = read_file("test/linker_md.c");
+
 
 }
