@@ -39,7 +39,9 @@ bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const
     bool is_close = false;
 
     // first find pattern or end pattern, whichever comes first
-    for (const Pattern& sub_pattern : pattern.patterns) {
+    for (const Pattern& pattern : pattern.patterns) {
+        const Pattern& sub_pattern = (pattern.include == nullptr)? pattern : *pattern.include;
+
         Match tmp = sub_pattern.begin.match(text, pos);
         if (tmp != Match::NOT_MATCHED) {
             if( found_pattern == nullptr || tmp[0].position < first_match[0].position) {
