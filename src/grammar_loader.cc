@@ -26,7 +26,7 @@ void GrammarLoader::process(const JsonObject& object, Grammar& grammar) {
 void GrammarLoader::compile_grammar(const JsonObject& root, Grammar& grammar, const JsonObject& object, Pattern& pattern) {
     pattern.name = object.name;
     pattern.patterns = vector<Pattern>(object.patterns.size());
-    for (int idx = 0; idx < pattern.patterns.size(); idx++) {
+    for (unsigned int idx = 0; idx < pattern.patterns.size(); idx++) {
         compile_grammar(root, grammar, object.patterns[idx], pattern.patterns[idx]);
     }
 
@@ -46,11 +46,13 @@ void GrammarLoader::compile_grammar(const JsonObject& root, Grammar& grammar, co
         pattern.end = Regex(object.end);
         pattern.end_captures = get_captures(object.end_captures);
         pattern.content_name = object.content_name;
+    } else {
+        if (object.patterns.empty()) throw InvalidGrammarException("Empty rule is not alowed");
     }
 }
 
 int to_int(const string& str) {
-    for (int idx = 0; idx < str.size(); idx++) {
+    for (unsigned int idx = 0; idx < str.size(); idx++) {
         if (!isdigit(str[idx])) throw InvalidGrammarException("only numeric capture keys are supported");
     }
     return atoi(str.c_str());
