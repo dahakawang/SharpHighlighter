@@ -1,5 +1,6 @@
 #include <vector>
 #include <utility>
+#include <algorithm>
 #include "tokenizer.h"
 #include "shl_exception.h"
 
@@ -90,11 +91,15 @@ vector<string> get_name(vector<const Pattern*>& stack, const string& name) {
     return names;
 }
 
-void add_token(vector<pair<Range, Scope> >& tokens, const Range& range, vector<const Pattern*>& stack, const string& name) {
+void process_name(vector<pair<Range, Scope> >& tokens, const Range& range, vector<const Pattern*>& stack, const string& name) {
     if (name.empty()) return;
 
     Scope scope(get_name(stack, name));
     tokens.push_back(std::make_pair(range, scope));
+}
+
+inline void append_back(vector<pair<Range, Scope> >& target, const vector<pair<Range, Scope> >& source ) {
+    std::move(source.begin(), source.end(), std::back_inserter(target));
 }
 
 Match Tokenizer::tokenize(const string& text, const Pattern& pattern, const Match& begin_lexeme, vector<const Pattern*>& stack, vector<pair<Range, Scope> >& tokens) {
@@ -105,18 +110,33 @@ Match Tokenizer::tokenize(const string& text, const Pattern& pattern, const Matc
     last_lexeme = begin_lexeme;
     while(next_lexeme(text, begin_lexeme, pattern, &found_pattern, match)) {
         if (found_pattern->is_match_rule) {
-            add_token(tokens, match[0], stack, found_pattern->name);
+            process_name(tokens, match[0], stack, found_pattern->name);
+
         } else {
+            vector<pair<Range, Scope> > child_tokens;
+
+            Match end_match = tokenize(text, *found_pattern, match, stack, child_tokens);
+            
+            Range name_range = Range(match[0].position, end_match[0].end() - match[0].position);
+            process_name(tokens, name_range, stack, found_pattern->name);
+            Range content_range = Range(match[0].end(), end_match[0].position - match[0].end());
+            process_name(tokens, content_range, stack, found_pattern->content_name);
+            
+            append_back(tokens, child_tokens);
             
         }
 
         last_lexeme = match;
     }
 
-
     stack.pop_back();
 
-    return last_lexeme;
+    if ( found_pattern == nullptr) { //see comments for next_lexeme
+        return last_lexeme; 
+    } else {
+        return match; 
+    }
+
 }
 
 }
