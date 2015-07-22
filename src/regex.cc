@@ -38,6 +38,10 @@ Range Match::operator[](const string& name) const {
     return _named_captures.at(name);
 }
 
+unsigned int Match::size() const {
+    return _captures.size();
+}
+
 Regex::Regex(const string& regex) {
     init(regex, ONIG_OPTION_CAPTURE_GROUP);
 }
