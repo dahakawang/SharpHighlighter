@@ -59,7 +59,7 @@ void for_all_subrules(const vector<Pattern>& patterns, function<void(const Patte
  */
 bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const Pattern& pattern, const Pattern** found, Match& match) {
     int pos = begin_lexeme[0].end();
-    const Pattern* found_pattern;
+    const Pattern* found_pattern = nullptr;
     Match first_match;
     bool is_close = false;
 
