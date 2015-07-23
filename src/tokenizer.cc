@@ -77,16 +77,18 @@ bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const
     });
     if (!pattern.end.empty()) {
         Match tmp = pattern.end.match(text, pos);
-        if( found_pattern != nullptr || tmp[0].position < first_match[0].position) {
-            first_match = std::move(tmp); 
-            found_pattern = &pattern;
-            is_close = true;
+        if (tmp != Match::NOT_MATCHED) {
+            if( found_pattern == nullptr || tmp[0].position < first_match[0].position) {
+                first_match = std::move(tmp); 
+                found_pattern = &pattern;
+                is_close = true;
+            }
         }
     }
     if ( found_pattern != nullptr) {
         *found = found_pattern;
         match = first_match;
-        return is_close;
+        return !is_close;
     }
 
     // special handle for toplevel rule
@@ -146,13 +148,14 @@ void Tokenizer::process_capture(vector<pair<Range, Scope> >& tokens, const Match
 Match Tokenizer::tokenize(const string& text, const Pattern& pattern, const Match& begin_lexeme, vector<const Pattern*>& stack, vector<pair<Range, Scope> >& tokens) {
     stack.push_back(&pattern);
 
-    const Pattern* found_pattern;
+    const Pattern* found_pattern = nullptr;
     Match last_lexeme, match;
     last_lexeme = begin_lexeme;
-    while(next_lexeme(text, begin_lexeme, pattern, &found_pattern, match)) {
+    while(next_lexeme(text, last_lexeme, pattern, &found_pattern, match)) {
         if (found_pattern->is_match_rule) {
             add_scope(tokens, match[0], stack, found_pattern->name);
             process_capture(tokens, match, stack, found_pattern->captures);
+            last_lexeme = match;
 
         } else {
             vector<pair<Range, Scope> > child_tokens;
@@ -168,10 +171,8 @@ Match Tokenizer::tokenize(const string& text, const Pattern& pattern, const Matc
             
             append_back(tokens, child_tokens);
             process_capture(tokens, match, stack, found_pattern->end_captures);
-            
+            last_lexeme = end_match;
         }
-
-        last_lexeme = match;
     }
 
     stack.pop_back();
