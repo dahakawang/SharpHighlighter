@@ -6,3 +6,4 @@ grammar
 tags
 src/run
 *.swp
+.syntastic_cpp_config
