@@ -2,11 +2,13 @@
 #include <utility>
 #include <algorithm>
 #include <functional>
+#include <unordered_set>
 #include "tokenizer.h"
 #include "shl_exception.h"
 
 using std::stack;
 using std::function;
+using std::unordered_set;
 
 namespace shl {
 
@@ -20,13 +22,25 @@ vector<pair<Range, Scope> > Tokenizer::tokenize(const Grammar& grammar, const st
     return tokens;
 }
 
-void for_all_subpatterns(const Pattern& root, function<void(const Pattern&)>& callback) {
-    const Pattern& pattern = (root.include != nullptr)? *root.include : root;
-    if (!pattern.begin.empty()) callback(pattern);
+void for_all_subrules(const vector<Pattern>& root, function<void(const Pattern&)> callback, int max_depth) {
+    if (max_depth <= 0) return;
 
-    for (auto& pat : pattern.patterns) {
-        for_all_subpatterns(pat, callback);
+    for (const auto& pattern : root) {
+        const Pattern& pat = (pattern.include != nullptr)? *pattern.include : pattern;
+        if (pattern.begin.empty()) {
+            for_all_subrules(root, callback, max_depth - 1);
+        } else {
+            callback(pat);
+        }
     }
+}
+void for_all_subrules(const vector<Pattern>& patterns, function<void(const Pattern&)> callback) {
+    // Define containing pattern to be below
+    // { patterns: [ {}, {} ] }
+    // it have no match/begin but only patterns
+    // There can't be 2 containing patterns as parent and child
+    // so we set the max_depth to be 2
+    for_all_subrules(patterns, callback, 2);
 }
 
 /**
@@ -50,7 +64,7 @@ bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const
     bool is_close = false;
 
     // first find pattern or end pattern, whichever comes first
-    for (const Pattern& pattern : pattern.patterns) {
+    for_all_subrules(pattern.patterns, [&found_pattern, &first_match, pos, &text](const Pattern& pattern) {
         const Pattern& sub_pattern = (pattern.include == nullptr)? pattern : *pattern.include;
 
         Match tmp = sub_pattern.begin.match(text, pos);
@@ -60,7 +74,7 @@ bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const
                 found_pattern = &sub_pattern;
             }
         }
-    }
+    });
     if (!pattern.end.empty()) {
         Match tmp = pattern.end.match(text, pos);
         if( found_pattern != nullptr || tmp[0].position < first_match[0].position) {
