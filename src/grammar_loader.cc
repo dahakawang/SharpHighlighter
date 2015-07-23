@@ -19,19 +19,19 @@ Grammar GrammarLoader::load(const string& buffer) {
 void GrammarLoader::process(const JsonObject& object, Grammar& grammar) {
     grammar.desc = object.name;
     grammar.file_types = object.file_types;
-    compile_grammar(object, grammar, object, grammar);
+    compile_grammar(object, grammar, object, grammar, nullptr);
     swap(grammar.desc, grammar.name);
 }
 
-void GrammarLoader::compile_grammar(const JsonObject& root, Grammar& grammar, const JsonObject& object, Pattern& pattern) {
+void GrammarLoader::compile_grammar(const JsonObject& root, Grammar& grammar, const JsonObject& object, Pattern& pattern, Pattern* parent) {
     pattern.name = object.name;
     pattern.patterns = vector<Pattern>(object.patterns.size());
     for (unsigned int idx = 0; idx < pattern.patterns.size(); idx++) {
-        compile_grammar(root, grammar, object.patterns[idx], pattern.patterns[idx]);
+        compile_grammar(root, grammar, object.patterns[idx], pattern.patterns[idx], &pattern);
     }
 
     if (!object.include.empty()) {
-        Pattern* included = find_include(root, grammar, pattern, object.include);
+        Pattern* included = find_include(root, grammar, pattern, object.include, parent);
         pattern.include = included;
     } else if (!object.match.empty()) {
         pattern.is_match_rule = true;
@@ -74,14 +74,19 @@ map<int, string> GrammarLoader::get_captures(const map<string, map<string, strin
     return captures;
 }
 
-Pattern* GrammarLoader::find_include(const JsonObject& root, Grammar& grammar, Pattern& pattern, const string& include_name) {
+Pattern* GrammarLoader::find_include(const JsonObject& root, Grammar& grammar, Pattern& pattern, const string& include_name, Pattern* parent) {
     
     // self reference
     if (include_name == "$self") {
-        return &pattern;
-
-    } else if (include_name == "$base") {
         return &grammar;
+
+    // base reference
+    } else if (include_name == "$base") {
+        if ( parent != nullptr) {
+            return parent;
+        } else {
+            throw InvalidGrammarException("a toplevel grammar or toplevel repository item can't included $base");
+        }
 
     // repository reference
     } else if (include_name[0] == '#'){
@@ -93,7 +98,7 @@ Pattern* GrammarLoader::find_include(const JsonObject& root, Grammar& grammar, P
         auto it = root.repository.find(repo_name);
         if (it == root.repository.end()) throw InvalidGrammarException(string("can't find the name in repository: ") + repo_name);
         grammar.repository[repo_name] = Pattern();
-        compile_grammar(root, grammar, it->second, grammar.repository[repo_name]);
+        compile_grammar(root, grammar, it->second, grammar.repository[repo_name], nullptr);
         return &grammar.repository[repo_name];
 
     // external grammar reference
