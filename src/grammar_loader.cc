@@ -25,10 +25,6 @@ void GrammarLoader::process(const JsonObject& object, Grammar& grammar) {
 
 void GrammarLoader::compile_grammar(const JsonObject& root, Grammar& grammar, const JsonObject& object, Pattern& pattern, Pattern* parent) {
     pattern.name = object.name;
-    pattern.patterns = vector<Pattern>(object.patterns.size());
-    for (unsigned int idx = 0; idx < pattern.patterns.size(); idx++) {
-        compile_grammar(root, grammar, object.patterns[idx], pattern.patterns[idx], &pattern);
-    }
 
     if (!object.include.empty()) {
         Pattern* included = find_include(root, grammar, pattern, object.include, parent);
@@ -47,7 +43,18 @@ void GrammarLoader::compile_grammar(const JsonObject& root, Grammar& grammar, co
         pattern.end_captures = get_captures(object.end_captures);
         pattern.content_name = object.content_name;
     } else {
-        if (object.patterns.empty()) throw InvalidGrammarException("Empty rule is not alowed");
+        if (object.patterns.empty()) {
+            throw InvalidGrammarException("empty rule is not alowed");
+        } else {
+            if (parent != nullptr && parent->begin.empty()) {
+                throw InvalidGrammarException("a containing rule can't be direct child of abother containing rule");
+            }
+        }
+    }
+
+    pattern.patterns = vector<Pattern>(object.patterns.size());
+    for (unsigned int idx = 0; idx < pattern.patterns.size(); idx++) {
+        compile_grammar(root, grammar, object.patterns[idx], pattern.patterns[idx], &pattern);
     }
 }
 
