@@ -58,5 +58,10 @@ int main() {
     shl::Tokenizer tokenizer;
     auto tokens = tokenizer.tokenize(g, source);
 
+    for (auto& pair : tokens) {
+        cout << "(" << pair.first.position << "," << pair.first.end() - 1 << ")" << pair.second.name() << endl;
+    }
+    cout << tokens.size() << endl;
+
 
 }
