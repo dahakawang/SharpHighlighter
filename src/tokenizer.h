@@ -14,7 +14,7 @@ namespace shl {
 
 class Tokenizer {
 public:
-    enum Option {OPTION_NONE = 0, OPTION_TOLERATE_ERROR = 1};
+    enum Option {OPTION_NONE = 0, OPTION_TOLERATE_ERROR = 1, OPTION_STRICT = 2};
 
     Tokenizer():_option(OPTION_NONE) {};
     Tokenizer(Option option):_option(option) {};

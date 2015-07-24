@@ -136,7 +136,7 @@ void Tokenizer::process_capture(vector<pair<Range, Scope> >& tokens, const Match
         if (match.size() > capture_num) {
             add_scope(tokens, match[capture_num], stack, name);
         } else {
-            if ((_option & OPTION_TOLERATE_ERROR) == 0) {
+            if (_option & OPTION_STRICT) {
                 throw InvalidSourceException("capture number out of range");
             }
         }
@@ -168,7 +168,7 @@ Match Tokenizer::tokenize(const string& text, const Pattern& pattern, const Matc
             add_scope(tokens, content_range, stack, found_pattern->content_name);
             
             append_back(tokens, child_tokens);
-            process_capture(tokens, match, stack, found_pattern->end_captures);
+            process_capture(tokens, end_match, stack, found_pattern->end_captures);
             last_lexeme = end_match;
         }
     }
