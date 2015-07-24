@@ -1,9 +1,11 @@
 //hello
-#include <iostream>
-
-using namespace std;
+#include <stdio.h>
 
 int main() {
-    coud << "hello" << endl;
+    printf("hello world\n");
+
+    for (int i = 0; i < 10; i++) {
+        printf("hello %d\n", i);
+    }
     return 0;
 }
