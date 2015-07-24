@@ -47,7 +47,15 @@ string read_file(const string& path) {
     return string(buffer, buffer + size);
 }
 
+using namespace shl;
 
+const Pattern& get_map(const map<string, Pattern> m, const char* key) {
+    return m.at(key);
+}
+
+const Pattern& get_v(const vector<Pattern> v, int i) {
+    return v.at(i);
+}
 int main() {
     string syntax_data = read_file("test/c.json");
     shl::GrammarLoader loader;
@@ -59,7 +67,8 @@ int main() {
     auto tokens = tokenizer.tokenize(g, source);
 
     for (auto& pair : tokens) {
-        cout << "(" << pair.first.position << "," << pair.first.end() - 1 << ")" << pair.second.name() << endl;
+        cout << "(" << pair.first.position << "," << pair.first.length << "," << pair.first.end() - 1 << ")" << pair.second.name() << endl;
+        cout << source.substr(pair.first.position, pair.first.length) << endl;
     }
     cout << tokens.size() << endl;
 
