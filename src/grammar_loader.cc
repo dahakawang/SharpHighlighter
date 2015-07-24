@@ -17,7 +17,7 @@ Grammar GrammarLoader::load(const string& buffer) {
 }
 
 void GrammarLoader::process(const JsonObject& object, Grammar& grammar) {
-    grammar.desc = object.name;
+    grammar.desc = object.scope_name;
     grammar.file_types = object.file_types;
     compile_grammar(object, grammar, object, grammar, nullptr);
     swap(grammar.desc, grammar.name);
