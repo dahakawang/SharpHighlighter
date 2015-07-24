@@ -27,8 +27,8 @@ void for_all_subrules(const vector<Pattern>& root, function<void(const Pattern&)
 
     for (const auto& pattern : root) {
         const Pattern& pat = (pattern.include != nullptr)? *pattern.include : pattern;
-        if (pattern.begin.empty()) {
-            for_all_subrules(root, callback, max_depth - 1);
+        if (pat.begin.empty()) {
+            for_all_subrules(pat.patterns, callback, max_depth - 1);
         } else {
             callback(pat);
         }
@@ -64,9 +64,7 @@ bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const
     bool is_close = false;
 
     // first find pattern or end pattern, whichever comes first
-    for_all_subrules(pattern.patterns, [&found_pattern, &first_match, pos, &text](const Pattern& pattern) {
-        const Pattern& sub_pattern = (pattern.include == nullptr)? pattern : *pattern.include;
-
+    for_all_subrules(pattern.patterns, [&found_pattern, &first_match, pos, &text](const Pattern& sub_pattern) {
         Match tmp = sub_pattern.begin.match(text, pos);
         if (tmp != Match::NOT_MATCHED) {
             if( found_pattern == nullptr || tmp[0].position < first_match[0].position) {
@@ -163,7 +161,7 @@ Match Tokenizer::tokenize(const string& text, const Pattern& pattern, const Matc
             Match end_match = tokenize(text, *found_pattern, match, stack, child_tokens);
             
             Range name_range = Range(match[0].position, end_match[0].end() - match[0].position);
-            add_scope(tokens, name_range, stack, "");
+            add_scope(tokens, name_range, stack, found_pattern->name);
             process_capture(tokens, match, stack, found_pattern->begin_captures);
 
             Range content_range = Range(match[0].end(), end_match[0].position - match[0].end());
