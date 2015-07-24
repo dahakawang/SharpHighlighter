@@ -76,6 +76,7 @@ map<int, string> GrammarLoader::get_captures(const map<string, map<string, strin
     for(auto raw_it = raw_capture.begin(); raw_it != raw_capture.end(); raw_it++) {
         int id = to_int(raw_it->first);
         string name = to_capture_name(raw_it->second);
+        captures[id] = name;
     }
 
     return captures;
