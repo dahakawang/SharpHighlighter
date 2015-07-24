@@ -134,16 +134,16 @@ void JsonLoader::process(JsonObject& root, const json_value* value) {
         } else if (key == "begin") {
             ensure_string(value, "begin pattern should be a regex");
             root.begin = get_string(value);
-        } else if (key == "begin_captures") {
+        } else if (key == "beginCaptures") {
             ensure_object(value, "begin_captures should be an object");
             root.begin_captures = get_captures(value);
         } else if (key == "end") {
             ensure_string(value, "end pattern should be a regex");
             root.end = get_string(value);
-        } else if (key == "end_captures") {
+        } else if (key == "endCaptures") {
             ensure_object(value, "end_captures should be an object");
             root.end_captures = get_captures(value);
-        } else if (key == "content_name") {
+        } else if (key == "contentName") {
             ensure_string(value, "content_name should be a string");
             root.content_name = get_string(value);
         }
