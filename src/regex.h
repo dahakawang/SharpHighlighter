@@ -36,6 +36,7 @@ public:
     bool operator==(const Match& lh) const;
     bool operator!=(const Match& lh) const { return !(*this == lh); };
     Range operator[](int capture_index) const;
+    Range& operator[](int capture_index) { return _captures[capture_index]; };
     Range operator[](const string& name) const;
     unsigned int size() const;
     static Match make_dummy(int position, int length);
