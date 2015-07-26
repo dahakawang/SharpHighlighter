@@ -3,12 +3,14 @@
 #include <algorithm>
 #include <functional>
 #include <unordered_set>
+#include <set>
 #include "tokenizer.h"
 #include "shl_exception.h"
 
 using std::stack;
 using std::function;
 using std::unordered_set;
+using std::set;
 
 namespace shl {
 
@@ -22,25 +24,25 @@ vector<pair<Range, Scope> > Tokenizer::tokenize(const Grammar& grammar, const st
     return tokens;
 }
 
-void for_all_subrules(const vector<Pattern>& root, function<void(const Pattern&)> callback, int max_depth) {
-    if (max_depth <= 0) return;
+void for_all_subrules(const Pattern& rule, set<const Pattern*>& visited, function<void(const Pattern&)> callback) {
+    const Pattern& real_rule = (rule.include)? *rule.include : rule;
+    if (visited.count(&real_rule) > 0) return;
+    visited.insert(&real_rule);
 
-    for (const auto& pattern : root) {
-        const Pattern& pat = (pattern.include != nullptr)? *pattern.include : pattern;
-        if (pat.begin.empty()) {
-            for_all_subrules(pat.patterns, callback, max_depth - 1);
-        } else {
-            callback(pat);
+    if (real_rule.begin.empty()) {
+        for (auto& subrule : real_rule.patterns) {
+            for_all_subrules(subrule, visited, callback);
         }
+    } else {
+        callback(real_rule);
     }
 }
+
 void for_all_subrules(const vector<Pattern>& patterns, function<void(const Pattern&)> callback) {
-    // Define containing pattern to be below
-    // { patterns: [ {}, {} ] }
-    // it have no match/begin but only patterns
-    // There can't be 2 containing patterns as parent and child
-    // so we set the max_depth to be 2
-    for_all_subrules(patterns, callback, 2);
+    set<const Pattern*> visited;
+    for (auto& rule : patterns) {
+        for_all_subrules(rule, visited, callback);
+    }
 }
 
 inline bool is_end_match_first(const Pattern& pattern, const Match& end_match, const Match& current_first_match) {
