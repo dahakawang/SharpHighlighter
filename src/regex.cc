@@ -42,6 +42,14 @@ unsigned int Match::size() const {
     return _captures.size();
 }
 
+Match Match::make_dummy(int position, int length) {
+    Match m;
+    m._matched = true;
+    m._captures.push_back(Range(position, length));
+
+    return m;
+}
+
 Regex::Regex(const string& regex) {
     init(regex, ONIG_OPTION_CAPTURE_GROUP);
 }
@@ -83,14 +91,6 @@ void Regex::init(const string& regex, OnigOptionType option) {
 
     _regex = shared_ptr<regex_t>(compiled_regex, [](regex_t* ptr) { onig_free(ptr);});
     _source = regex;
-}
-
-Match Match::make_dummy(int position, int length) {
-    Match m;
-    m._matched = true;
-    m._captures.push_back(Range(position, length));
-
-    return m;
 }
 
 }
