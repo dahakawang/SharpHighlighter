@@ -24,6 +24,7 @@ public:
     map<string, map<string, string> > begin_captures;
     string end;
     map<string, map<string, string> > end_captures;
+    string applyEndPatternLast;
     string content_name;
     string match;
     map<string, map<string, string> > captures;

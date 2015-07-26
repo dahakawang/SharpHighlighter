@@ -19,6 +19,7 @@ public:
     Regex begin;
     map<int, string> captures;
     Regex end;
+    bool applyEndPatternLast;
     map<int, string> begin_captures;
     map<int, string> end_captures;
     vector<Pattern> patterns;

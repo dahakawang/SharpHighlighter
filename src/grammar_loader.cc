@@ -42,6 +42,7 @@ void GrammarLoader::compile_grammar(const JsonObject& root, Grammar& grammar, co
         pattern.end = Regex(object.end);
         pattern.end_captures = get_captures(object.end_captures);
         pattern.content_name = object.content_name;
+        if (object.applyEndPatternLast == "true") pattern.applyEndPatternLast = true;
     } else {
         if (object.patterns.empty()) {
             throw InvalidGrammarException("empty rule is not alowed");

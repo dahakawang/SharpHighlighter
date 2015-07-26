@@ -140,6 +140,9 @@ void JsonLoader::process(JsonObject& root, const json_value* value) {
         } else if (key == "end") {
             ensure_string(value, "end pattern should be a regex");
             root.end = get_string(value);
+        } else if (key == "applyEndPatternLast") {
+            root.applyEndPatternLast = "true";
+
         } else if (key == "endCaptures") {
             ensure_object(value, "end_captures should be an object");
             root.end_captures = get_captures(value);
