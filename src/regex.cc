@@ -58,15 +58,32 @@ Regex::Regex(const string& regex, OnigOptionType option) {
     init(regex, option);
 }
 
-
-Match Regex::match(const string& target, int start_offset) const {
+/* match text with regex
+ *
+ * Usage:
+ * 1. match(target, start_offset)
+ *    search the target from start_offset
+ *
+ * 2. match(target, start_offset, last_end)
+ *    search the target from start_offset, and set last match end to last_end. the third is to support \G
+ *    Normally \G matches start position, to get a perl compatible behaviour, this indicate where previous
+ *    matching attempt end (the position should be taken care by user of this API)
+ *
+ * target       -   the target string to search with
+ * start_offset -   the start offset to search
+ * last_end     -   the last matched end (defaults to -1)
+ *
+ */
+Match Regex::match(const string& target, int start_offset, int last_end) const {
     UChar* str = (UChar*) target.c_str();
     UChar* start = (UChar*) (target.c_str() + start_offset);
     UChar* end = (UChar*) (target.c_str() + target.size());
+    UChar* gpos = (last_end < 0) ? start : (UChar*) (target.c_str() + last_end);
+
     shared_ptr<OnigRegion> region(onig_region_new(), [](OnigRegion* ptr) { onig_region_free(ptr, true);});
     if (region == nullptr) throw ShlException("fatal error: can't create OnigRegion");
 
-    int ret_code = onig_search(_regex.get(), str, end, start, end, region.get(), ONIG_OPTION_NONE);
+    int ret_code = onig_search_gpos(_regex.get(), str, end, gpos, start, end, region.get(), ONIG_OPTION_NONE);
     if (ret_code != ONIG_MISMATCH) {
         return Match(region, _regex, target);
     }

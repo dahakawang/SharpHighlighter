@@ -54,7 +54,7 @@ public:
     Regex(const string& regex, OnigOptionType option);
     const string& source() const;
     bool empty() const { return _source.empty(); };
-    Match match(const string& target, int start) const;
+    Match match(const string& target, int start, int last_end = -1) const;
 
 private:
     shared_ptr<regex_t> _regex;
