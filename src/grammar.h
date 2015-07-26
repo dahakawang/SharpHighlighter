@@ -14,6 +14,7 @@ namespace shl {
 
 class Pattern {
 public:
+    Pattern():include(nullptr) {};
     bool is_match_rule;
     string name;
     Regex begin;
