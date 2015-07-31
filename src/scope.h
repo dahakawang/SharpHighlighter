@@ -15,6 +15,8 @@ public:
     Scope(const string& scope);
     string name() const;
     bool is_prefix_of(const Scope& other) const;
+    unsigned size() const { return _scope.size(); };
+    string operator[](unsigned pos) const { return _scope[pos]; };
 
 private:
     vector<string> _scope;
