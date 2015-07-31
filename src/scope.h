@@ -14,6 +14,7 @@ public:
     Scope(const vector<string>& scope);
     Scope(const string& scope);
     string name() const;
+    bool is_prefix_of(const Scope& other) const;
 
 private:
     vector<string> _scope;

@@ -56,8 +56,18 @@ string trim(const string& str) {
 
 Scope::Scope(const vector<string>& scope) {
     for (auto& name : scope) {
-        if(!name.empty()) _scope.push_back(name);
+        if(!trim(name).empty()) _scope.push_back(name);
     }
+}
+
+bool Scope::is_prefix_of(const Scope& other) const {
+    if (other._scope.size() < _scope.size()) return false;
+
+    for (unsigned i = 0; i < _scope.size(); i++) {
+        if (_scope[i] != other._scope[i]) return false;
+    }
+
+    return true;
 }
 
 string Scope::name() const {
