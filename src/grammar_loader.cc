@@ -85,12 +85,12 @@ map<int, string> GrammarLoader::get_captures(const map<string, map<string, strin
 
 Pattern* GrammarLoader::find_include(const JsonObject& root, Grammar& grammar, Pattern& pattern, const string& include_name, Pattern* parent) {
     
-    // self reference
-    if (include_name == "$self") {
+    // base reference
+    if (include_name == "$base") {
         return &grammar;
 
-    // base reference
-    } else if (include_name == "$base") {
+    // self reference
+    } else if (include_name == "$self") {
         if ( parent != nullptr) {
             return parent;
         } else {
