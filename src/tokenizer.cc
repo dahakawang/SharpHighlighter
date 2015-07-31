@@ -34,6 +34,7 @@ void for_all_subrules(const Pattern& rule, set<const Pattern*>& visited, functio
             for_all_subrules(subrule, visited, callback);
         }
     } else {
+        // we don't need to look at it's subrule at this time
         callback(real_rule);
     }
 }
