@@ -8,6 +8,7 @@
 #include "grammar_loader.h"
 #include "scope.h"
 #include "tokenizer.h"
+#include "structured_scope.h"
 
 using namespace std;
 
@@ -65,12 +66,16 @@ int main() {
 
     shl::Tokenizer tokenizer;
     auto tokens = tokenizer.tokenize(g, source);
-
+/*
     for (auto& pair : tokens) {
         cout << "(" << pair.first.position << "," << pair.first.length << "," << pair.first.end() - 1 << ")" << pair.second.name() << endl;
         cout << source.substr(pair.first.position, pair.first.length) << endl;
     }
-    cout << tokens.size() << endl;
+*/
+    StructuredScope structure;
+    string markup = structure.to_markup(source, tokens);
+    cout << markup << endl;
+
 
 
 }
