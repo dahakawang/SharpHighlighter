@@ -22,7 +22,7 @@ struct Range {
     Range(const Range& obj) = default;
     Range(int pos, int len):position(pos), length(len) {};
     Range():position(0),length(0) {};
-    int end() {return position + length;};
+    int end() const {return position + length;};
 
     string substr(const string& str) { return str.substr(position, length); };
 };
