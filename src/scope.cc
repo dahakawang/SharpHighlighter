@@ -11,27 +11,28 @@ using std::ostringstream;
 
 namespace shl {
 
-vector<string> strtok(const string& str) {
+template<typename T>
+vector<string> strtok(const string& str, T predicator) {
     const char* s = str.c_str();
     auto length = str.size();
     vector<string> tokens;
 
-    bool in_blank = true;
+    bool in_separator = true;
     string::size_type start, index;
     for(index = 0; index < length; index++) {
-        if (in_blank) {
-            if (!isblank(s[index])) {
-                in_blank = false;
+        if (in_separator) {
+            if (!predicator(s[index])) {
+                in_separator = false;
                 start = index;
             }
         } else {
-            if (isblank(s[index])) {
-                in_blank = true;
+            if (predicator(s[index])) {
+                in_separator = true;
                 tokens.push_back(str.substr(start, index - start));
             }
         }
     }
-    if (!in_blank) {
+    if (!in_separator) {
         tokens.push_back(str.substr(start));
     }
 
@@ -39,7 +40,7 @@ vector<string> strtok(const string& str) {
 }
     
 Scope::Scope(const string& scope) {
-    _scope = strtok(scope);
+    _scope = strtok(scope, isblank);
 }
 
 string trim(const string& str) {
@@ -68,6 +69,17 @@ bool Scope::is_prefix_of(const Scope& other) const {
     }
 
     return true;
+}
+
+vector<string> Scope::breakdown(unsigned pos) const {
+    const string& str = _scope[pos];
+    return strtok(str, [](char c) { if (c == '.') return true; return false;});
+}
+
+Scope Scope::subscope(unsigned pos) const {
+    vector<string> scopes(_scope.begin() + pos, _scope.end());
+
+    return Scope(scopes);
 }
 
 string Scope::name() const {
