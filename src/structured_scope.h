@@ -14,20 +14,17 @@ using std::pair;
 namespace shl {
 
 struct ScopeNode {
-    string name;
+    Scope name;
     vector<ScopeNode> children;
     string content;
 };
 
 class StructuredScope {
 public:
-    StructuredScope(const string& text, const vector<pair<Range, Scope> >& scopes);
-    string to_markup() const;
+    string to_markup(const string& text, const vector<pair<Range, Scope> >& scopes);
 
 private:
-    ScopeNode _root;
-
-    void build(const string& text, const vector<pair<Range, Scope> >& scopes, unsigned pos, ScopeNode& node, unsigned depth);
+    unsigned build(const string& text, const vector<pair<Range, Scope> >& scopes, unsigned pos, unsigned depth, string& markup);
 };
 
 }
