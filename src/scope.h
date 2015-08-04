@@ -18,6 +18,8 @@ public:
     bool is_prefix_of(const Scope& other) const;
     unsigned size() const { return _scope.size(); };
     string operator[](unsigned pos) const { return _scope[pos]; };
+    bool operator==(const Scope& other) const;
+    bool operator!=(const Scope& other) const;
     Scope subscope(unsigned pos) const;
     vector<string> breakdown(unsigned pos) const;
 

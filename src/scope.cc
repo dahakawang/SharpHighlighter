@@ -71,6 +71,20 @@ bool Scope::is_prefix_of(const Scope& other) const {
     return true;
 }
 
+bool Scope::operator==(const Scope& other) const {
+    if (_scope.size() != other._scope.size()) return false;
+
+    for (unsigned i = 0; i < _scope.size(); i++) {
+        if (other._scope[i] != _scope[i]) return false;
+    }
+
+    return true;
+}
+
+bool Scope::operator!=(const Scope& other) const {
+    return ! (*this == other);
+}
+
 vector<string> Scope::breakdown(unsigned pos) const {
     const string& str = _scope[pos];
     return strtok(str, [](char c) { if (c == '.') return true; return false;});
