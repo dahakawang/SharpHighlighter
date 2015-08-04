@@ -25,7 +25,7 @@ string markup_class(const vector<string>& name) {
     string clazz;
 
     for (unsigned i = 0; i < name.size(); i++) {
-        clazz.append(join(name, 0, i));
+        clazz.append(name[i]);
         clazz.append(" ");
     }
 
