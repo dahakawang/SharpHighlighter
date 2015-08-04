@@ -62,11 +62,11 @@ unsigned StructuredScope::build(const string& text, const vector<pair<Range, Sco
         const Scope& next_scope = scopes[pos].second;
         Range next_range = scopes[pos].first;
 
-        if (current_scope.is_prefix_of(next_scope)) {
+        if (current_scope != next_scope && current_scope.is_prefix_of(next_scope)) {
             put_text(text, last_end, next_range.position - last_end, markup);
 
+            last_end = scopes[pos].first.end(); // pos is the root of next subtree
             pos = build(text, scopes, pos,  depth + 1, markup);
-            last_end = scopes[pos-1].first.end();
         } else {
             break;
         }
