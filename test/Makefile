@@ -1,11 +1,11 @@
 
 SOURCE=$(shell ls *.cc)
-OBJECTS=$(SOURCE:.cc=.o)
+TARGETS=$(SOURCE:.cc=)
 
-all:$(OBJECTS)
+all:$(TARGETS)
 
-$(OBJECTS): %.o: %.cc
-	$(CC) $(CFLAGS) -I$(ROOT)/src $(INCLUDE_PATH) -L$(ROOT)/lib $(LIB_PATH) $< $(LIBS) -lshl -o $@
+$(TARGETS): %: %.cc
+	$(CC) $(CFLAGS) -I$(ROOT)/src $(INCLUDE_PATH) -L$(ROOT)/lib $(LIB_PATH) $< -lshl $(LIBS) -o $@.run
 
 clean:
-	rm *.o
+	-rm *.run
