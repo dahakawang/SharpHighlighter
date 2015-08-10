@@ -23,6 +23,8 @@ struct Range {
     Range(int pos, int len):position(pos), length(len) {};
     Range():position(0),length(0) {};
     int end() const {return position + length;};
+    bool operator==(const Range& rh) {return position == rh.position && length == rh.length;};
+    bool operator!=(const Range& rh) { return !(*this == rh);};
 
     string substr(const string& str) { return str.substr(position, length); };
 };
