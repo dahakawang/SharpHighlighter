@@ -14,7 +14,7 @@ inline string onig_error_string(int code, OnigErrorInfo* error_info) {
     return string(buffer, buffer + length);
 }
 
-Match Match::NOT_MATCHED;
+const Match Match::NOT_MATCHED;
 
 Match::Match(shared_ptr<OnigRegion> region, shared_ptr<regex_t> regex, const string& target):_matched(true) {
     int capture_count = region->num_regs;

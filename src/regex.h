@@ -29,7 +29,7 @@ struct Range {
 
 class Match {
 public:
-    static Match NOT_MATCHED;
+    static const Match NOT_MATCHED;
 
     Match():_matched(false) {};
     Match(shared_ptr<OnigRegion> region, shared_ptr<regex_t> regex, const string& target);
@@ -40,6 +40,7 @@ public:
     Range operator[](const string& name) const;
     unsigned int size() const;
     static Match make_dummy(int position, int length);
+    operator bool() { return _matched; };
 
 private:
     vector<Range> _captures;
