@@ -1,6 +1,6 @@
 export 
 ROOT=$(shell pwd)
-TARGET=src
+TARGET=src test
 
 include MacroRules
 
