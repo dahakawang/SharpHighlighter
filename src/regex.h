@@ -29,23 +29,22 @@ struct Range {
 
 class Match {
 public:
-    static const Match NOT_MATCHED;
+    friend class Regex;
+    enum MatchResult { MATCHED, NOT_MATCHED };
 
-    Match():_matched(false) {};
-    Match(shared_ptr<OnigRegion> region, shared_ptr<regex_t> regex, const string& target);
-    bool operator==(const Match& lh) const;
-    bool operator!=(const Match& lh) const { return !(*this == lh); };
-    Range operator[](int capture_index) const;
-    Range& operator[](int capture_index) { return _captures[capture_index]; };
-    Range operator[](const string& name) const;
+    Match() = default;
+    Range operator[](int capture_index) const { return _captures[capture_index]; };
     unsigned int size() const;
+    Range named_capture(const string& name) const { return _named_captures.at(name); };
     static Match make_dummy(int position, int length);
-    operator bool() { return _matched; };
+    operator bool() { return _captures.size() != 0; };
+    operator MatchResult() { return (_captures.size() == 0)? NOT_MATCHED : MATCHED; };
 
 private:
     vector<Range> _captures;
     map<string, Range> _named_captures;
-    bool _matched;
+
+    Match(shared_ptr<OnigRegion> region, shared_ptr<regex_t> regex, const string& target);
 };
 
 class Regex {
