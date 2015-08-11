@@ -34,7 +34,7 @@ string markup_class(const vector<string>& name) {
 
 inline void put_open_tags(Scope& name_scope, string& target) {
     for (unsigned i = 0; i < name_scope.size(); i++) {
-        target.append("<span class=\"" + markup_class(name_scope.breakdown(i)) + "\">");
+        target.append("<span class=\"" + markup_class(name_scope[i].breakdown()) + "\">");
     }
 }
 
