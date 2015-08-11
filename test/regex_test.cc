@@ -1,6 +1,7 @@
 //#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 #include <regex.h>
+#include <shl_exception.h>
 
 using namespace shl;
 
@@ -82,5 +83,100 @@ TEST_CASE("Regex can find matchs") {
 
         REQUIRE((bool)result);
         REQUIRE( result == Match::MATCHED );
+    }
+
+    SECTION("capture whole regex by default") {
+        Regex r("\\d{3}-\\d{4}");
+        string target = "hello my Tel. is 322-0592";
+        auto result = r.match(target, 0);
+
+        REQUIRE(result.size() == 1);
+        REQUIRE(result[0] == Range(17, 8));
+        REQUIRE(result[0].substr(target) == "322-0592");
+    }
+
+    SECTION("regex can capture groups") {
+        Regex r("(\\d{3})-(\\d{4})");
+        string target = "hello my Tel. is 322-0592";
+        auto result = r.match(target, 0);
+
+        REQUIRE(result.size() == 3);
+        REQUIRE(result[0].substr(target) == "322-0592");
+        REQUIRE(result[1].substr(target) == "322");
+        REQUIRE(result[2].substr(target) == "0592");
+    }
+
+    SECTION("regex can retrieve the source") {
+        Regex r("\\d{3}-\\d{4}");
+        
+        REQUIRE(r.source() == "\\d{3}-\\d{4}");
+    }
+
+    SECTION("invalid regex will throw") {
+        REQUIRE_THROWS_AS(Regex r("[}"), InvalidRegexException);
+    }
+
+    SECTION("default contructor create a empty regex") {
+        Regex regex;
+
+        REQUIRE(regex.empty());
+    }
+
+    SECTION("empty regex match will throw") {
+        Regex regex;
+
+        REQUIRE_THROWS_AS(regex.match("hello world", 0), InvalidRegexException);
+    }
+
+    SECTION("regex can search from a position") {
+        Regex r("abc");
+
+        auto result = r.match("abcdefg", 0);
+        REQUIRE(result == Match::MATCHED);
+
+        auto result2 = r.match("abcdefg", 2);
+        REQUIRE(result2 == Match::NOT_MATCHED);
+    }
+
+    SECTION("\\G means matching start position") {
+        Regex r("\\Gabc");
+
+        auto result1 = r.match("abcdef", 0);
+        REQUIRE(result1 == Match::MATCHED);
+
+        auto result2 = r.match(" abcdef", 0);
+        REQUIRE(result2 == Match::NOT_MATCHED);
+
+        auto result3 = r.match(" abcdef", 1);
+        REQUIRE(result3 == Match::MATCHED);
+
+        Regex r2("(?<=123)\\Gabc");
+        auto result4 = r2.match("123abc", 3);
+        REQUIRE(result4 == Match::MATCHED);
+    }
+
+    SECTION("\\G means last match end, perl compatible") {
+        Regex r("\\Gabc");
+
+        auto result1 = r.match("bstabcdef", 3, 3);
+        REQUIRE(result1 == Match::MATCHED);
+
+        auto result2 = r.match("bstabcdef", 3, 0);
+        REQUIRE(result2 == Match::NOT_MATCHED);
+
+        auto result3 = r.match("bstabcdef", 0, 3);
+        REQUIRE(result2 == Match::NOT_MATCHED);
+
+
+        Regex r2("(?<=bst)\\Gabc");
+        auto result4 = r2.match("bstabcdef", 3, 3);
+        REQUIRE(result4 == Match::MATCHED);
+
+        auto result5 = r2.match("bstabcdef", 0, 3);
+        REQUIRE(result5 == Match::NOT_MATCHED);
+
+        Regex r3("\\Gabc");
+        auto result6 = r3.match("bstabcdef", 0, 3);
+        REQUIRE(result6 == Match::MATCHED);
     }
 }
