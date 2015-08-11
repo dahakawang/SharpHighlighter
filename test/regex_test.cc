@@ -177,6 +177,6 @@ TEST_CASE("Regex can find matchs") {
 
         Regex r3("\\Gabc");
         auto result6 = r3.match("bstabcdef", 0, 3);
-        REQUIRE(result6 == Match::MATCHED);
+        REQUIRE(result6 == Match::NOT_MATCHED);
     }
 }
