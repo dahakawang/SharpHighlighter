@@ -25,7 +25,7 @@ private:
 
 class Scope {
 public:
-    Scope() {};
+    Scope() = default;
     Scope(const vector<string>& scope);
     Scope(const vector<ScopeName>& scope);
     Scope(const string& scope);
