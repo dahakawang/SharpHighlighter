@@ -67,7 +67,7 @@ Scope::Scope(const string& scope) {
 
 Scope::Scope(const vector<string>& scope) {
     for (auto& name : scope) {
-        if(!trim(name).empty()) _scope.push_back(name);
+        if(!trim(name).empty()) _scope.emplace_back(name);
     }
 }
 
