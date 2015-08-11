@@ -80,4 +80,29 @@ TEST_CASE("Scope Test") {
 
     }
 
+    SECTION("can check if a scope is prefix for another") {
+        Scope prefix("source name level3");
+        Scope name("source name level3 name");
+        Scope nonprefix("source test");
+        Scope empty;
+
+        REQUIRE(name.is_prefix_of(name));
+        REQUIRE(prefix.is_prefix_of(name));
+        REQUIRE_FALSE(name.is_prefix_of(prefix));
+        REQUIRE_FALSE(nonprefix.is_prefix_of(name));
+        REQUIRE(empty.is_prefix_of(name));
+        REQUIRE(empty.is_prefix_of(prefix));
+        REQUIRE(empty.is_prefix_of(nonprefix));
+        REQUIRE(empty.is_prefix_of(empty));
+    }
+
+    SECTION("can extract subscopes from Scope") {
+        Scope s("abc def gh fij");
+
+        REQUIRE(s.subscope(0) == Scope("abc def gh fij"));
+        REQUIRE(s.subscope(2) == Scope("gh fij"));
+        REQUIRE(s.subscope(3) == Scope("fij"));
+        REQUIRE(s.subscope(4) == Scope(""));
+    }
+
 }
