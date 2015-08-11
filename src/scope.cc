@@ -38,10 +38,6 @@ vector<string> strtok(const string& str, T predicator) {
 
     return tokens;
 }
-    
-Scope::Scope(const string& scope) {
-    _scope = strtok(scope, isblank);
-}
 
 string trim(const string& str) {
     const char* s = str.c_str();
@@ -54,6 +50,16 @@ string trim(const string& str) {
 
     return str.substr(start, end - start);
 }
+
+ScopeName::ScopeName(const string& scope_name) {
+    _name = scope_name;
+    _component = strtok(scope_name, [](char c) { return c == '.';});
+}
+
+Scope::Scope(const string& scope) {
+    _scope = strtok(scope, isblank);
+}
+
 
 Scope::Scope(const vector<string>& scope) {
     for (auto& name : scope) {

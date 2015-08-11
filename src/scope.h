@@ -9,6 +9,18 @@ using std::vector;
 
 namespace shl {
 
+class ScopeName {
+public:
+    ScopeName() = default;
+    ScopeName(const string& scope_name);
+    const string& name() const { return _name; };
+    const vector<string>& breakdown() const { return _component; };
+
+private:
+    vector<string> _component;
+    string _name;
+};
+
 class Scope {
 public:
     Scope() {};

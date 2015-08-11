@@ -58,9 +58,18 @@ TEST_CASE("Range Test") {
 
 TEST_CASE("Match Tests") {
 
+    SECTION("match can be checked equality with MatcheRsult") {
+        Match match;
+
+        REQUIRE(match == Match::NOT_MATCHED);
+        REQUIRE(Match::NOT_MATCHED == match);
+        REQUIRE_FALSE(Match::MATCHED == match);
+        REQUIRE(Match::MATCHED != match);
+        REQUIRE(match != Match::MATCHED);
+    }
+
     SECTION("default constructor creates a no match object") {
         Match match;
-        REQUIRE_FALSE((bool)match);
         REQUIRE( match == Match::NOT_MATCHED );
         REQUIRE(match.size() == 0);
     }
@@ -68,7 +77,6 @@ TEST_CASE("Match Tests") {
     SECTION("dummy Match object can be created by make_dummy") {
         Match match = Match::make_dummy(0, 10);
 
-        REQUIRE((bool)match);
         REQUIRE(match == Match::MATCHED);
         REQUIRE(match.size() == 1);
         REQUIRE(match[0] == Range(0, 10));
@@ -81,7 +89,6 @@ TEST_CASE("Regex can find matchs") {
         Regex r("\\d{3}-\\d{4}");
         auto result = r.match("hello my Tel. is 322-0592", 0);
 
-        REQUIRE((bool)result);
         REQUIRE( result == Match::MATCHED );
     }
 
