@@ -23,29 +23,33 @@ struct Range {
     Range(int pos, int len):position(pos), length(len) {};
     Range():position(0),length(0) {};
     int end() const {return position + length;};
-    bool operator==(const Range& rh) {return position == rh.position && length == rh.length;};
-    bool operator!=(const Range& rh) { return !(*this == rh);};
+    bool operator==(const Range& rh) const {return position == rh.position && length == rh.length;};
+    bool operator!=(const Range& rh) const { return !(*this == rh);};
 
-    string substr(const string& str) { return str.substr(position, length); };
+    string substr(const string& str) const { return str.substr(position, length); };
 };
 
 class Match {
 public:
-    friend class Regex;
     enum MatchResult { MATCHED, NOT_MATCHED };
+    friend class Regex;
+    friend bool operator==(const Match& match, MatchResult result);
 
     Match() = default;
     Range operator[](int capture_index) const { return _captures[capture_index]; };
     unsigned int size() const;
     static Match make_dummy(int position, int length);
-    operator bool() { return _captures.size() != 0; };
-    operator MatchResult() { return (_captures.size() == 0)? NOT_MATCHED : MATCHED; };
 
 private:
     vector<Range> _captures;
 
     Match(shared_ptr<OnigRegion> region, shared_ptr<regex_t> regex, const string& target);
 };
+
+bool operator==(const Match& match, Match::MatchResult result);
+bool operator==(Match::MatchResult result, const Match& match);
+bool operator!=(const Match& match, Match::MatchResult result);
+bool operator!=(Match::MatchResult result, const Match& match);
 
 class Regex {
 public:

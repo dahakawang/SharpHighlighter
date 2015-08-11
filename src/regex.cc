@@ -33,6 +33,22 @@ Match Match::make_dummy(int position, int length) {
     return m;
 }
 
+bool operator==(const Match& match, Match::MatchResult result) { 
+    return result == ((match._captures.size() == 0)? Match::NOT_MATCHED : Match::MATCHED);
+}
+
+bool operator==(Match::MatchResult result, const Match& match) {
+    return match == result;
+}
+
+bool operator!=(const Match& match, Match::MatchResult result) { 
+    return !(match == result);
+}
+
+bool operator!=(Match::MatchResult result, const Match& match) { 
+    return !(match == result);
+}
+
 Regex::Regex(const string& regex) {
     init(regex, ONIG_OPTION_CAPTURE_GROUP);
 }
