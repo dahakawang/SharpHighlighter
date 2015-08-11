@@ -20,6 +20,14 @@ TEST_CASE("Range Test") {
     }
 
     SECTION("constructs by copy a range") {
+        Range range2(10,20);
+        Range range(range2);
+
+        REQUIRE(range.position == 10);
+        REQUIRE(range.length == 20);
+    }
+
+    SECTION("the Range object is assignable") {
         Range range, range2(10,20);
         range = range2;
 
@@ -27,9 +35,25 @@ TEST_CASE("Range Test") {
         REQUIRE(range.length == 20);
     }
 
-    SECTION("the Range object is assignable") {
+    SECTION("the end of Range is position plus length") {
+        Range range(25, 456);
+
+        REQUIRE(range.end() == (range.position + range.length));
+    }
+
+    SECTION("Range can be compared equal/inequal") {
+        Range range1(25, 30), range2(25, 30), range3(25, 31), range4(24, 30);
+
+        REQUIRE(range1 == range2);
+        REQUIRE(range1 == range1);
+        REQUIRE_FALSE(range1 == range3);
+        REQUIRE_FALSE(range1 == range4);
+        REQUIRE(range1 != range3);
+        REQUIRE(range1 != range4);
     }
 }
+
+
 
 TEST_CASE("Match Tests") {
 
