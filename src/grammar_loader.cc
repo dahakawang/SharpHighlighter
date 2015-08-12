@@ -23,26 +23,26 @@ void GrammarLoader::process(const JsonObject& object, Grammar& grammar) {
     swap(grammar.desc, grammar.name);
 }
 
-void GrammarLoader::compile_grammar(const JsonObject& root, Grammar& grammar, const JsonObject& object, Pattern& pattern, Pattern* parent) {
-    pattern.name = object.name;
+void GrammarLoader::compile_grammar(const JsonObject& root, Grammar& grammar, const JsonObject& object, Rule& rule, Rule* parent) {
+    rule.name = object.name;
 
     if (!object.include.empty()) {
-        Pattern* included = find_include(root, grammar, pattern, object.include, parent);
-        pattern.include = included;
+        Rule* included = find_include(root, grammar, rule, object.include, parent);
+        rule.include = included;
     } else if (!object.match.empty()) {
-        pattern.is_match_rule = true;
-        pattern.begin = Regex(object.match);
-        pattern.captures = get_captures(object.captures);
+        rule.is_match_rule = true;
+        rule.begin = Regex(object.match);
+        rule.captures = get_captures(object.captures);
     } else if (!object.begin.empty()) {
-        pattern.is_match_rule = false;
-        pattern.begin = Regex(object.begin);
-        pattern.begin_captures = get_captures(object.begin_captures);
+        rule.is_match_rule = false;
+        rule.begin = Regex(object.begin);
+        rule.begin_captures = get_captures(object.begin_captures);
 
         if(object.end.empty()) throw InvalidGrammarException("should have end for a begin/end pattern");
-        pattern.end = Regex(object.end);
-        pattern.end_captures = get_captures(object.end_captures);
-        pattern.content_name = object.content_name;
-        if (object.applyEndPatternLast == "true") pattern.applyEndPatternLast = true;
+        rule.end = Regex(object.end);
+        rule.end_captures = get_captures(object.end_captures);
+        rule.content_name = object.content_name;
+        if (object.applyEndPatternLast == "true") rule.applyEndPatternLast = true;
     } else {
         if (object.patterns.empty()) {
             throw InvalidGrammarException("empty rule is not alowed");
@@ -53,9 +53,9 @@ void GrammarLoader::compile_grammar(const JsonObject& root, Grammar& grammar, co
         }
     }
 
-    pattern.patterns = vector<Pattern>(object.patterns.size());
-    for (unsigned int idx = 0; idx < pattern.patterns.size(); idx++) {
-        compile_grammar(root, grammar, object.patterns[idx], pattern.patterns[idx], &pattern);
+    rule.patterns = vector<Rule>(object.patterns.size());
+    for (unsigned int idx = 0; idx < rule.patterns.size(); idx++) {
+        compile_grammar(root, grammar, object.patterns[idx], rule.patterns[idx], &rule);
     }
 }
 
@@ -83,7 +83,7 @@ map<int, string> GrammarLoader::get_captures(const map<string, map<string, strin
     return captures;
 }
 
-Pattern* GrammarLoader::find_include(const JsonObject& root, Grammar& grammar, Pattern& pattern, const string& include_name, Pattern* parent) {
+Rule* GrammarLoader::find_include(const JsonObject& root, Grammar& grammar, Rule& rule, const string& include_name, Rule* parent) {
     
     // base reference
     if (include_name == "$base") {
@@ -106,7 +106,7 @@ Pattern* GrammarLoader::find_include(const JsonObject& root, Grammar& grammar, P
 
         auto it = root.repository.find(repo_name);
         if (it == root.repository.end()) throw InvalidGrammarException(string("can't find the name in repository: ") + repo_name);
-        grammar.repository[repo_name] = Pattern();
+        grammar.repository[repo_name] = Rule();
         compile_grammar(root, grammar, it->second, grammar.repository[repo_name], nullptr);
         return &grammar.repository[repo_name];
 

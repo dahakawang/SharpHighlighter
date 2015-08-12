@@ -13,9 +13,9 @@ public:
 
 private:
     void process(const JsonObject& object, Grammar& grammar);
-    void compile_grammar(const JsonObject& root, Grammar& grammar, const JsonObject& object, Pattern& pattern, Pattern* parent);
+    void compile_grammar(const JsonObject& root, Grammar& grammar, const JsonObject& object, Rule& rule, Rule* parent);
     map<int, string> get_captures(const map<string, map<string, string> > raw_capture);
-    Pattern* find_include(const JsonObject& root, Grammar& grammar, Pattern& pattern, const string& include_name, Pattern* parent);
+    Rule* find_include(const JsonObject& root, Grammar& grammar, Rule& rule, const string& include_name, Rule* parent);
 };
 
 }
