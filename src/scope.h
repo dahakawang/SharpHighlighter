@@ -29,13 +29,13 @@ public:
     Scope(const vector<string>& scope);
     Scope(const vector<ScopeName>& scope);
     Scope(const string& scope);
-    string name() const;
+    const string name() const;
     bool is_prefix_of(const Scope& other) const;
     unsigned size() const { return _scope.size(); };
-    ScopeName operator[](unsigned pos) const { return _scope[pos]; };
+    const ScopeName& operator[](unsigned pos) const { return _scope[pos]; };
     bool operator==(const Scope& other) const;
     bool operator!=(const Scope& other) const;
-    Scope subscope(unsigned pos) const;
+    const Scope subscope(unsigned pos) const;
 
 private:
     vector<ScopeName> _scope;

@@ -98,13 +98,13 @@ bool Scope::operator!=(const Scope& other) const {
     return ! (*this == other);
 }
 
-Scope Scope::subscope(unsigned pos) const {
+const Scope Scope::subscope(unsigned pos) const {
     vector<ScopeName> scopes(_scope.begin() + pos, _scope.end());
 
     return Scope(scopes);
 }
 
-string Scope::name() const {
+const string Scope::name() const {
     ostringstream name;
     bool first = true;
     for (auto& component : _scope) {
