@@ -6,10 +6,15 @@
 using namespace shl;
 
 TEST_CASE("JsonLoader Test") {
+    string data = load_string("fixture/valid.json");
+
     SECTION("can load a valid syntax file") {
-        string data = load_string("fixture/valid.json");
 
         JsonLoader loader;
         JsonObject obj = loader.load(data);
+
+        REQUIRE(obj.scope_name == "source.c");
+        REQUIRE(obj.name == "C");
+
     }
 }
