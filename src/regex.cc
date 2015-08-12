@@ -26,7 +26,7 @@ unsigned int Match::size() const {
     return _captures.size();
 }
 
-Match Match::make_dummy(int position, int length) {
+const Match Match::make_dummy(int position, int length) {
     Match m;
     m._captures.push_back(Range(position, length));
 
@@ -73,7 +73,7 @@ Regex::Regex(const string& regex, OnigOptionType option) {
  * last_end     -   the last matched end (defaults to -1)
  *
  */
-Match Regex::match(const string& target, int start_offset, int last_end) const {
+const Match Regex::match(const string& target, int start_offset, int last_end) const {
     if (_regex == nullptr) throw InvalidRegexException("can't match using an empty regex");
 
     UChar* str = (UChar*) target.c_str();

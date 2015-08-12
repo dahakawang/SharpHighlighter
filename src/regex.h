@@ -25,7 +25,7 @@ struct Range {
     bool operator==(const Range& rh) const {return position == rh.position && length == rh.length;};
     bool operator!=(const Range& rh) const { return !(*this == rh);};
 
-    string substr(const string& str) const { return str.substr(position, length); };
+    const string substr(const string& str) const { return str.substr(position, length); };
 };
 
 class Match {
@@ -35,9 +35,9 @@ public:
     friend bool operator==(const Match& match, MatchResult result);
 
     Match() = default;
-    Range operator[](int capture_index) const { return _captures[capture_index]; };
+    const Range operator[](int capture_index) const { return _captures[capture_index]; };
     unsigned int size() const;
-    static Match make_dummy(int position, int length);
+    static const Match make_dummy(int position, int length);
 
 private:
     vector<Range> _captures;
@@ -57,7 +57,7 @@ public:
     Regex(const string& regex, OnigOptionType option);
     const string& source() const;
     bool empty() const { return _source.empty(); };
-    Match match(const string& target, int start, int last_end = -1) const;
+    const Match match(const string& target, int start, int last_end = -1) const;
 
 private:
     shared_ptr<regex_t> _regex;
