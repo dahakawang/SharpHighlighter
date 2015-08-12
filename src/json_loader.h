@@ -14,7 +14,7 @@ namespace shl {
 
 class JsonLoader {
 public:
-    JsonObject load(const string& json);
+    const JsonObject load(const string& json);
 
 private:
     static void process(JsonObject& root, const json_value* value);

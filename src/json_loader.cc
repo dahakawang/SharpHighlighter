@@ -73,7 +73,7 @@ static inline shared_ptr<json_value> parse_json(const string& json) {
     return shared_ptr<json_value>(value, [](json_value* ptr) { json_value_free(ptr); });
 }
 
-JsonObject JsonLoader::load(const string& json) {
+const JsonObject JsonLoader::load(const string& json) {
     ensure_utf8(json);
 
     JsonObject object;
