@@ -66,6 +66,26 @@ private:
     void init(const string& regex, OnigOptionType option);
 };
 
+
+class EndPatternRegex {
+public:
+    EndPatternRegex():_has_backref(false) {};
+    EndPatternRegex(const string& regex);
+    const string& source() const { return _original_regex; };
+    bool empty() const { return _original_regex.empty(); };
+    const Match match(const Match& match, const string& target, int start, int last_end = -1) const;
+    bool has_backref() const { return _has_backref; };
+
+private:
+    Regex _cached_regex; // if end pattern has no back reference, use this pre-compiled regex
+    string _original_regex;
+    bool _has_backref;
+
+    bool check_has_backref(const string& regex) const;
+    string expand_backref(const Match& match) const;
+    
+};
+
 }
 
 #endif

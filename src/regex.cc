@@ -111,4 +111,42 @@ void Regex::init(const string& regex, OnigOptionType option) {
     _source = regex;
 }
 
+EndPatternRegex::EndPatternRegex(const string& regex) {
+    _has_backref = check_has_backref(regex);
+    _original_regex = regex;
+
+    if (!_has_backref) {
+        _cached_regex = Regex(regex);
+    }
+}
+
+const Match EndPatternRegex::match(const Match& match, const string& target, int start, int last_end) const {
+    if (_has_backref) {
+        string expanded = expand_backref(match);
+        Regex dynamic_regex(expanded);
+        return dynamic_regex.match(target, start, last_end);
+    } else {
+        return _cached_regex.match(target, start, last_end);
+    }
+}
+
+bool EndPatternRegex::check_has_backref(const string& regex) const {
+    bool escaped = false;
+    for (char ch : regex) {
+        if (escaped && isdigit(ch)) return true;
+        if(ch == '\\') escaped = !escaped;
+    }
+    return false;
+}
+
+string EndPatternRegex::expand_backref(const Match& match) const {
+    string expanded_regex;
+    bool escaped = false;
+
+    for (char ch : _original_regex) {
+        if (escaped && isdigit(ch)) {
+        }
+    }
+}
+
 }
