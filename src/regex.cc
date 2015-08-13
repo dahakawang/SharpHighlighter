@@ -120,9 +120,9 @@ EndPatternRegex::EndPatternRegex(const string& regex) {
     }
 }
 
-const Match EndPatternRegex::match(const Match& match, const string& target, int start, int last_end) const {
+const Match EndPatternRegex::match(const Match& last_match, const string& target, int start, int last_end) const {
     if (_has_backref) {
-        string expanded = expand_backref(match);
+        string expanded = expand_backref(last_match, target);
         Regex dynamic_regex(expanded);
         return dynamic_regex.match(target, start, last_end);
     } else {
@@ -133,29 +133,56 @@ const Match EndPatternRegex::match(const Match& match, const string& target, int
 bool EndPatternRegex::check_has_backref(const string& regex) const {
     bool escaped = false;
     for (char ch : regex) {
-        if (escaped && isdigit(ch)) return true;
-        if(ch == '\\') escaped = !escaped;
+        if (ch == '\\') {
+            escaped = !escaped;
+        } else {
+            if (escaped && isdigit(ch)) return true;
+            escaped = false;
+        }
     }
     return false;
 }
 
 int get_int(const char* str, int* size) {
+    int pos = 0;
+    int value = 0;
+
+    for(; str[pos] != 0 && isdigit(str[pos]); pos++) {
+        value *= 10;
+        value += (str[pos] - '0');
+    }
+
+    *size = pos;
+    return value;
 }
 
-string EndPatternRegex::expand_backref(const Match& match) const {
+string EndPatternRegex::expand_backref(const Match& match, const string& target) const {
     string expanded_regex;
     bool escaped = false;
 
     for (size_t pos = 0; pos < _original_regex.size(); pos++) {
         char ch = _original_regex[pos];
-        if (escaped && isdigit(ch)) {
-            int size = 0;
-            int capture_num = get_int(_original_regex.c_str() + pos, &size);
-            pos += (size - 1);
+        if (ch == '\\') {
+            escaped = !escaped;
+        } else {
+            if (escaped && isdigit(ch)) {
+                int size = 0;
+                size_t capture_num = get_int(_original_regex.c_str() + pos, &size);
+                pos += (size - 1);
 
+                if (capture_num > match.size()) throw InvalidRegexException("trying to back reference a not existed group");
+                expanded_regex += match[capture_num].substr(target);
+            } else if (escaped) {
+                expanded_regex += '\\';
+                expanded_regex += ch;
+            } else {
+                expanded_regex += ch;
+            }
+            escaped = false;
         }
-        if(ch == '\\') escaped = !escaped;
     }
+
+    return expanded_regex;
 }
 
 }

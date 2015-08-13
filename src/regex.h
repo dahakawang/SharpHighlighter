@@ -73,7 +73,7 @@ public:
     EndPatternRegex(const string& regex);
     const string& source() const { return _original_regex; };
     bool empty() const { return _original_regex.empty(); };
-    const Match match(const Match& match, const string& target, int start, int last_end = -1) const;
+    const Match match(const Match& last_match, const string& target, int start, int last_end = -1) const;
     bool has_backref() const { return _has_backref; };
 
 private:
@@ -82,7 +82,7 @@ private:
     bool _has_backref;
 
     bool check_has_backref(const string& regex) const;
-    string expand_backref(const Match& match) const;
+    string expand_backref(const Match& match, const string& target) const;
     
 };
 
