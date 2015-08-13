@@ -32,11 +32,12 @@ void GrammarLoader::compile_grammar(const JsonObject& root, Grammar& grammar, co
     } else if (!object.match.empty()) {
         rule.is_match_rule = true;
         rule.begin = Regex(object.match);
-        rule.captures = get_captures(object.captures);
+        rule.begin_captures = get_captures(object.captures);
     } else if (!object.begin.empty()) {
         rule.is_match_rule = false;
         rule.begin = Regex(object.begin);
         rule.begin_captures = get_captures(object.begin_captures);
+        if (rule.begin_captures.empty()) rule.begin_captures = get_captures(object.captures);
 
         if(object.end.empty()) throw InvalidGrammarException("should have end for a begin/end pattern");
         rule.end = Regex(object.end);

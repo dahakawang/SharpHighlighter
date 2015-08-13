@@ -18,7 +18,6 @@ public:
     bool is_match_rule;
     string name;
     Regex begin;
-    map<int, string> captures;
     Regex end;
     bool applyEndPatternLast;
     map<int, string> begin_captures;

@@ -171,7 +171,7 @@ Match Tokenizer::tokenize(const string& text, const Rule& rule, const Match& beg
     while(next_lexeme(text, begin_end_pos, last_lexeme, rule, &found_rule, match)) {
         if (found_rule->is_match_rule) {
             add_scope(tokens, match[0], stack, found_rule->name);
-            process_capture(tokens, match, stack, found_rule->captures, found_rule->name);
+            process_capture(tokens, match, stack, found_rule->begin_captures, found_rule->name);
             last_lexeme = match;
 
         } else {
