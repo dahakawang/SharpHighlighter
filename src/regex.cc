@@ -139,13 +139,22 @@ bool EndPatternRegex::check_has_backref(const string& regex) const {
     return false;
 }
 
+int get_int(const char* str, int* size) {
+}
+
 string EndPatternRegex::expand_backref(const Match& match) const {
     string expanded_regex;
     bool escaped = false;
 
-    for (char ch : _original_regex) {
+    for (size_t pos = 0; pos < _original_regex.size(); pos++) {
+        char ch = _original_regex[pos];
         if (escaped && isdigit(ch)) {
+            int size = 0;
+            int capture_num = get_int(_original_regex.c_str() + pos, &size);
+            pos += (size - 1);
+
         }
+        if(ch == '\\') escaped = !escaped;
     }
 }
 
