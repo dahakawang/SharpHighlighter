@@ -187,3 +187,65 @@ TEST_CASE("Regex can find matchs") {
         REQUIRE(result6 == Match::NOT_MATCHED);
     }
 }
+
+
+TEST_CASE("EndPatternRegex Test") {
+    SECTION("EndPatternRegex can do everything Regex can do") {
+        EndPatternRegex r("^(\\d{3})-(\\d{4})");
+        string str = "123-3456";
+
+        auto match = r.match(Match::make_dummy(0,0), str, 0);
+
+        REQUIRE( match.size() == 3 );
+    }
+
+    SECTION("EndPatternRegex will throw when invalid regex is passed") {
+        REQUIRE_THROWS_AS(EndPatternRegex r("[}"), InvalidRegexException);
+    }
+
+    SECTION("EndPatternRegex will recgonize regex that has back references") {
+        EndPatternRegex r("</\\1>");
+        REQUIRE( r.has_backref() );
+
+        EndPatternRegex r1("^(\\d{3})-(\\d{4})");
+        REQUIRE_FALSE( r1.has_backref() );
+
+        EndPatternRegex r2("^(\\d{3})-(\\\\\\\\1{4})");
+        REQUIRE_FALSE( r2.has_backref() );
+
+        EndPatternRegex r3("^(\\d{3})-(\\\\\\1{4})");
+        REQUIRE( r3.has_backref() );
+    }
+
+    SECTION("can capture external back reference") {
+        Regex r1("<(\\w+)>");
+        EndPatternRegex r2("</\\1>");
+        string str = "<div>hello</div>";
+
+        REQUIRE( r2.has_backref());
+
+        auto begin = r1.match(str, 0);
+        auto end = r2.match(begin, str, 0);
+
+        REQUIRE( begin.size() == 2 );
+        REQUIRE( end == Match::MATCHED );
+        REQUIRE( end.size() == 1 );
+        REQUIRE( end[0].substr(str) == "</div>" );
+    }
+
+    SECTION("can capture many back reference") {
+        Regex r1("(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)(l)(\\d*)");
+        EndPatternRegex r2("\\13haha");
+        string src = "abcdefghijkl12345hahaend";
+
+        REQUIRE( r2.has_backref() );
+
+        auto begin = r1.match(src, 0);
+        REQUIRE( begin.size() == 14 );
+
+        auto end = r2.match(begin, src, 0);
+        REQUIRE( end == Match::MATCHED );
+        REQUIRE( end.size() == 1 );
+        REQUIRE( end[0].substr(src) == "12345haha" );
+    }
+}
