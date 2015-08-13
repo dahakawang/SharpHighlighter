@@ -1,0 +1,112 @@
+{
+  "scopeName": "source.c",
+  "fileTypes": [
+    "c",
+    "h"
+  ],
+  "name": "C",
+  "patterns": [
+    {
+      "include": "#preprocessor-rule-enabled"
+    },
+    {
+      "begin": "\"",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.c"
+        }
+      },
+      "end": "\"",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.c"
+        }
+      },
+      "name": "string.quoted.double.c",
+      "patterns": [
+        {
+          "include": "#string_escaped_char"
+        },
+        {
+          "include": "$self"
+        },
+        {
+          "include": "$base"
+        }
+      ]
+    }
+  ],
+  "repository": {
+    "preprocessor-rule-enabled": {
+      "begin": "^\\s*(#(if)\\s+(0*1)\\b)",
+      "captures": {
+        "1": {
+          "name": "meta.preprocessor.c"
+        },
+        "2": {
+          "name": "keyword.control.import.if.c"
+        },
+        "3": {
+          "name": "constant.numeric.preprocessor.c"
+        }
+      },
+      "end": "^\\s*(#\\s*(endif)\\b)",
+      "patterns": [
+        {
+          "begin": "^\\s*(#\\s*(else)\\b).*",
+          "captures": {
+            "1": {
+              "name": "meta.preprocessor.c"
+            },
+            "2": {
+              "name": "keyword.control.import.else.c"
+            }
+          },
+          "contentName": "comment.block.preprocessor.else-branch",
+          "end": "(?=^\\s*#\\s*endif\\b)",
+          "patterns": [
+            {
+              "include": "$self"
+            },
+            {
+              "include": "#string_escaped_char"
+            }
+          ]
+        },
+        {
+          "begin": "",
+          "end": "(?=^\\s*#\\s*(else|endif)\\b)",
+          "patterns": [
+            {
+              "include": "$base"
+            }
+          ]
+        }
+      ]
+    },
+    "string_escaped_char": {
+      "patterns": [
+        {
+          "match": "\\\\(\\\\|[abefnprtv'\"?]|[0-3]\\d{,2}|[4-7]\\d?|x[a-fA-F0-9]{,2}|u[a-fA-F0-9]{,4}|U[a-fA-F0-9]{,8})",
+          "name": "constant.character.escape.c"
+        },
+        {
+          "match": "\\\\.",
+          "name": "invalid.illegal.unknown-escape.c"
+        }
+      ]
+    },
+    "unused": {
+      "patterns": [
+        {
+          "match": "\\\\(\\\\|[abefnprtv'\"?]|[0-3]\\d{,2}|[4-7]\\d?|x[a-fA-F0-9]{,2}|u[a-fA-F0-9]{,4}|U[a-fA-F0-9]{,8})",
+          "name": "constant.character.escape.c"
+        },
+        {
+          "match": "\\\\.",
+          "name": "invalid.illegal.unknown-escape.c"
+        }
+      ]
+    }
+  }
+}
