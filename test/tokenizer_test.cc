@@ -39,4 +39,22 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[1].first.substr(source) == "return" );
         REQUIRE( tokens[1].second.name() == "source.coffee keyword.control.coffee" );
     }
+
+    SECTION("return several tokens when matches a single pattern with capture gorups") {
+        string data = load_string("fixture/coffee-script.json");
+        string source = "new foo.bar.Baz";
+        Grammar g = loader.load(data);
+        auto tokens = tokenizer.tokenize(g, source); 
+
+        REQUIRE( tokens.size() == 4 );
+        
+        REQUIRE( tokens[1].first.substr(source) == source );
+        REQUIRE( tokens[1].second.name() == "source.coffee meta.class.instance.constructor" );
+        
+        REQUIRE( tokens[2].first.substr(source) == "new" );
+        REQUIRE( tokens[2].second.name() == "source.coffee meta.class.instance.constructor keyword.operator.new.coffee" );
+
+        REQUIRE( tokens[3].first.substr(source) == "foo.bar.Baz" );
+        REQUIRE( tokens[3].second.name() == "source.coffee meta.class.instance.constructor entity.name.type.instance.coffee" );
+    }
 }
