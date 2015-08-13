@@ -9,3 +9,4 @@ src/run
 .syntastic_cpp_config
 *.run
 lib
+*.dSYM
