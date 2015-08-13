@@ -7,11 +7,11 @@ using std::shared_ptr;
 
 namespace shl {
 
-inline string onig_error_string(int code, OnigErrorInfo* error_info) {
+inline string onig_error_string(int code, OnigErrorInfo* error_info, const string& regex) {
     UChar buffer[1024];
     int length = onig_error_code_to_str(buffer, code, error_info);
 
-    return string(buffer, buffer + length);
+    return string(buffer, buffer + length) + " -> " + regex;
 }
 
 Match::Match(shared_ptr<OnigRegion> region, shared_ptr<regex_t> regex, const string& target) {
@@ -105,7 +105,7 @@ void Regex::init(const string& regex, OnigOptionType option) {
     
     regex_t* compiled_regex;
     ret_code = onig_new(&compiled_regex, pattern, pattern_end, option, ONIG_ENCODING_UTF8, ONIG_SYNTAX_DEFAULT, &oni_error);
-    if (ret_code != ONIG_NORMAL) throw InvalidRegexException("invalid regex: " + onig_error_string(ret_code, &oni_error));
+    if (ret_code != ONIG_NORMAL) throw InvalidRegexException("invalid regex: " + onig_error_string(ret_code, &oni_error, regex));
 
     _regex = shared_ptr<regex_t>(compiled_regex, [](regex_t* ptr) { onig_free(ptr);});
     _source = regex;
