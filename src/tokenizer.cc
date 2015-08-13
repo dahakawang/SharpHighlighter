@@ -72,8 +72,9 @@ inline bool is_end_match_first(const Rule& rule, const Match& end_match, const M
  * begin_end_pos: this is the offset of current pattern's begin match.end(), it's meant to 
  * support Perl style \G, and stands for the *previous* match.end()
  */
-bool Tokenizer::next_lexeme(const string& text, const int begin_end_pos, const Match& begin_lexeme, const Rule& rule, const Rule** found, Match& match) {
-    int pos = begin_lexeme[0].end();
+bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const Match& last_lexeme, const Rule& rule, const Rule** found, Match& match) {
+    int begin_end_pos = begin_lexeme[0].end();
+    int pos = last_lexeme[0].end();
     const Rule* found_rule = nullptr;
     Match first_match;
     bool is_close = false;
@@ -89,7 +90,7 @@ bool Tokenizer::next_lexeme(const string& text, const int begin_end_pos, const M
         }
     });
     if (!rule.end.empty()) {
-        Match end_match = rule.end.match(text, pos, begin_end_pos);
+        Match end_match = rule.end.match(begin_lexeme, text, pos, begin_end_pos); 
         if (end_match != Match::NOT_MATCHED) {
             if( found_rule == nullptr || is_end_match_first(rule, end_match, first_match)) {
                 first_match = std::move(end_match); 
@@ -164,11 +165,10 @@ void Tokenizer::process_capture(vector<pair<Range, Scope> >& tokens, const Match
 Match Tokenizer::tokenize(const string& text, const Rule& rule, const Match& begin_lexeme, vector<const Rule*>& stack, vector<pair<Range, Scope> >& tokens) {
     stack.push_back(&rule);
 
-    int begin_end_pos = begin_lexeme[0].end();
     const Rule* found_rule = nullptr;
     Match last_lexeme, match;
     last_lexeme = begin_lexeme;
-    while(next_lexeme(text, begin_end_pos, last_lexeme, rule, &found_rule, match)) {
+    while(next_lexeme(text, begin_lexeme, last_lexeme, rule, &found_rule, match)) {
         if (found_rule->is_match_rule) {
             add_scope(tokens, match[0], stack, found_rule->name);
             process_capture(tokens, match, stack, found_rule->begin_captures, found_rule->name);
