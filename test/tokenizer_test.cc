@@ -57,4 +57,16 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[3].first.substr(source) == "foo.bar.Baz" );
         REQUIRE( tokens[3].second.name() == "source.coffee meta.class.instance.constructor entity.name.type.instance.coffee" );
     }
+
+    SECTION("return grammar top level token when no match at all") {
+        string data = load_string("fixture/text.json");
+        string source = "abc def";
+        Grammar g = loader.load(data);
+        auto tokens = tokenizer.tokenize(g, source); 
+        
+        REQUIRE( tokens.size() == 1 );
+
+        REQUIRE( tokens[0].first.substr(source) == source );
+        REQUIRE( tokens[0].second.name() == "text.plain" );
+    }
 }
