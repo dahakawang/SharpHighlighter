@@ -216,4 +216,34 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[1].first.substr(source) == "1233456" ); 
         REQUIRE( tokens[1].second.name() == "source.coffee constant.numeric.coffee" );
     }
+
+    SECTION("can handle interpolated string") {
+        string data = load_string("fixture/coffee-script.json");
+        string source = "\"the value is #{@x} my friend\"";
+        Grammar g = loader.load(data);
+        auto tokens = tokenizer.tokenize(g, source); 
+
+        REQUIRE( tokens.size() == 7 );
+
+        REQUIRE( tokens[0].first.substr(source) == source ); 
+        REQUIRE( tokens[0].second.name() == "source.coffee" );
+        
+        REQUIRE( tokens[1].first.substr(source) == source ); 
+        REQUIRE( tokens[1].second.name() == "source.coffee string.quoted.double.coffee" );
+
+        REQUIRE( tokens[2].first.substr(source) == "\"" ); 
+        REQUIRE( tokens[2].second.name() == "source.coffee string.quoted.double.coffee punctuation.definition.string.begin.coffee" );
+
+        REQUIRE( tokens[3].first.substr(source) == "#{@x}" ); 
+        REQUIRE( tokens[3].second.name() == "source.coffee string.quoted.double.coffee source.coffee.embedded.source" );
+
+        REQUIRE( tokens[4].first.substr(source) == "#{" ); 
+        REQUIRE( tokens[4].second.name() == "source.coffee string.quoted.double.coffee source.coffee.embedded.source punctuation.section.embedded.coffee" );
+
+        REQUIRE( tokens[5].first.substr(source) == "}" ); 
+        REQUIRE( tokens[5].second.name() == "source.coffee string.quoted.double.coffee source.coffee.embedded.source punctuation.section.embedded.coffee" );
+
+        REQUIRE( tokens[6].first.substr(source) == "\"" ); 
+        REQUIRE( tokens[6].second.name() == "source.coffee string.quoted.double.coffee punctuation.definition.string.end.coffee" );
+    }
 }
