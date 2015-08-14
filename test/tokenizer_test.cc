@@ -1,5 +1,6 @@
 #include "catch.hpp"
 #include "util.h"
+#include <shl_exception.h>
 #include <tokenizer.h>
 #include <grammar_loader.h>
 
@@ -68,6 +69,23 @@ TEST_CASE("Tokenizer Tests") {
 
         REQUIRE( tokens[0].first.substr(source) == source );
         REQUIRE( tokens[0].second.name() == "text.plain" );
+    }
+
+    SECTION("will throw when scope is not properly closed (i.e. source code is malformed)") {
+        string data = load_string("fixture/c.json");
+        string source = "int main() {";
+        Grammar g = loader.load(data);
+        
+        REQUIRE_THROWS_AS(tokenizer.tokenize(g, source), InvalidSourceException);
+    }
+
+    SECTION("will not throw when scope is not properly closed, if OPTION_TOLERATE_ERROR is specified") {
+        string data = load_string("fixture/c.json");
+        string source = "int main() {";
+        Grammar g = loader.load(data);
+        Tokenizer tokenizer(Tokenizer::OPTION_TOLERATE_ERROR);
+        
+        REQUIRE_NOTHROW(tokenizer.tokenize(g, source));
     }
 
     SECTION("the enclosing scope will cover the sub-scopes") {
