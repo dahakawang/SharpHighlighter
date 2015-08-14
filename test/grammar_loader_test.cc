@@ -27,6 +27,11 @@ TEST_CASE("GrammarLoader Test") {
         REQUIRE(g.repository["preprocessor-rule-enabled"].begin_captures[2] == "keyword.control.import.if.c");
     }
 
+    SECTION("captures can be regard as end_captures if is a begin/end rule and has no end_captures") {
+        REQUIRE(g.repository["preprocessor-rule-enabled"].end_captures.size() == 3);
+        REQUIRE(g.repository["preprocessor-rule-enabled"].end_captures[2] == "keyword.control.import.if.c");
+    }
+
     SECTION("match rule merged with begin, and captures merge with begin_captures") {
         REQUIRE(g.repository["string_escaped_char"].patterns[1].begin.source() == "\\\\.");
         REQUIRE(g.patterns[1].begin_captures.size() == 1);
