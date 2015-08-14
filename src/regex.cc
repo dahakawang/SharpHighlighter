@@ -8,6 +8,10 @@ using std::shared_ptr;
 
 namespace shl {
 
+bool Range::contain(const Range& rh) const {
+    return (position <= rh.position) && (end() >= rh.end());
+}
+
 inline string onig_error_string(int code, OnigErrorInfo* error_info, const string& regex) {
     UChar buffer[1024];
     int length = onig_error_code_to_str(buffer, code, error_info);

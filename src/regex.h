@@ -24,6 +24,7 @@ struct Range {
     int end() const {return position + length;};
     bool operator==(const Range& rh) const {return position == rh.position && length == rh.length;};
     bool operator!=(const Range& rh) const { return !(*this == rh);};
+    bool contain(const Range& rh) const;
 
     const string substr(const string& str) const { return str.substr(position, length); };
 };
