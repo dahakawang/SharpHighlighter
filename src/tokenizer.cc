@@ -123,7 +123,7 @@ bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const
     }
 }
 
-vector<string> get_name(vector<const Rule*>& stack, const string& name, const string& enclosing_name) {
+vector<string> compile_scope_name(vector<const Rule*>& stack, const string& name, const string& enclosing_name, const vector<string> additional) {
     vector<string> names;
 
     for(auto rule: stack) {
@@ -131,16 +131,19 @@ vector<string> get_name(vector<const Rule*>& stack, const string& name, const st
         names.push_back(rule->content_name);
     }
     if (!enclosing_name.empty()) names.push_back(enclosing_name);
-    names.push_back(name); // name can't be empty
+    for(auto elem : additional) {
+        names.push_back(elem);
+    }
+    names.push_back(name); // name can't be empty, enforced by caller
 
     return names;
 }
 
-void Tokenizer::add_scope(vector<pair<Range, Scope> >& tokens, const Range& range, vector<const Rule*>& stack, const string& name, const string& enclosing_name = "") {
+void Tokenizer::add_scope(vector<pair<Range, Scope> >& tokens, const Range& range, vector<const Rule*>& stack, const string& name, const string& enclosing_name, const vector<string>& additional) {
     if (name.empty()) return;
     if (range.length == 0) return; // only captures can potentially has 0 length
 
-    Scope scope(get_name(stack, name, enclosing_name));
+    Scope scope(compile_scope_name(stack, name, enclosing_name, additional));
     tokens.push_back(std::make_pair(range, scope));
 }
 
@@ -148,12 +151,27 @@ inline void append_back(vector<pair<Range, Scope> >& target, const vector<pair<R
     std::move(source.begin(), source.end(), std::back_inserter(target));
 }
 
+vector<string> get_parent_capture_names(const Match& match, const map<int, string>& capture, int pos) {
+    vector<string> addictinal;
+
+    for (size_t it = 0; it < pos; it++) {
+        auto it_name = capture.find(it);
+        if (match[it].contain(match[pos]) && it_name != capture.end()) {
+            addictinal.push_back(it_name->second);
+        }
+    }
+
+    return addictinal;
+}
+
 void Tokenizer::process_capture(vector<pair<Range, Scope> >& tokens, const Match& match, vector<const Rule*>& stack, const map<int, string>& capture, const string& enclosing_name) {
     for (auto& pair : capture) {
         unsigned int capture_num = pair.first;
         const string& name = pair.second;
         if (match.size() > capture_num) {
-            add_scope(tokens, match[capture_num], stack, name, enclosing_name);
+            if (match[0].contain(match[capture_num])) {
+                add_scope(tokens, match[capture_num], stack, name, enclosing_name, get_parent_capture_names(match, capture, capture_num));
+            }
         } else {
             if (_option & OPTION_STRICT) {
                 throw InvalidSourceException("capture number out of range");
