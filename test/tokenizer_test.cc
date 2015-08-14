@@ -85,7 +85,7 @@ TEST_CASE("Tokenizer Tests") {
         Grammar g = loader.load(data);
         Tokenizer tokenizer(Tokenizer::OPTION_TOLERATE_ERROR);
         
-        REQUIRE_NOTHROW(tokenizer.tokenize(g, source));
+        REQUIRE_NOTHROW( tokenizer.tokenize(g, source) );
     }
 
     SECTION("the enclosing scope will cover the sub-scopes") {
@@ -95,20 +95,20 @@ TEST_CASE("Tokenizer Tests") {
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 5 );
-        REQUIRE (tokens[0].first.substr(source) == source );
-        REQUIRE (tokens[0].second.name() == "source.coffee" );
+        REQUIRE( tokens[0].first.substr(source) == source );
+        REQUIRE( tokens[0].second.name() == "source.coffee" );
 
-        REQUIRE (tokens[1].first.substr(source) == "return" );
-        REQUIRE (tokens[1].second.name() == "source.coffee keyword.control.coffee" );
+        REQUIRE( tokens[1].first.substr(source) == "return" );
+        REQUIRE( tokens[1].second.name() == "source.coffee keyword.control.coffee" );
 
-        REQUIRE (tokens[2].first.substr(source) == "new foo.bar.Baz" );
-        REQUIRE (tokens[2].second.name() == "source.coffee meta.class.instance.constructor" );
+        REQUIRE( tokens[2].first.substr(source) == "new foo.bar.Baz" );
+        REQUIRE( tokens[2].second.name() == "source.coffee meta.class.instance.constructor" );
 
-        REQUIRE (tokens[3].first.substr(source) == "new" );
-        REQUIRE (tokens[3].second.name() == "source.coffee meta.class.instance.constructor keyword.operator.new.coffee" );
+        REQUIRE( tokens[3].first.substr(source) == "new" );
+        REQUIRE( tokens[3].second.name() == "source.coffee meta.class.instance.constructor keyword.operator.new.coffee" );
 
-        REQUIRE (tokens[4].first.substr(source) == "foo.bar.Baz" );
-        REQUIRE (tokens[4].second.name() == "source.coffee meta.class.instance.constructor entity.name.type.instance.coffee" );
+        REQUIRE( tokens[4].first.substr(source) == "foo.bar.Baz" );
+        REQUIRE( tokens[4].second.name() == "source.coffee meta.class.instance.constructor entity.name.type.instance.coffee" );
     }
 
     SECTION("only return matched capture groups when match rule has an optional captre groups") {
@@ -120,16 +120,16 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens.size() == 4 );
 
         REQUIRE( tokens[0].first.substr(source) == source ); 
-        REQUIRE (tokens[0].second.name() == "source.coffee" );
+        REQUIRE( tokens[0].second.name() == "source.coffee" );
 
         REQUIRE( tokens[1].first.substr(source) == source ); 
-        REQUIRE (tokens[1].second.name() == "source.coffee meta.class.coffee" );
+        REQUIRE( tokens[1].second.name() == "source.coffee meta.class.coffee" );
 
         REQUIRE( tokens[2].first.substr(source) == "class" ); 
-        REQUIRE (tokens[2].second.name() == "source.coffee meta.class.coffee storage.type.class.coffee" );
+        REQUIRE( tokens[2].second.name() == "source.coffee meta.class.coffee storage.type.class.coffee" );
 
         REQUIRE( tokens[3].first.substr(source) == "Foo" ); 
-        REQUIRE (tokens[3].second.name() == "source.coffee meta.class.coffee entity.name.type.class.coffee" );
+        REQUIRE( tokens[3].second.name() == "source.coffee meta.class.coffee entity.name.type.class.coffee" );
     }
 
     /* The tokens are sorted in the way similar to the in-order traversal of the AST
@@ -154,22 +154,22 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens.size() == 6 );
 
         REQUIRE( tokens[0].first.substr(source) == source ); 
-        REQUIRE(tokens[0].second.name() == "source.coffee" );
+        REQUIRE( tokens[0].second.name() == "source.coffee" );
 
         REQUIRE( tokens[1].first.substr(source) == "destroy" ); 
-        REQUIRE (tokens[1].second.name() == "source.coffee meta.function.coffee" );
+        REQUIRE( tokens[1].second.name() == "source.coffee meta.function.coffee" );
 
         REQUIRE( tokens[2].first.substr(source) == "destroy" ); 
-        REQUIRE(tokens[2].second.name() == "source.coffee meta.function.coffee entity.name.function.coffee" );
+        REQUIRE( tokens[2].second.name() == "source.coffee meta.function.coffee entity.name.function.coffee" );
 
         REQUIRE( tokens[3].first.substr(source) == "y" ); 
-        REQUIRE(tokens[3].second.name() == "source.coffee meta.function.coffee entity.name.function.coffee entity.name.function.coffee" );
+        REQUIRE( tokens[3].second.name() == "source.coffee meta.function.coffee entity.name.function.coffee entity.name.function.coffee" );
 
         REQUIRE( tokens[4].first.substr(source) == ":" ); 
-        REQUIRE (tokens[4].second.name() == "source.coffee keyword.operator.coffee" );
+        REQUIRE( tokens[4].second.name() == "source.coffee keyword.operator.coffee" );
 
         REQUIRE( tokens[5].first.substr(source) == "->" ); 
-        REQUIRE (tokens[5].second.name() == "source.coffee storage.type.function.coffee" );
+        REQUIRE( tokens[5].second.name() == "source.coffee storage.type.function.coffee" );
     }
 
     SECTION("when capture beyond the matched range (i.e. capture in a look ahead/behind group)") {
@@ -183,7 +183,7 @@ TEST_CASE("Tokenizer Tests") {
         // the scope "source.coffee meta.function.coffee storage.type.function.coffee" captures
         // "->", which is beyond the matching range. so ignore it.
         REQUIRE_FALSE( tokens[4].first.substr(source) == "->" ); 
-        REQUIRE_FALSE(tokens[4].second.name() == "source.coffee meta.function.coffee storage.type.function.coffee" );
+        REQUIRE_FALSE( tokens[4].second.name() == "source.coffee meta.function.coffee storage.type.function.coffee" );
     }
 
     SECTION("the enclosed/nested capture group will has additional ScopeNames") {
@@ -195,10 +195,10 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens.size() == 6 );
 
         REQUIRE( tokens[2].first.substr(source) == "destroy" ); 
-        REQUIRE(tokens[2].second.name() == "source.coffee meta.function.coffee entity.name.function.coffee" );
+        REQUIRE( tokens[2].second.name() == "source.coffee meta.function.coffee entity.name.function.coffee" );
 
         REQUIRE( tokens[3].first.substr(source) == "y" ); 
-        REQUIRE(tokens[3].second.name() == "source.coffee meta.function.coffee entity.name.function.coffee entity.name.function.coffee" );
+        REQUIRE( tokens[3].second.name() == "source.coffee meta.function.coffee entity.name.function.coffee entity.name.function.coffee" );
 
     }
 
