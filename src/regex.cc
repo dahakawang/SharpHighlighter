@@ -170,7 +170,7 @@ string EndPatternRegex::expand_backref(const Match& match, const string& target)
                 size_t capture_num = get_int(_original_regex.c_str() + pos, &size);
                 pos += (size - 1);
 
-                if (capture_num > match.size()) throw InvalidRegexException("trying to back reference a not existed group");
+                if (capture_num >= match.size()) throw InvalidRegexException("trying to back reference a not existed group");
                 expanded_regex += match[capture_num].substr(target);
             } else if (escaped) {
                 expanded_regex += '\\';
