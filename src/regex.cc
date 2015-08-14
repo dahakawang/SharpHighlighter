@@ -1,5 +1,6 @@
 #include <iostream>
 #include <memory>
+#include <cstring>
 #include "regex.h"
 #include "shl_exception.h"
 
@@ -156,6 +157,19 @@ int get_int(const char* str, int* size) {
     return value;
 }
 
+string escape_regex(const string& regex) {
+    static char const* special = "\\|([{}]).?*+^$";
+    string escaped;
+
+    for (char ch : regex) {
+        if (strchr(special, ch)) {
+            escaped += '\\';
+        }
+        escaped += ch;
+    }
+
+    return escaped;
+}
 string EndPatternRegex::expand_backref(const Match& match, const string& target) const {
     string expanded_regex;
     bool escaped = false;
@@ -182,7 +196,7 @@ string EndPatternRegex::expand_backref(const Match& match, const string& target)
         }
     }
 
-    return expanded_regex;
+    return escape_regex(expanded_regex);
 }
 
 }
