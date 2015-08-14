@@ -145,7 +145,7 @@ TEST_CASE("Tokenizer Tests") {
      *         / \
      *        3   4
      */
-    SECTION("when capture ranges overlap, ensure parent rule appears ahead of child") {
+    SECTION("when encounter nested capture, ensure parent capture group appears ahead of child") {
         string data = load_string("fixture/coffee-script.json");
         string source = "  destroy: ->";
         Grammar g = loader.load(data);
@@ -172,7 +172,7 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE (tokens[5].second.name() == "source.coffee storage.type.function.coffee" );
     }
 
-    SECTION("when capture beyond the matched range (i.e. capture in a look ahead group)") {
+    SECTION("when capture beyond the matched range (i.e. capture in a look ahead/behind group)") {
         string data = load_string("fixture/coffee-script.json");
         string source = "  destroy: ->";
         Grammar g = loader.load(data);
@@ -186,7 +186,7 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE_FALSE(tokens[4].second.name() == "source.coffee meta.function.coffee storage.type.function.coffee" );
     }
 
-    SECTION("the enclosed capture group will has one additional ScopeName") {
+    SECTION("the enclosed/nested capture group will has additional ScopeNames") {
         string data = load_string("fixture/coffee-script.json");
         string source = "  destroy: ->";
         Grammar g = loader.load(data);
