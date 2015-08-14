@@ -42,6 +42,7 @@ void GrammarLoader::compile_grammar(const JsonObject& root, Grammar& grammar, co
         if(object.end.empty()) throw InvalidGrammarException("should have end for a begin/end pattern");
         rule.end = EndPatternRegex(object.end);
         rule.end_captures = get_captures(object.end_captures);
+        if (rule.end_captures.empty()) rule.end_captures = get_captures(object.captures);
         rule.content_name = object.content_name;
         if (object.applyEndPatternLast == "true") rule.applyEndPatternLast = true;
     } else {
