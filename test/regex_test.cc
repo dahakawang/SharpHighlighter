@@ -52,6 +52,25 @@ TEST_CASE("Range Test") {
         REQUIRE(range1 != range3);
         REQUIRE(range1 != range4);
     }
+
+    SECTION("contain can check if range contains another") {
+        Range r1(100, 100), r2(0, 10), r3(0, 100), r4(0, 101), r5(0, 150);
+        Range r6(0, 200), r7(100, 50), r8(100, 100), r9(100, 101);
+        Range r10(150, 50), r11(150, 51), r12(200, 10), r13(201, 100);
+
+        REQUIRE_FALSE( r1.contain(r2) );
+        REQUIRE_FALSE( r1.contain(r3) );
+        REQUIRE_FALSE( r1.contain(r4) );
+        REQUIRE_FALSE( r1.contain(r5) );
+        REQUIRE_FALSE( r1.contain(r6) );
+        REQUIRE( r1.contain(r7) );
+        REQUIRE( r1.contain(r8) );
+        REQUIRE_FALSE( r1.contain(r9) );
+        REQUIRE( r1.contain(r10) );
+        REQUIRE_FALSE( r1.contain(r11) );
+        REQUIRE_FALSE( r1.contain(r12) );
+        REQUIRE_FALSE( r1.contain(r13) );
+    }
 }
 
 
