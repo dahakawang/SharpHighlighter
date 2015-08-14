@@ -201,4 +201,19 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE(tokens[3].second.name() == "source.coffee meta.function.coffee entity.name.function.coffee entity.name.function.coffee" );
 
     }
+
+    SECTION("the include rule wil do its work") {
+        string data = load_string("fixture/coffee-script.json");
+        string source = "1233456";
+        Grammar g = loader.load(data);
+        auto tokens = tokenizer.tokenize(g, source); 
+
+        REQUIRE( tokens.size() == 2 );
+        
+        REQUIRE( tokens[0].first.substr(source) == source ); 
+        REQUIRE( tokens[0].second.name() == "source.coffee" );
+
+        REQUIRE( tokens[1].first.substr(source) == "1233456" ); 
+        REQUIRE( tokens[1].second.name() == "source.coffee constant.numeric.coffee" );
+    }
 }
