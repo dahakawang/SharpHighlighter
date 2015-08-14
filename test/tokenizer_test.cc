@@ -131,4 +131,74 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[3].first.substr(source) == "Foo" ); 
         REQUIRE (tokens[3].second.name() == "source.coffee meta.class.coffee entity.name.type.class.coffee" );
     }
+
+    /* The tokens are sorted in the way similar to the in-order traversal of the AST
+     * This holds true even for begin_captures/end_capture/captures rules, because 
+     * capture group themselves have hierarchy. Although capture rules are listed in 
+     * any order, since we simply apply scope to the captured group in ascending order(0,1...N),
+     * we are actually apply in the same way of the in-order traversal.
+     *
+     * e.g. ((()())()), the capture group number are corresponding to below tree
+     *             1
+     *           /   \
+     *          2     5
+     *         / \
+     *        3   4
+     */
+    SECTION("when capture ranges overlap, ensure parent rule appears ahead of child") {
+        string data = load_string("fixture/coffee-script.json");
+        string source = "  destroy: ->";
+        Grammar g = loader.load(data);
+        auto tokens = tokenizer.tokenize(g, source); 
+
+        REQUIRE( tokens.size() == 6 );
+
+        REQUIRE( tokens[0].first.substr(source) == source ); 
+        REQUIRE(tokens[0].second.name() == "source.coffee" );
+
+        REQUIRE( tokens[1].first.substr(source) == "destroy" ); 
+        REQUIRE (tokens[1].second.name() == "source.coffee meta.function.coffee" );
+
+        REQUIRE( tokens[2].first.substr(source) == "destroy" ); 
+        REQUIRE(tokens[2].second.name() == "source.coffee meta.function.coffee entity.name.function.coffee" );
+
+        REQUIRE( tokens[3].first.substr(source) == "y" ); 
+        REQUIRE(tokens[3].second.name() == "source.coffee meta.function.coffee entity.name.function.coffee entity.name.function.coffee" );
+
+        REQUIRE( tokens[4].first.substr(source) == ":" ); 
+        REQUIRE (tokens[4].second.name() == "source.coffee keyword.operator.coffee" );
+
+        REQUIRE( tokens[5].first.substr(source) == "->" ); 
+        REQUIRE (tokens[5].second.name() == "source.coffee storage.type.function.coffee" );
+    }
+
+    SECTION("when capture beyond the matched range (i.e. capture in a look ahead group)") {
+        string data = load_string("fixture/coffee-script.json");
+        string source = "  destroy: ->";
+        Grammar g = loader.load(data);
+        auto tokens = tokenizer.tokenize(g, source); 
+
+        REQUIRE( tokens.size() == 6 );
+
+        // the scope "source.coffee meta.function.coffee storage.type.function.coffee" captures
+        // "->", which is beyond the matching range. so ignore it.
+        REQUIRE_FALSE( tokens[4].first.substr(source) == "->" ); 
+        REQUIRE_FALSE(tokens[4].second.name() == "source.coffee meta.function.coffee storage.type.function.coffee" );
+    }
+
+    SECTION("the enclosed capture group will has one additional ScopeName") {
+        string data = load_string("fixture/coffee-script.json");
+        string source = "  destroy: ->";
+        Grammar g = loader.load(data);
+        auto tokens = tokenizer.tokenize(g, source); 
+
+        REQUIRE( tokens.size() == 6 );
+
+        REQUIRE( tokens[2].first.substr(source) == "destroy" ); 
+        REQUIRE(tokens[2].second.name() == "source.coffee meta.function.coffee entity.name.function.coffee" );
+
+        REQUIRE( tokens[3].first.substr(source) == "y" ); 
+        REQUIRE(tokens[3].second.name() == "source.coffee meta.function.coffee entity.name.function.coffee entity.name.function.coffee" );
+
+    }
 }
