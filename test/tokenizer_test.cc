@@ -71,6 +71,17 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[0].second.name() == "text.plain" );
     }
 
+    /*
+    SECTION("it will loop all") { // TODO fix this
+        string data = load_string("fixture/text.json");
+        string source = "abd def";
+        Grammar g = loader.load(data);
+        Tokenizer tokenizer(Tokenizer::OPTION_TOLERATE_ERROR);
+
+        REQUIRE_NOTHROW( tokenizer.tokenize(g, source) );
+    }
+    */
+
     SECTION("will throw when scope is not properly closed (i.e. source code is malformed)") {
         string data = load_string("fixture/c.json");
         string source = "int main() {";
@@ -299,6 +310,15 @@ TEST_CASE("Tokenizer Tests") {
 
         REQUIRE( tokens[13].first.substr(source) == "\"" ); 
         REQUIRE( tokens[13].second.name() == "source.coffee string.quoted.double.coffee punctuation.definition.string.end.coffee" );
+    }
+
+    SECTION("return top level scope when empty source") {
+        string data = load_string("fixture/coffee-script.json");
+        string source = "";
+        Grammar g = loader.load(data);
+        auto tokens = tokenizer.tokenize(g, source); 
+
+        REQUIRE( tokens.size() == 1 );
     }
 
     // TODO test $base $self
