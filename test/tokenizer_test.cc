@@ -223,7 +223,7 @@ TEST_CASE("Tokenizer Tests") {
         Grammar g = loader.load(data);
         auto tokens = tokenizer.tokenize(g, source); 
 
-        REQUIRE( tokens.size() == 7 );
+        REQUIRE( tokens.size() == 8 );
 
         REQUIRE( tokens[0].first.substr(source) == source ); 
         REQUIRE( tokens[0].second.name() == "source.coffee" );
@@ -240,10 +240,15 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[4].first.substr(source) == "#{" ); 
         REQUIRE( tokens[4].second.name() == "source.coffee string.quoted.double.coffee source.coffee.embedded.source punctuation.section.embedded.coffee" );
 
-        REQUIRE( tokens[5].first.substr(source) == "}" ); 
-        REQUIRE( tokens[5].second.name() == "source.coffee string.quoted.double.coffee source.coffee.embedded.source punctuation.section.embedded.coffee" );
+        REQUIRE( tokens[5].first.substr(source) == "@x" ); 
+        REQUIRE( tokens[5].second.name() == "source.coffee string.quoted.double.coffee source.coffee.embedded.source variable.other.readwrite.instance.coffee" );
 
-        REQUIRE( tokens[6].first.substr(source) == "\"" ); 
-        REQUIRE( tokens[6].second.name() == "source.coffee string.quoted.double.coffee punctuation.definition.string.end.coffee" );
+        REQUIRE( tokens[6].first.substr(source) == "}" ); 
+        REQUIRE( tokens[6].second.name() == "source.coffee string.quoted.double.coffee source.coffee.embedded.source punctuation.section.embedded.coffee" );
+
+        REQUIRE( tokens[7].first.substr(source) == "\"" ); 
+        REQUIRE( tokens[7].second.name() == "source.coffee string.quoted.double.coffee punctuation.definition.string.end.coffee" );
     }
+
+    // TODO test $base $self
 }

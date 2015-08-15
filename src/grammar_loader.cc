@@ -27,8 +27,7 @@ void GrammarLoader::compile_grammar(const JsonObject& root, Grammar& grammar, co
     rule.name = object.name;
 
     if (!object.include.empty()) {
-        Rule* included = find_include(root, grammar, rule, object.include, parent);
-        rule.include = included;
+        rule.include = find_include(root, grammar, object.include);
     } else if (!object.match.empty()) {
         rule.is_match_rule = true;
         rule.begin = Regex(object.match);
@@ -85,26 +84,22 @@ map<int, string> GrammarLoader::get_captures(const map<string, map<string, strin
     return captures;
 }
 
-Rule* GrammarLoader::find_include(const JsonObject& root, Grammar& grammar, Rule& rule, const string& include_name, Rule* parent) {
+WeakIncludePtr GrammarLoader::find_include(const JsonObject& root, Grammar& grammar, const string& include_name) {
     
     // base reference
     if (include_name == "$base") {
-        return &grammar;
+        return WeakIncludePtr(nullptr, true);
 
     // self reference
     } else if (include_name == "$self") {
-        if ( parent != nullptr) {
-            return parent;
-        } else {
-            throw InvalidGrammarException("a toplevel grammar or toplevel repository item can't included $base");
-        }
+        return WeakIncludePtr(&grammar);
 
     // repository reference
     } else if (include_name[0] == '#'){
         string repo_name = include_name.substr(1);
         // if the stocked resource is already added, then return the address directly
         auto stock_res = grammar.repository.find(repo_name);
-        if (stock_res != grammar.repository.end()) return &stock_res->second;
+        if (stock_res != grammar.repository.end()) return WeakIncludePtr(&stock_res->second);
 
         auto it = root.repository.find(repo_name);
         if (it == root.repository.end()) throw InvalidGrammarException(string("can't find the name in repository: ") + repo_name);

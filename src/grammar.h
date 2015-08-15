@@ -12,9 +12,19 @@ using std::vector;
 
 namespace shl {
 
+class Rule;
+
+class WeakIncludePtr {
+public:
+    WeakIncludePtr():ptr(nullptr), is_base_ref(false) {};
+    WeakIncludePtr(Rule* _ptr, bool _is_base = false):ptr(_ptr), is_base_ref(_is_base) {};
+    Rule* ptr;
+    bool is_base_ref;
+};
+
 class Rule {
 public:
-    Rule():is_match_rule(false), applyEndPatternLast(false), include(nullptr) {};
+    Rule():is_match_rule(false), applyEndPatternLast(false) {};
     bool is_match_rule;
     string name;
     Regex begin;
@@ -24,7 +34,7 @@ public:
     map<int, string> end_captures;
     vector<Rule> patterns;
     string content_name;
-    Rule* include; // like a kind of weak pointer, only points to entries in repository
+    WeakIncludePtr include; // like a kind of weak pointer, only points to entries in repository
 };
 
 class Grammar : public Rule {

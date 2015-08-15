@@ -42,13 +42,15 @@ TEST_CASE("GrammarLoader Test") {
 
 
     SECTION("can resolve includes") {
-        REQUIRE(g.patterns[0].include == &g.repository["preprocessor-rule-enabled"]);
-        REQUIRE(g.patterns[1].patterns[0].include == &g.repository["string_escaped_char"]);
-        REQUIRE(g.patterns[1].patterns[1].include == &g.patterns[1]);
-        REQUIRE(g.patterns[1].patterns[2].include == &g);
+        REQUIRE(g.patterns[0].include.ptr == &g.repository["preprocessor-rule-enabled"]);
+        REQUIRE(g.patterns[1].patterns[0].include.ptr == &g.repository["string_escaped_char"]);
+        REQUIRE(g.patterns[1].patterns[1].include.ptr == &g);
+        REQUIRE(g.patterns[1].patterns[2].include.ptr == nullptr);
+        REQUIRE(g.patterns[1].patterns[2].include.is_base_ref == true);
 
-        REQUIRE(g.repository["preprocessor-rule-enabled"].patterns[0].patterns[0].include == &g.repository["preprocessor-rule-enabled"].patterns[0]);
-        REQUIRE(g.repository["preprocessor-rule-enabled"].patterns[0].patterns[1].include == &g.repository["string_escaped_char"]);
-        REQUIRE(g.repository["preprocessor-rule-enabled"].patterns[1].patterns[0].include == &g);
+        REQUIRE(g.repository["preprocessor-rule-enabled"].patterns[0].patterns[0].include.ptr == &g);
+        REQUIRE(g.repository["preprocessor-rule-enabled"].patterns[0].patterns[1].include.ptr == &g.repository["string_escaped_char"]);
+        REQUIRE(g.repository["preprocessor-rule-enabled"].patterns[1].patterns[0].include.ptr == nullptr);
+        REQUIRE(g.repository["preprocessor-rule-enabled"].patterns[1].patterns[0].include.is_base_ref == true);
     }
 }
