@@ -250,5 +250,56 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[7].second.name() == "source.coffee string.quoted.double.coffee punctuation.definition.string.end.coffee" );
     }
 
+    SECTION("can handle nested e interpolated string") {
+        string data = load_string("fixture/coffee-script.json");
+        string source = "\"#{\"#{@x}\"}\"";
+        Grammar g = loader.load(data);
+        auto tokens = tokenizer.tokenize(g, source); 
+
+        REQUIRE( tokens.size() == 14 );
+
+        REQUIRE( tokens[0].first.substr(source) == source ); 
+        REQUIRE( tokens[0].second.name() == "source.coffee" );
+
+        REQUIRE( tokens[1].first.substr(source) == source ); 
+        REQUIRE( tokens[1].second.name() == "source.coffee string.quoted.double.coffee" );
+
+        REQUIRE( tokens[2].first.substr(source) == "\"" ); 
+        REQUIRE( tokens[2].second.name() == "source.coffee string.quoted.double.coffee punctuation.definition.string.begin.coffee" );
+
+        REQUIRE( tokens[3].first.substr(source) == "#{\"#{@x}\"}" ); 
+        REQUIRE( tokens[3].second.name() == "source.coffee string.quoted.double.coffee source.coffee.embedded.source" );
+
+        REQUIRE( tokens[4].first.substr(source) == "#{" ); 
+        REQUIRE( tokens[4].second.name() == "source.coffee string.quoted.double.coffee source.coffee.embedded.source punctuation.section.embedded.coffee" );
+
+        REQUIRE( tokens[5].first.substr(source) == "\"#{@x}\"" ); 
+        REQUIRE( tokens[5].second.name() == "source.coffee string.quoted.double.coffee source.coffee.embedded.source string.quoted.double.coffee" );
+
+        REQUIRE( tokens[6].first.substr(source) == "\"" ); 
+        REQUIRE( tokens[6].second.name() == "source.coffee string.quoted.double.coffee source.coffee.embedded.source string.quoted.double.coffee punctuation.definition.string.begin.coffee" );
+
+        REQUIRE( tokens[7].first.substr(source) == "#{@x}" ); 
+        REQUIRE( tokens[7].second.name() == "source.coffee string.quoted.double.coffee source.coffee.embedded.source string.quoted.double.coffee source.coffee.embedded.source" );
+
+        REQUIRE( tokens[8].first.substr(source) == "#{" ); 
+        REQUIRE( tokens[8].second.name() == "source.coffee string.quoted.double.coffee source.coffee.embedded.source string.quoted.double.coffee source.coffee.embedded.source punctuation.section.embedded.coffee" );
+
+        REQUIRE( tokens[9].first.substr(source) == "@x" ); 
+        REQUIRE( tokens[9].second.name() == "source.coffee string.quoted.double.coffee source.coffee.embedded.source string.quoted.double.coffee source.coffee.embedded.source variable.other.readwrite.instance.coffee" );
+
+        REQUIRE( tokens[10].first.substr(source) == "}" ); 
+        REQUIRE( tokens[10].second.name() == "source.coffee string.quoted.double.coffee source.coffee.embedded.source string.quoted.double.coffee source.coffee.embedded.source punctuation.section.embedded.coffee" );
+
+        REQUIRE( tokens[11].first.substr(source) == "\"" ); 
+        REQUIRE( tokens[11].second.name() == "source.coffee string.quoted.double.coffee source.coffee.embedded.source string.quoted.double.coffee punctuation.definition.string.end.coffee" );
+
+        REQUIRE( tokens[12].first.substr(source) == "}" ); 
+        REQUIRE( tokens[12].second.name() == "source.coffee string.quoted.double.coffee source.coffee.embedded.source punctuation.section.embedded.coffee" );
+
+        REQUIRE( tokens[13].first.substr(source) == "\"" ); 
+        REQUIRE( tokens[13].second.name() == "source.coffee string.quoted.double.coffee punctuation.definition.string.end.coffee" );
+    }
+
     // TODO test $base $self
 }
