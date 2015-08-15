@@ -151,7 +151,7 @@ inline void append_back(vector<pair<Range, Scope> >& target, const vector<pair<R
     std::move(source.begin(), source.end(), std::back_inserter(target));
 }
 
-vector<string> get_parent_capture_names(const Match& match, const map<int, string>& capture, int pos) {
+vector<string> get_parent_capture_names(const Match& match, const map<int, string>& capture, size_t pos) {
     vector<string> addictinal;
 
     for (size_t it = 0; it < pos; it++) {
