@@ -71,16 +71,14 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[0].second.name() == "text.plain" );
     }
 
-    /*
-    SECTION("it will loop all") { // TODO fix this
+    SECTION("it will loop infinitely") {
         string data = load_string("fixture/text.json");
-        string source = "abd def";
+        string source = "hoo";
         Grammar g = loader.load(data);
         Tokenizer tokenizer(Tokenizer::OPTION_TOLERATE_ERROR);
 
         REQUIRE_NOTHROW( tokenizer.tokenize(g, source) );
     }
-    */
 
     SECTION("will throw when scope is not properly closed (i.e. source code is malformed)") {
         string data = load_string("fixture/c.json");
