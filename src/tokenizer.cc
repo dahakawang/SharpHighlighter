@@ -190,6 +190,14 @@ void Tokenizer::process_capture(vector<pair<Range, Scope> >& tokens, const Match
     }
 }
 
+// when we can't find the end, last found lexeme will be returned
+// But when current rule even dose not contain any sub-rule, then
+// the last found lexeme will be the begin lexeme of current rule
+// In this case we should advance the parser pointer by 1 to avoid infinite loop
+inline static bool detect_infinite_loop(const Match& begin, Match& end) {
+    return (begin[0].end() >= end[0].end());
+}
+
 Match Tokenizer::tokenize(const string& text, const Rule& rule, const Match& begin_lexeme, vector<const Rule*>& stack, vector<pair<Range, Scope> >& tokens) {
     stack.push_back(&rule);
 
@@ -206,17 +214,23 @@ Match Tokenizer::tokenize(const string& text, const Rule& rule, const Match& beg
             vector<pair<Range, Scope> > child_tokens;
 
             Match end_match = tokenize(text, *found_rule, match, stack, child_tokens);
-            
-            Range name_range = Range(match[0].position, end_match[0].end() - match[0].position);
-            add_scope(tokens, name_range, stack, found_rule->name);
-            process_capture(tokens, match, stack, found_rule->begin_captures, found_rule->name);
+            if (detect_infinite_loop(match, end_match)) {
+                last_lexeme = end_match;
+                last_lexeme[0].length++;
 
-            Range content_range = Range(match[0].end(), end_match[0].position - match[0].end());
-            add_scope(tokens, content_range, stack, found_rule->content_name, found_rule->name);
-            
-            append_back(tokens, child_tokens);
-            process_capture(tokens, end_match, stack, found_rule->end_captures, found_rule->name);
-            last_lexeme = end_match;
+            } else {
+                Range name_range = Range(match[0].position, end_match[0].end() - match[0].position);
+                add_scope(tokens, name_range, stack, found_rule->name);
+                process_capture(tokens, match, stack, found_rule->begin_captures, found_rule->name);
+
+                Range content_range = Range(match[0].end(), end_match[0].position - match[0].end());
+                add_scope(tokens, content_range, stack, found_rule->content_name, found_rule->name);
+
+                append_back(tokens, child_tokens);
+                process_capture(tokens, end_match, stack, found_rule->end_captures, found_rule->name);
+
+                last_lexeme = end_match;
+            }
         }
     }
 
