@@ -37,6 +37,7 @@ public:
 
     Match() = default;
     const Range operator[](int capture_index) const { return _captures[capture_index]; };
+    Range& operator[](int capture_index) { return _captures[capture_index]; };
     unsigned int size() const;
     static const Match make_dummy(int position, int length);
 
