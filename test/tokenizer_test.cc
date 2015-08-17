@@ -319,5 +319,11 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens.size() == 1 );
     }
 
+    SECTION("contentName rule will return token name after its content") {
+        string data = load_string("fixture/text.json");
+        string source = "ok, cool";
+        Grammar g = loader.load(data);
+        auto tokens = tokenizer.tokenize(g, source); 
+    }
     // TODO test $base $self
 }
