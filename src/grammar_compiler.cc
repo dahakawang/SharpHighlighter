@@ -1,5 +1,5 @@
 #include <algorithm>
-#include "grammar_loader.h"
+#include "grammar_compiler.h"
 #include "grammar.h"
 #include "json_object.h"
 #include "json_loader.h"
@@ -7,7 +7,7 @@
 
 namespace shl {
 
-Grammar GrammarLoader::load(const string& buffer) {
+Grammar GrammarCompiler::compile(const string& buffer) {
     JsonLoader loader;
     JsonObject object = loader.load(buffer);
 
@@ -16,14 +16,14 @@ Grammar GrammarLoader::load(const string& buffer) {
     return grammar;
 }
 
-void GrammarLoader::process(const JsonObject& object, Grammar& grammar) {
+void GrammarCompiler::process(const JsonObject& object, Grammar& grammar) {
     grammar.desc = object.scope_name;
     grammar.file_types = object.file_types;
     compile_grammar(object, grammar, object, grammar, nullptr);
     swap(grammar.desc, grammar.name);
 }
 
-void GrammarLoader::compile_grammar(const JsonObject& root, Grammar& grammar, const JsonObject& object, Rule& rule, Rule* parent) {
+void GrammarCompiler::compile_grammar(const JsonObject& root, Grammar& grammar, const JsonObject& object, Rule& rule, Rule* parent) {
     rule.name = object.name;
 
     if (!object.include.empty()) {
@@ -73,7 +73,7 @@ string to_capture_name(const map<string, string> m) {
     return it->second;
 }
 
-map<int, string> GrammarLoader::get_captures(const map<string, map<string, string> > raw_capture) {
+map<int, string> GrammarCompiler::get_captures(const map<string, map<string, string> > raw_capture) {
     map<int, string> captures;
     for(auto raw_it = raw_capture.begin(); raw_it != raw_capture.end(); raw_it++) {
         int id = to_int(raw_it->first);
@@ -84,7 +84,7 @@ map<int, string> GrammarLoader::get_captures(const map<string, map<string, strin
     return captures;
 }
 
-WeakIncludePtr GrammarLoader::find_include(const JsonObject& root, Grammar& grammar, const string& include_name) {
+WeakIncludePtr GrammarCompiler::find_include(const JsonObject& root, Grammar& grammar, const string& include_name) {
     
     // base reference
     if (include_name == "$base") {

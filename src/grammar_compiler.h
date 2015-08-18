@@ -1,5 +1,5 @@
-#ifndef _GRAMMAR_LOADER_
-#define _GRAMMAR_LOADER_
+#ifndef __GRAMMAR_COMPILER__
+#define __GRAMMAR_COMPILER__
 
 #include <string>
 #include "grammar.h"
@@ -7,9 +7,9 @@
 
 namespace shl {
 
-class GrammarLoader {
+class GrammarCompiler {
 public:
-    Grammar load(const string& buffer);
+    Grammar compile(const string& buffer);
 
 private:
     void process(const JsonObject& object, Grammar& grammar);

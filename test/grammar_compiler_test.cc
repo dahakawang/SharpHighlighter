@@ -1,13 +1,13 @@
 #include "catch.hpp"
 #include "util.h"
-#include <grammar_loader.h>
+#include <grammar_compiler.h>
 
 using namespace shl;
 
-TEST_CASE("GrammarLoader Test") {
+TEST_CASE("GrammarCompiler Test") {
     string data = load_string("fixture/valid.json");
-    GrammarLoader loader;
-    Grammar g = loader.load(data);
+    GrammarCompiler compiler;
+    Grammar g = compiler.compile(data);
 
     SECTION("can load a valid grammar") {
         REQUIRE(g.desc == "C");

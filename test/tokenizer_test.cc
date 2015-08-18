@@ -2,18 +2,18 @@
 #include "util.h"
 #include <shl_exception.h>
 #include <tokenizer.h>
-#include <grammar_loader.h>
+#include <grammar_compiler.h>
 
 using namespace shl;
 
 TEST_CASE("Tokenizer Tests") {
     Tokenizer tokenizer;
-    GrammarLoader loader;
+    GrammarCompiler compiler;
 
     SECTION("can load grammar and tokenizer string") {
         string data = load_string("fixture/hello.json");
         string source = "hello world!";
-        Grammar g = loader.load(data);
+        Grammar g = compiler.compile(data);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 4 );
@@ -33,7 +33,7 @@ TEST_CASE("Tokenizer Tests") {
     SECTION("return a single token when matches a single pattern with no capture groups") {
         string data = load_string("fixture/coffee-script.json");
         string source = "return";
-        Grammar g = loader.load(data);
+        Grammar g = compiler.compile(data);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 2 );
@@ -44,7 +44,7 @@ TEST_CASE("Tokenizer Tests") {
     SECTION("return several tokens when matches a single pattern with capture gorups") {
         string data = load_string("fixture/coffee-script.json");
         string source = "new foo.bar.Baz";
-        Grammar g = loader.load(data);
+        Grammar g = compiler.compile(data);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 4 );
@@ -62,7 +62,7 @@ TEST_CASE("Tokenizer Tests") {
     SECTION("return grammar top level token when no match at all") {
         string data = load_string("fixture/text.json");
         string source = "   ";
-        Grammar g = loader.load(data);
+        Grammar g = compiler.compile(data);
         auto tokens = tokenizer.tokenize(g, source); 
         
         REQUIRE( tokens.size() == 1 );
@@ -74,7 +74,7 @@ TEST_CASE("Tokenizer Tests") {
     SECTION("it will loop infinitely") {
         string data = load_string("fixture/text.json");
         string source = "hoo";
-        Grammar g = loader.load(data);
+        Grammar g = compiler.compile(data);
         Tokenizer tokenizer(Tokenizer::OPTION_TOLERATE_ERROR);
 
         REQUIRE_NOTHROW( tokenizer.tokenize(g, source) );
@@ -83,7 +83,7 @@ TEST_CASE("Tokenizer Tests") {
     SECTION("will throw when scope is not properly closed (i.e. source code is malformed)") {
         string data = load_string("fixture/c.json");
         string source = "int main() {";
-        Grammar g = loader.load(data);
+        Grammar g = compiler.compile(data);
         
         REQUIRE_THROWS_AS(tokenizer.tokenize(g, source), InvalidSourceException);
     }
@@ -91,7 +91,7 @@ TEST_CASE("Tokenizer Tests") {
     SECTION("will not throw when scope is not properly closed, if OPTION_TOLERATE_ERROR is specified") {
         string data = load_string("fixture/c.json");
         string source = "int main() {";
-        Grammar g = loader.load(data);
+        Grammar g = compiler.compile(data);
         Tokenizer tokenizer(Tokenizer::OPTION_TOLERATE_ERROR);
         
         REQUIRE_NOTHROW( tokenizer.tokenize(g, source) );
@@ -100,7 +100,7 @@ TEST_CASE("Tokenizer Tests") {
     SECTION("the enclosing scope will cover the sub-scopes") {
         string data = load_string("fixture/coffee-script.json");
         string source = " return new foo.bar.Baz ";
-        Grammar g = loader.load(data);
+        Grammar g = compiler.compile(data);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 5 );
@@ -123,7 +123,7 @@ TEST_CASE("Tokenizer Tests") {
     SECTION("only return matched capture groups when match rule has an optional captre groups") {
         string data = load_string("fixture/coffee-script.json");
         string source = "class Foo";
-        Grammar g = loader.load(data);
+        Grammar g = compiler.compile(data);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 4 );
@@ -157,7 +157,7 @@ TEST_CASE("Tokenizer Tests") {
     SECTION("when encounter nested capture, ensure parent capture group appears ahead of child") {
         string data = load_string("fixture/coffee-script.json");
         string source = "  destroy: ->";
-        Grammar g = loader.load(data);
+        Grammar g = compiler.compile(data);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 6 );
@@ -184,7 +184,7 @@ TEST_CASE("Tokenizer Tests") {
     SECTION("when capture beyond the matched range (i.e. capture in a look ahead/behind group)") {
         string data = load_string("fixture/coffee-script.json");
         string source = "  destroy: ->";
-        Grammar g = loader.load(data);
+        Grammar g = compiler.compile(data);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 6 );
@@ -198,7 +198,7 @@ TEST_CASE("Tokenizer Tests") {
     SECTION("the enclosed/nested capture group will has additional ScopeNames") {
         string data = load_string("fixture/coffee-script.json");
         string source = "  destroy: ->";
-        Grammar g = loader.load(data);
+        Grammar g = compiler.compile(data);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 6 );
@@ -214,7 +214,7 @@ TEST_CASE("Tokenizer Tests") {
     SECTION("the include rule wil do its work") {
         string data = load_string("fixture/coffee-script.json");
         string source = "1233456";
-        Grammar g = loader.load(data);
+        Grammar g = compiler.compile(data);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 2 );
@@ -229,7 +229,7 @@ TEST_CASE("Tokenizer Tests") {
     SECTION("can handle interpolated string") {
         string data = load_string("fixture/coffee-script.json");
         string source = "\"the value is #{@x} my friend\"";
-        Grammar g = loader.load(data);
+        Grammar g = compiler.compile(data);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 8 );
@@ -262,7 +262,7 @@ TEST_CASE("Tokenizer Tests") {
     SECTION("can handle nested e interpolated string") {
         string data = load_string("fixture/coffee-script.json");
         string source = "\"#{\"#{@x}\"}\"";
-        Grammar g = loader.load(data);
+        Grammar g = compiler.compile(data);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 14 );
@@ -313,7 +313,7 @@ TEST_CASE("Tokenizer Tests") {
     SECTION("return top level scope when empty source") {
         string data = load_string("fixture/coffee-script.json");
         string source = "";
-        Grammar g = loader.load(data);
+        Grammar g = compiler.compile(data);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 1 );
@@ -322,7 +322,7 @@ TEST_CASE("Tokenizer Tests") {
     SECTION("contentName rule will return token name after its content") {
         string data = load_string("fixture/content-name.json");
         string source = "#if\ntest\n#endif";
-        Grammar g = loader.load(data);
+        Grammar g = compiler.compile(data);
         Tokenizer tokenizer(Tokenizer::OPTION_TOLERATE_ERROR);
         auto tokens = tokenizer.tokenize(g, source); 
 
@@ -342,7 +342,7 @@ TEST_CASE("Tokenizer Tests") {
     SECTION("scope will be ignored if the pattern contains no name or contentName") {
         string data = load_string("fixture/ruby.json");
         string source = "%w|oh \\look|";
-        Grammar g = loader.load(data);
+        Grammar g = compiler.compile(data);
         auto tokens = tokenizer.tokenize(g, source); 
     }
     // TODO test $base $self
