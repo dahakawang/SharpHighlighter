@@ -37,6 +37,16 @@
     }
   ],
   "repository": {
+    "hello": {
+        "patterns":[
+            {
+                "patterns": [
+                    { "include" : "#preprocessor-rule-enabled" },
+                    { "include" : "#hello" }
+                ]
+            }
+        ]
+    },
     "preprocessor-rule-enabled": {
       "begin": "^\\s*(#(if)\\s+(0*1)\\b)",
       "captures": {
