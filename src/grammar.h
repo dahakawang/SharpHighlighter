@@ -16,7 +16,8 @@ class Rule;
 
 class WeakIncludePtr {
 public:
-    WeakIncludePtr(string _name):name(_name), ptr(nullptr), is_base_ref(false), {};
+    WeakIncludePtr():ptr(nullptr), is_base_ref(false) {};
+    WeakIncludePtr(string _name):name(_name), ptr(nullptr), is_base_ref(false) {};
     Rule* ptr;
     bool is_base_ref;
     string name;
