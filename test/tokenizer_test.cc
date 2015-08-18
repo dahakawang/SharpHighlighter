@@ -4,6 +4,7 @@
 #include <tokenizer.h>
 #include <grammar_compiler.h>
 
+#include <iostream>
 using namespace shl;
 
 TEST_CASE("Tokenizer Tests") {
@@ -14,6 +15,7 @@ TEST_CASE("Tokenizer Tests") {
         string data = load_string("fixture/hello.json");
         string source = "hello world!";
         Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 4 );
@@ -34,6 +36,7 @@ TEST_CASE("Tokenizer Tests") {
         string data = load_string("fixture/coffee-script.json");
         string source = "return";
         Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 2 );
@@ -45,6 +48,7 @@ TEST_CASE("Tokenizer Tests") {
         string data = load_string("fixture/coffee-script.json");
         string source = "new foo.bar.Baz";
         Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 4 );
@@ -63,6 +67,7 @@ TEST_CASE("Tokenizer Tests") {
         string data = load_string("fixture/text.json");
         string source = "   ";
         Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
         auto tokens = tokenizer.tokenize(g, source); 
         
         REQUIRE( tokens.size() == 1 );
@@ -75,6 +80,7 @@ TEST_CASE("Tokenizer Tests") {
         string data = load_string("fixture/text.json");
         string source = "hoo";
         Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
         Tokenizer tokenizer(Tokenizer::OPTION_TOLERATE_ERROR);
 
         REQUIRE_NOTHROW( tokenizer.tokenize(g, source) );
@@ -84,6 +90,7 @@ TEST_CASE("Tokenizer Tests") {
         string data = load_string("fixture/c.json");
         string source = "int main() {";
         Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
         
         REQUIRE_THROWS_AS(tokenizer.tokenize(g, source), InvalidSourceException);
     }
@@ -92,6 +99,7 @@ TEST_CASE("Tokenizer Tests") {
         string data = load_string("fixture/c.json");
         string source = "int main() {";
         Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
         Tokenizer tokenizer(Tokenizer::OPTION_TOLERATE_ERROR);
         
         REQUIRE_NOTHROW( tokenizer.tokenize(g, source) );
@@ -101,6 +109,7 @@ TEST_CASE("Tokenizer Tests") {
         string data = load_string("fixture/coffee-script.json");
         string source = " return new foo.bar.Baz ";
         Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 5 );
@@ -124,6 +133,7 @@ TEST_CASE("Tokenizer Tests") {
         string data = load_string("fixture/coffee-script.json");
         string source = "class Foo";
         Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 4 );
@@ -158,6 +168,7 @@ TEST_CASE("Tokenizer Tests") {
         string data = load_string("fixture/coffee-script.json");
         string source = "  destroy: ->";
         Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 6 );
@@ -185,6 +196,7 @@ TEST_CASE("Tokenizer Tests") {
         string data = load_string("fixture/coffee-script.json");
         string source = "  destroy: ->";
         Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 6 );
@@ -199,6 +211,7 @@ TEST_CASE("Tokenizer Tests") {
         string data = load_string("fixture/coffee-script.json");
         string source = "  destroy: ->";
         Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 6 );
@@ -215,7 +228,11 @@ TEST_CASE("Tokenizer Tests") {
         string data = load_string("fixture/coffee-script.json");
         string source = "1233456";
         Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
         auto tokens = tokenizer.tokenize(g, source); 
+        std::cout << g.patterns[g.patterns.size() - 1].include.name << std::endl;
+        std::cout << g.patterns[g.patterns.size() - 1].include.ptr << std::endl;
+        std::cout << &g.repository["numeric"] << std::endl;
 
         REQUIRE( tokens.size() == 2 );
         
@@ -230,6 +247,7 @@ TEST_CASE("Tokenizer Tests") {
         string data = load_string("fixture/coffee-script.json");
         string source = "\"the value is #{@x} my friend\"";
         Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 8 );
@@ -263,6 +281,7 @@ TEST_CASE("Tokenizer Tests") {
         string data = load_string("fixture/coffee-script.json");
         string source = "\"#{\"#{@x}\"}\"";
         Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 14 );
@@ -314,6 +333,7 @@ TEST_CASE("Tokenizer Tests") {
         string data = load_string("fixture/coffee-script.json");
         string source = "";
         Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
         auto tokens = tokenizer.tokenize(g, source); 
 
         REQUIRE( tokens.size() == 1 );
@@ -323,6 +343,7 @@ TEST_CASE("Tokenizer Tests") {
         string data = load_string("fixture/content-name.json");
         string source = "#if\ntest\n#endif";
         Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
         Tokenizer tokenizer(Tokenizer::OPTION_TOLERATE_ERROR);
         auto tokens = tokenizer.tokenize(g, source); 
 
@@ -343,6 +364,7 @@ TEST_CASE("Tokenizer Tests") {
         string data = load_string("fixture/ruby.json");
         string source = "%w|oh \\look|";
         Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
         auto tokens = tokenizer.tokenize(g, source); 
     }
     // TODO test $base $self
