@@ -11,4 +11,6 @@ catch_main.o: catch_main.cc
 	$(CC) -c $(CFLAGS) -I$(ROOT)/src $(INCLUDE_PATH) catch_main.cc -o catch_main.o
 
 clean:
-	-rm *.run
+	@-rm *.o
+	@-rm -rf *.dSYM
+	@-rm *.run
