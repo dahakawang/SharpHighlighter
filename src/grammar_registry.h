@@ -19,7 +19,8 @@ public:
     GrammarRegistry(const std::shared_ptr<GrammarSource> data_source);
     bool contain_grammar(const std::string& grammar_name) const;
     const Grammar& get_grammar(const std::string& grammar_name) const;
-    Grammar& load_grammar(const std::string& grammar_name);
+    Grammar& get_grammar(const std::string& grammar_name);
+    void load_grammar(const std::string& grammar_name);
 
 private:
     std::map<std::string, Grammar> _grammars;

@@ -9,6 +9,15 @@ using std::string;
 
 namespace shl {
 
+static void resolve_all_include(map<string, Grammar>& grammars, GrammarRegistry* registry) {
+    GrammarCompiler compiler;
+
+    for ( auto& name_grammar : grammars ) {
+        Grammar& grammar = name_grammar.second;
+        compiler.resolve_include(grammar, registry);
+    }
+}
+
 GrammarRegistry::GrammarRegistry(const std::shared_ptr<GrammarSource> data_source):_source(data_source) {
     auto list = _source->list_grammars();
 
@@ -16,6 +25,7 @@ GrammarRegistry::GrammarRegistry(const std::shared_ptr<GrammarSource> data_sourc
         string raw_grammar = _source->load_data(grammar_name);
         add_grammar(raw_grammar);
     }
+    resolve_all_include(_grammars, this);
 }
 
 Grammar& GrammarRegistry::add_grammar(const std::string& data) {
@@ -32,17 +42,22 @@ bool GrammarRegistry::contain_grammar(const std::string& grammar_name) const {
     return _grammars.count(grammar_name) != 0;
 }
 
-Grammar& GrammarRegistry::load_grammar(const std::string& grammar_name) {
-    if (_grammars.count(grammar_name) != 0) return _grammars.find(grammar_name)->second;
+void GrammarRegistry::load_grammar(const std::string& grammar_name) {
+    if (contain_grammar(grammar_name)) return;
 
     string raw_grammar = _source->load_data(grammar_name);
-    return add_grammar(raw_grammar);
+    add_grammar(raw_grammar);
+    resolve_all_include(_grammars, this);
 }
 
 const Grammar& GrammarRegistry::get_grammar(const std::string& grammar_name) const {
     if (_grammars.count(grammar_name) == 0) return _empty;
 
     return _grammars.find(grammar_name)->second;
+}
+
+Grammar& GrammarRegistry::get_grammar(const std::string& grammar_name) {
+    return const_cast<Grammar&>(static_cast<const GrammarRegistry*>(this)->get_grammar(grammar_name));
 }
 
 }
