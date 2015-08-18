@@ -17,7 +17,7 @@ private:
 
 TestSource::TestSource() {
     ruby = load_string("fixture/ruby.json");
-    html = load_string("fixture/hello.json");
+    html = load_string("fixture/html.json");
 }
 
 const std::string TestSource::load_data(const std::string& grammar_name) const {
