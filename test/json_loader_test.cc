@@ -32,7 +32,7 @@ TEST_CASE("JsonLoader Test") {
         REQUIRE(obj.patterns[1].patterns.size() == 3);
         REQUIRE(obj.patterns[1].patterns[2].include == "$base");
 
-        REQUIRE(obj.repository.size() == 2);
+        REQUIRE(obj.repository.size() == 3);
         REQUIRE(obj.repository["preprocessor-rule-enabled"].begin == "^\\s*(#(if)\\s+(0*1)\\b)");
         REQUIRE(obj.repository["preprocessor-rule-enabled"].patterns[0].content_name == "comment.block.preprocessor.else-branch");
     }
