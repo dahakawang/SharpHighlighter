@@ -320,10 +320,23 @@ TEST_CASE("Tokenizer Tests") {
     }
 
     SECTION("contentName rule will return token name after its content") {
-        string data = load_string("fixture/text.json");
-        string source = "ok, cool";
+        string data = load_string("fixture/content-name.json");
+        string source = "#if\ntest\n#endif";
         Grammar g = loader.load(data);
+        Tokenizer tokenizer(Tokenizer::OPTION_TOLERATE_ERROR);
         auto tokens = tokenizer.tokenize(g, source); 
+
+        REQUIRE( tokens.size() == 3 );
+
+
+        REQUIRE( tokens[0].first.substr(source) == source ); 
+        REQUIRE( tokens[0].second.name() == "source.test" );
+
+        REQUIRE( tokens[1].first.substr(source) == source ); 
+        REQUIRE( tokens[1].second.name() == "source.test pre" );
+
+        REQUIRE( tokens[2].first.substr(source) == "\ntest\n" ); 
+        REQUIRE( tokens[2].second.name() == "source.test pre nested" );
     }
     // TODO test $base $self
 }
