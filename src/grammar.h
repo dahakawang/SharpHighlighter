@@ -16,10 +16,10 @@ class Rule;
 
 class WeakIncludePtr {
 public:
-    WeakIncludePtr():ptr(nullptr), is_base_ref(false) {};
-    WeakIncludePtr(Rule* _ptr, bool _is_base = false):ptr(_ptr), is_base_ref(_is_base) {};
+    WeakIncludePtr(string _name):name(_name), ptr(nullptr), is_base_ref(false), {};
     Rule* ptr;
     bool is_base_ref;
+    string name;
 };
 
 class Rule {
@@ -42,6 +42,8 @@ public:
     string desc;
     vector<string> file_types;
     map<string, Rule> repository;
+
+    bool empty() { return name.empty() && patterns.empty() && repository.empty(); };
 };
 }
 
