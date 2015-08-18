@@ -338,5 +338,12 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[2].first.substr(source) == "\ntest\n" ); 
         REQUIRE( tokens[2].second.name() == "source.test pre nested" );
     }
+
+    SECTION("scope will be ignored if the pattern contains no name or contentName") {
+        string data = load_string("fixture/ruby.json");
+        string source = "%w|oh \\look|";
+        Grammar g = loader.load(data);
+        auto tokens = tokenizer.tokenize(g, source); 
+    }
     // TODO test $base $self
 }
