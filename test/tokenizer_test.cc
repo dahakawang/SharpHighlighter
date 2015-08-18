@@ -3,13 +3,17 @@
 #include <shl_exception.h>
 #include <tokenizer.h>
 #include <grammar_compiler.h>
+#include <grammar_registry.h>
 
-#include <iostream>
 using namespace shl;
 
 TEST_CASE("Tokenizer Tests") {
     Tokenizer tokenizer;
     GrammarCompiler compiler;
+    shared_ptr<TestGrammarSource> grammar_source(new TestGrammarSource({
+            "source.ruby", "fixture/ruby.json",
+            "text.html.basic", "fixture/html.json"}));
+    GrammarRegistry registry(grammar_source);
 
     SECTION("can load grammar and tokenizer string") {
         string data = load_string("fixture/hello.json");
@@ -230,9 +234,6 @@ TEST_CASE("Tokenizer Tests") {
         Grammar g = compiler.compile(data);
         compiler.resolve_include(g, nullptr);
         auto tokens = tokenizer.tokenize(g, source); 
-        std::cout << g.patterns[g.patterns.size() - 1].include.name << std::endl;
-        std::cout << g.patterns[g.patterns.size() - 1].include.ptr << std::endl;
-        std::cout << &g.repository["numeric"] << std::endl;
 
         REQUIRE( tokens.size() == 2 );
         
@@ -361,10 +362,8 @@ TEST_CASE("Tokenizer Tests") {
     }
 
     SECTION("scope will be ignored if the pattern contains no name or contentName") {
-        string data = load_string("fixture/ruby.json");
         string source = "%w|oh \\look|";
-        Grammar g = compiler.compile(data);
-        compiler.resolve_include(g, nullptr);
+        Grammar g = registry.get_grammar("source.ruby");
         auto tokens = tokenizer.tokenize(g, source); 
     }
     // TODO test $base $self
