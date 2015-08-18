@@ -19,15 +19,24 @@ Grammar GrammarCompiler::compile(const string& buffer) {
 void GrammarCompiler::process(const JsonObject& object, Grammar& grammar) {
     grammar.desc = object.scope_name;
     grammar.file_types = object.file_types;
-    compile_grammar(object, grammar, object, grammar, nullptr);
+
+    compile_grammar(object, grammar);
+    for ( auto& stocked : object.repository ) {
+        const string& repo_name = stocked.first;
+        const JsonObject& root = stocked.second;
+
+        grammar.repository[repo_name] = Rule();
+        compile_grammar(root, grammar.repository[repo_name]);
+    }
+
     swap(grammar.desc, grammar.name);
 }
 
-void GrammarCompiler::compile_grammar(const JsonObject& root, Grammar& grammar, const JsonObject& object, Rule& rule, Rule* parent) {
+void GrammarCompiler::compile_grammar(const JsonObject& object, Rule& rule) {
     rule.name = object.name;
 
     if (!object.include.empty()) {
-        rule.include = find_include(root, grammar, object.include);
+        rule.include = WeakIncludePtr(object.include);
     } else if (!object.match.empty()) {
         rule.is_match_rule = true;
         rule.begin = Regex(object.match);
@@ -47,16 +56,12 @@ void GrammarCompiler::compile_grammar(const JsonObject& root, Grammar& grammar, 
     } else {
         if (object.patterns.empty()) {
             throw InvalidGrammarException("empty rule is not alowed");
-        } else {
-            if (parent != nullptr && parent->begin.empty()) {
-                throw InvalidGrammarException("a containing rule can't be direct child of abother containing rule");
-            }
         }
     }
 
     rule.patterns = vector<Rule>(object.patterns.size());
     for (unsigned int idx = 0; idx < rule.patterns.size(); idx++) {
-        compile_grammar(root, grammar, object.patterns[idx], rule.patterns[idx], &rule);
+        compile_grammar(object.patterns[idx], rule.patterns[idx]);
     }
 }
 
@@ -84,34 +89,56 @@ map<int, string> GrammarCompiler::get_captures(const map<string, map<string, str
     return captures;
 }
 
-WeakIncludePtr GrammarCompiler::find_include(const JsonObject& root, Grammar& grammar, const string& include_name) {
+static void find_include(GrammarRegistry* registry, Grammar& grammar, WeakIncludePtr& include_rule) {
+    string include_name = include_rule.name;
     
     // base reference
     if (include_name == "$base") {
-        return WeakIncludePtr(nullptr, true);
+        include_rule.is_base_ref = true;
 
     // self reference
     } else if (include_name == "$self") {
-        return WeakIncludePtr(&grammar);
+        include_rule.ptr = &grammar;
 
     // repository reference
     } else if (include_name[0] == '#'){
         string repo_name = include_name.substr(1);
-        // if the stocked resource is already added, then return the address directly
-        auto stock_res = grammar.repository.find(repo_name);
-        if (stock_res != grammar.repository.end()) return WeakIncludePtr(&stock_res->second);
 
-        auto it = root.repository.find(repo_name);
-        if (it == root.repository.end()) throw InvalidGrammarException(string("can't find the name in repository: ") + repo_name);
-        grammar.repository[repo_name] = Rule();
-        compile_grammar(root, grammar, it->second, grammar.repository[repo_name], nullptr);
-        return &grammar.repository[repo_name];
+        auto stock_res = grammar.repository.find(repo_name);
+        if (stock_res != grammar.repository.end()) {
+            include_rule.ptr = &stock_res->second;
+        } else {
+            throw InvalidGrammarException(string("can't find the name in repository: ") + repo_name);
+        }
 
     // external grammar reference
     } else {
-        throw InvalidGrammarException("include another grammar is not supported yet");
+        if (registry == nullptr) {
+            throw ShlException("can't refer to external grammar without grammar registry");
+        } else {
+            //TODO report if no external grammar found
+            Grammar& embeded_grammar = registry->get_grammar(include_name);
+            include_rule.ptr = &embeded_grammar;
+        }
     }
 
 }
 
+static void _resolve_include(Grammar& grammar, Rule& rule, GrammarRegistry* registry) {
+    if ( rule.include.name.empty() ) {
+        for ( Rule& subrule : rule.patterns ) {
+            _resolve_include(grammar, subrule, registry);
+        }
+    } else {
+        find_include(registry, grammar, rule.include);
+    }
+}
+
+void GrammarCompiler::resolve_include(Grammar& grammar, GrammarRegistry* registry) { 
+    _resolve_include(grammar, grammar, registry);
+
+    for ( auto& stocked_rule : grammar.repository ) {
+        _resolve_include(grammar, stocked_rule.second, registry);
+    }
+}
 }

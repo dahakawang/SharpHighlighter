@@ -1,5 +1,6 @@
 #include "catch.hpp"
 #include "util.h"
+#include <shl_exception.h>
 #include <grammar_compiler.h>
 
 using namespace shl;
@@ -8,18 +9,23 @@ TEST_CASE("GrammarCompiler Test") {
     string data = load_string("fixture/valid.json");
     GrammarCompiler compiler;
     Grammar g = compiler.compile(data);
+    compiler.resolve_include(g, nullptr); // do not check external grammar include here
 
     SECTION("can load a valid grammar") {
         REQUIRE(g.desc == "C");
         REQUIRE(g.file_types.size() == 2);
         REQUIRE(g.name == "source.c");
 
-        REQUIRE(g.repository.size() == 2);
+        REQUIRE(g.repository.size() == 3);
         REQUIRE(g.repository["preprocessor-rule-enabled"].begin.source() == "^\\s*(#(if)\\s+(0*1)\\b)");
     }
 
-    SECTION("unused repository is ignored") {
-        REQUIRE(g.repository.size() == 2);
+    SECTION("can load an enclosing rule") {
+        REQUIRE(g.repository.find("hello") != g.repository.end());
+
+        auto object = g.repository["hello"];
+        REQUIRE(object.patterns.size() == 1);
+        REQUIRE(object.patterns[0].patterns.size() == 2);
     }
 
     SECTION("captures can be regard as begin_captures if is a begin/end rule and has no begin_captures") {
@@ -52,5 +58,16 @@ TEST_CASE("GrammarCompiler Test") {
         REQUIRE(g.repository["preprocessor-rule-enabled"].patterns[0].patterns[1].include.ptr == &g.repository["string_escaped_char"]);
         REQUIRE(g.repository["preprocessor-rule-enabled"].patterns[1].patterns[0].include.ptr == nullptr);
         REQUIRE(g.repository["preprocessor-rule-enabled"].patterns[1].patterns[0].include.is_base_ref == true);
+
+        REQUIRE(g.repository["hello"].patterns[0].patterns[0].include.ptr == &g.repository["preprocessor-rule-enabled"]);
+        REQUIRE(g.repository["hello"].patterns[0].patterns[1].include.ptr == &g.repository["hello"]);
+    }
+
+    SECTION("will throw if encounter a external grammar include but GrammarRegister is not set") {
+        string data = load_string("fixture/ruby.json");
+        GrammarCompiler compiler;
+        Grammar g = compiler.compile(data);
+        
+        REQUIRE_THROWS_AS( compiler.resolve_include(g, nullptr), ShlException);
     }
 }
