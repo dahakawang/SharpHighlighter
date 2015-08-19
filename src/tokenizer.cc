@@ -34,25 +34,31 @@ static const Rule& resolve_include(const Rule& rule, vector<const Rule*>& stack)
     }
 }
 
-static void for_all_subrules(const Rule& rule, set<const Rule*>& visited, vector<const Rule*>& stack, function<void(const Rule&)> callback) {
+static void for_all_subrules(const Rule& rule, set<const Rule*>& visited, vector<string>& scope_names, vector<const Rule*>& stack, function<void(const Rule&, const vector<string>&)> callback) {
     const Rule& real_rule = resolve_include(rule, stack);
     if (visited.count(&real_rule) > 0) return;
     visited.insert(&real_rule);
+    scope_names.push_back(real_rule.name);
 
     if (real_rule.begin.empty()) {
         for (auto& subrule : real_rule.patterns) {
-            for_all_subrules(subrule, visited, stack, callback);
+            scope_names.push_back(real_rule.content_name);
+            for_all_subrules(subrule, visited, scope_names, stack, callback);
+            scope_names.pop_back();
         }
     } else {
         // we don't need to look at it's subrule at this time
-        callback(real_rule);
+        callback(real_rule, scope_names);
     }
+
+    scope_names.pop_back();
 }
 
-static void for_all_subrules(const vector<Rule>& rules, vector<const Rule*>& stack, function<void(const Rule&)> callback) {
+static void for_all_subrules(const vector<Rule>& rules, vector<const Rule*>& stack, function<void(const Rule&, const vector<string>&)> callback) {
     set<const Rule*> visited;
+    vector<string> scope_names;
     for (auto& rule : rules) {
-        for_all_subrules(rule, visited, stack, callback);
+        for_all_subrules(rule, visited, scope_names, stack, callback);
     }
 }
 
@@ -82,19 +88,21 @@ static inline bool is_end_match_first(const Rule& rule, const Match& end_match, 
  * begin_end_pos: this is the offset of current pattern's begin match.end(), it's meant to 
  * support Perl style \G, and stands for the *previous* match.end()
  */
-bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const Match& last_lexeme, const Rule& rule, const Rule** found, Match& match, vector<const Rule*>& stack) {
+bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const Match& last_lexeme, const Rule& rule, const Rule** found, Match& match, vector<string>& scope_names, vector<const Rule*>& stack) {
     int begin_end_pos = begin_lexeme[0].end();
     int pos = last_lexeme[0].end();
     const Rule* found_rule = nullptr;
     Match first_match;
+    vector<string> found_scope_names;
     bool is_close = false;
 
     // first find pattern or end pattern, whichever comes first
-    for_all_subrules(rule.patterns, stack, [&found_rule , &first_match, pos, &text, begin_end_pos](const Rule& sub_rule) {
+    for_all_subrules(rule.patterns, stack, [&found_scope_names, &found_rule, &first_match, pos, &text, begin_end_pos](const Rule& sub_rule, const vector<string>& cur_scope_names) {
         Match tmp = sub_rule.begin.match(text, pos, begin_end_pos);
         if (tmp != Match::NOT_MATCHED) {
             if( found_rule == nullptr || tmp[0].position < first_match[0].position) {
                 first_match = std::move(tmp); 
+                found_scope_names = cur_scope_names;
                 found_rule = &sub_rule;
             }
         }
@@ -104,6 +112,7 @@ bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const
         if (end_match != Match::NOT_MATCHED) {
             if( found_rule == nullptr || is_end_match_first(rule, end_match, first_match)) {
                 first_match = std::move(end_match); 
+                found_scope_names.clear();
                 found_rule= &rule;
                 is_close = true;
             }
@@ -111,7 +120,8 @@ bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const
     }
     if ( found_rule != nullptr) {
         *found = found_rule;
-        match = first_match;
+        match = std::move(first_match);
+        scope_names = std::move(found_scope_names);
         return !is_close;
     }
 
@@ -130,54 +140,59 @@ bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const
     }
 }
 
-vector<string> compile_scope_name(vector<const Rule*>& stack, const string& name, const string& enclosing_name, const vector<string> additional) {
+vector<string> compile_scope_names(vector<const Rule*>& stack, const vector<string> scope_names) {
     vector<string> names;
 
     for(auto rule: stack) {
         names.push_back(rule->name);
         names.push_back(rule->content_name);
     }
-    if (!enclosing_name.empty()) names.push_back(enclosing_name);
-    for(auto elem : additional) {
+    for(auto elem : scope_names) {
         names.push_back(elem);
     }
-    names.push_back(name); // name can't be empty, enforced by caller
 
     return names;
 }
 
-void Tokenizer::add_scope(vector<pair<Range, Scope> >& tokens, const Range& range, vector<const Rule*>& stack, const string& name, const string& enclosing_name, const vector<string>& additional) {
-    if (name.empty()) return;
-    if (range.length == 0) return; // only captures can potentially has 0 length
+void Tokenizer::add_scope(vector<pair<Range, Scope> >& tokens, const Range& range, vector<const Rule*>& stack, const vector<string>& scope_names) {
+    if (scope_names.back().empty()) return;
+    if (range.length == 0) return;
 
-    Scope scope(compile_scope_name(stack, name, enclosing_name, additional));
+    Scope scope(compile_scope_names(stack, scope_names));
     tokens.push_back(std::make_pair(range, scope));
+}
+
+void Tokenizer::add_scope(vector<pair<Range, Scope> >& tokens, const Range& range, vector<const Rule*>& stack, vector<string>& scope_names, const string& name) {
+    scope_names.push_back(name);
+    add_scope(tokens, range, stack, scope_names);
+    scope_names.pop_back();
 }
 
 inline void append_back(vector<pair<Range, Scope> >& target, const vector<pair<Range, Scope> >& source ) {
     std::move(source.begin(), source.end(), std::back_inserter(target));
 }
 
-vector<string> get_parent_capture_names(const Match& match, const map<int, string>& capture, size_t pos) {
-    vector<string> addictinal;
+vector<string> get_parent_capture_names(const vector<string> scope_names, const Match& match, const map<int, string>& capture, size_t pos) {
+    vector<string> result(scope_names);
 
     for (size_t it = 0; it < pos; it++) {
         auto it_name = capture.find(it);
         if (match[it].contain(match[pos]) && it_name != capture.end()) {
-            addictinal.push_back(it_name->second);
+            result.push_back(it_name->second);
         }
     }
 
-    return addictinal;
+    return result;
 }
 
-void Tokenizer::process_capture(vector<pair<Range, Scope> >& tokens, const Match& match, vector<const Rule*>& stack, const map<int, string>& capture, const string& enclosing_name) {
+void Tokenizer::process_capture(vector<pair<Range, Scope> >& tokens, const Match& match, vector<const Rule*>& stack, const map<int, string>& capture, const vector<string>& scope_names) {
     for (auto& pair : capture) {
         unsigned int capture_num = pair.first;
         const string& name = pair.second;
         if (match.size() > capture_num) {
             if (match[0].contain(match[capture_num])) {
-                add_scope(tokens, match[capture_num], stack, name, enclosing_name, get_parent_capture_names(match, capture, capture_num));
+                auto merged_scope_names = get_parent_capture_names(scope_names, match, capture, capture_num);
+                add_scope(tokens, match[capture_num], stack, merged_scope_names, name);
             }
         } else {
             if (_option & OPTION_STRICT) {
@@ -201,10 +216,11 @@ Match Tokenizer::tokenize(const string& text, const Rule& rule, const Match& beg
     const Rule* found_rule = nullptr;
     Match last_lexeme, match;
     last_lexeme = begin_lexeme;
-    while(next_lexeme(text, begin_lexeme, last_lexeme, rule, &found_rule, match, stack)) {
+    vector<string> scope_names;
+    while(next_lexeme(text, begin_lexeme, last_lexeme, rule, &found_rule, match, scope_names, stack)) {
         if (found_rule->is_match_rule) {
-            add_scope(tokens, match[0], stack, found_rule->name);
-            process_capture(tokens, match, stack, found_rule->begin_captures, found_rule->name);
+            add_scope(tokens, match[0], stack, scope_names);
+            process_capture(tokens, match, stack, found_rule->begin_captures, scope_names);
             last_lexeme = match;
 
         } else {
@@ -217,14 +233,14 @@ Match Tokenizer::tokenize(const string& text, const Rule& rule, const Match& beg
 
             } else {
                 Range name_range = Range(match[0].position, end_match[0].end() - match[0].position);
-                add_scope(tokens, name_range, stack, found_rule->name);
-                process_capture(tokens, match, stack, found_rule->begin_captures, found_rule->name);
+                add_scope(tokens, name_range, stack, scope_names);
+                process_capture(tokens, match, stack, found_rule->begin_captures, scope_names);
 
                 Range content_range = Range(match[0].end(), end_match[0].position - match[0].end());
-                add_scope(tokens, content_range, stack, found_rule->content_name, found_rule->name);
+                add_scope(tokens, content_range, stack, scope_names, found_rule->content_name);
 
                 append_back(tokens, child_tokens);
-                process_capture(tokens, end_match, stack, found_rule->end_captures, found_rule->name);
+                process_capture(tokens, end_match, stack, found_rule->end_captures, scope_names);
 
                 last_lexeme = end_match;
             }

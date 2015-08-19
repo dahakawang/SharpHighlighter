@@ -40,6 +40,7 @@ public:
     Range& operator[](int capture_index) { return _captures[capture_index]; };
     unsigned int size() const;
     static const Match make_dummy(int position, int length);
+    void clear() { _captures.clear(); };
 
 private:
     vector<Range> _captures;
