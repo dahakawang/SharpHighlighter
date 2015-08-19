@@ -454,6 +454,31 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[3].first.substr(source) == "'''" ); 
         REQUIRE( tokens[3].second.name() == "source.coffee string.quoted.heredoc.coffee punctuation.definition.string.end.coffee" );
     }
+
+    SECTION("the sub-patterns will capture scopes") {
+        string data = load_string("fixture/coffee-script.json");
+        string source = "'''content \nof\\t h\neredoc'''";
+        Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
+        auto tokens = tokenizer.tokenize(g, source); 
+        
+        REQUIRE( tokens.size() == 5 );
+
+        REQUIRE( tokens[0].first.substr(source) == source ); 
+        REQUIRE( tokens[0].second.name() == "source.coffee" );
+
+        REQUIRE( tokens[1].first.substr(source) == source ); 
+        REQUIRE( tokens[1].second.name() == "source.coffee string.quoted.heredoc.coffee" );
+
+        REQUIRE( tokens[2].first.substr(source) == "'''" ); 
+        REQUIRE( tokens[2].second.name() == "source.coffee string.quoted.heredoc.coffee punctuation.definition.string.begin.coffee" );
+
+        REQUIRE( tokens[3].first.substr(source) == "\\t" ); 
+        REQUIRE( tokens[3].second.name() == "source.coffee string.quoted.heredoc.coffee constant.character.escape.coffee" );
+
+        REQUIRE( tokens[4].first.substr(source) == "'''" ); 
+        REQUIRE( tokens[4].second.name() == "source.coffee string.quoted.heredoc.coffee punctuation.definition.string.end.coffee" );
+    }
     // TODO test external grammar
     // TODO test $base $self
 }
