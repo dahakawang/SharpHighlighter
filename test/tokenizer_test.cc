@@ -350,7 +350,6 @@ TEST_CASE("Tokenizer Tests") {
 
         REQUIRE( tokens.size() == 3 );
 
-
         REQUIRE( tokens[0].first.substr(source) == source ); 
         REQUIRE( tokens[0].second.name() == "source.test" );
 
@@ -359,6 +358,35 @@ TEST_CASE("Tokenizer Tests") {
 
         REQUIRE( tokens[2].first.substr(source) == "\ntest\n" ); 
         REQUIRE( tokens[2].second.name() == "source.test pre nested" );
+
+
+        source = "test";
+        tokens = tokenizer.tokenize(g, source);
+
+        REQUIRE( tokens.size() == 3 );
+
+        REQUIRE( tokens[0].first.substr(source) == source ); 
+        REQUIRE( tokens[0].second.name() == "source.test" );
+
+        REQUIRE( tokens[1].first.substr(source) == source ); 
+        REQUIRE( tokens[1].second.name() == "source.test all" );
+
+        REQUIRE( tokens[1].first.substr(source) == source ); 
+        REQUIRE( tokens[1].second.name() == "source.test all middle" );
+
+        source = "  test";
+        tokens = tokenizer.tokenize(g, source);
+
+        REQUIRE( tokens.size() == 3 );
+
+        REQUIRE( tokens[0].first.substr(source) == source ); 
+        REQUIRE( tokens[0].second.name() == "source.test" );
+
+        REQUIRE( tokens[1].first.substr(source) == source ); 
+        REQUIRE( tokens[1].second.name() == "source.test all" );
+
+        REQUIRE( tokens[1].first.substr(source) == "test" ); 
+        REQUIRE( tokens[1].second.name() == "source.test all middle" );
     }
 
     SECTION("scope will be ignored if the pattern contains no name or contentName") {
@@ -366,5 +394,8 @@ TEST_CASE("Tokenizer Tests") {
         Grammar g = registry.get_grammar("source.ruby");
         auto tokens = tokenizer.tokenize(g, source); 
     }
+
+    
+    // TODO test external grammar
     // TODO test $base $self
 }
