@@ -22,7 +22,7 @@ TEST_CASE("Tokenizer Tests") {
         compiler.resolve_include(g, nullptr);
         auto tokens = tokenizer.tokenize(g, source); 
 
-//        REQUIRE( tokens.size() == 4 );
+        REQUIRE( tokens.size() == 4 );
         REQUIRE( tokens[0].first.substr(source) == source );
         REQUIRE( tokens[0].second.name() == "source.hello" );
 
