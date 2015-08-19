@@ -116,11 +116,8 @@ bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const
     }
 
     // special handle for toplevel rule
-    if (rule.end.empty()) {
-        // all rule with begin will has an end, which is enforced by grammar loader
-        // so only toplevel rules can be here
+    if (stack[0] == &rule) {
         *found = nullptr;
-        is_close = true;
         return false;
     }
 
