@@ -129,7 +129,7 @@ bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const
         *found = nullptr;
         return false;
     } else {
-       throw InvalidSourceException("scope not properly closed"); 
+       throw InvalidSourceException("scope not properly closed: " + rule.name); 
     }
 }
 
