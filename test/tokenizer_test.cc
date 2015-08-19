@@ -410,6 +410,28 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[3].second.name() == "source.ruby string.quoted.other.literal.lower.ruby punctuation.definition.string.end.ruby" );
     }
 
+    SECTION("the beginCapture, endCapture and chid scope will capture lexeme") {
+        string data = load_string("fixture/coffee-script.json");
+        string source = "'''content of heredoc'''";
+        Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
+        auto tokens = tokenizer.tokenize(g, source); 
+
+        REQUIRE( tokens.size() == 4 );
+
+        REQUIRE( tokens[0].first.substr(source) == source ); 
+        REQUIRE( tokens[0].second.name() == "source.coffee" );
+
+        REQUIRE( tokens[1].first.substr(source) == source ); 
+        REQUIRE( tokens[1].second.name() == "source.coffee string.quoted.heredoc.coffee" );
+
+        REQUIRE( tokens[2].first.substr(source) == "'''" ); 
+        REQUIRE( tokens[2].second.name() == "source.coffee string.quoted.heredoc.coffee punctuation.definition.string.begin.coffee" );
+
+        REQUIRE( tokens[3].first.substr(source) == "'''" ); 
+        REQUIRE( tokens[3].second.name() == "source.coffee string.quoted.heredoc.coffee punctuation.definition.string.end.coffee" );
+    }
+
     
     // TODO test external grammar
     // TODO test $base $self
