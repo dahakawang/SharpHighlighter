@@ -539,6 +539,63 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[4].first.substr(source) == "," ); 
         REQUIRE( tokens[4].second.name() == "source.ruby punctuation.separator.object.ruby" );
     }
+
+    SECTION("end pattern that contains back reference can be different when the rule appears on the stack for several times") {
+        string source = "%Q+matz had some #{%Q-crazy ideas-} for ruby syntax+ # damn.\n";
+        Grammar g = registry.get_grammar("source.ruby");
+        auto tokens = tokenizer.tokenize(g, source); 
+
+        REQUIRE( tokens.size() == 14 );
+
+        REQUIRE( tokens[0].first.substr(source) == source ); 
+        REQUIRE( tokens[0].second.name() == "source.ruby" );
+
+        REQUIRE( tokens[1].first.substr(source) == "%Q+matz had some #{%Q-crazy ideas-} for ruby syntax+"); 
+        REQUIRE( tokens[1].second.name() == "source.ruby string.quoted.other.literal.upper.ruby" );
+
+        REQUIRE( tokens[2].first.substr(source) == "%Q+"); 
+        REQUIRE( tokens[2].second.name() == "source.ruby string.quoted.other.literal.upper.ruby punctuation.definition.string.begin.ruby" );
+
+        REQUIRE( tokens[3].first.substr(source) == "#{%Q-crazy ideas-}"); 
+        REQUIRE( tokens[3].second.name() == "source.ruby string.quoted.other.literal.upper.ruby meta.embedded.line.ruby" );
+
+        REQUIRE( tokens[4].first.substr(source) == "#{"); 
+        REQUIRE( tokens[4].second.name() == "source.ruby string.quoted.other.literal.upper.ruby meta.embedded.line.ruby punctuation.section.embedded.begin.ruby" );
+
+        REQUIRE( tokens[5].first.substr(source) == "%Q-crazy ideas-"); 
+        REQUIRE( tokens[5].second.name() == "source.ruby string.quoted.other.literal.upper.ruby meta.embedded.line.ruby source.ruby" );
+
+        REQUIRE( tokens[6].first.substr(source) == "%Q-crazy ideas-"); 
+        REQUIRE( tokens[6].second.name() == "source.ruby string.quoted.other.literal.upper.ruby meta.embedded.line.ruby source.ruby string.quoted.other.literal.upper.ruby" );
+
+        REQUIRE( tokens[7].first.substr(source) == "%Q-"); 
+        REQUIRE( tokens[7].second.name() == "source.ruby string.quoted.other.literal.upper.ruby meta.embedded.line.ruby source.ruby string.quoted.other.literal.upper.ruby punctuation.definition.string.begin.ruby" );
+
+        REQUIRE( tokens[8].first.substr(source) == "-"); 
+        REQUIRE( tokens[8].second.name() == "source.ruby string.quoted.other.literal.upper.ruby meta.embedded.line.ruby source.ruby string.quoted.other.literal.upper.ruby punctuation.definition.string.end.ruby" );
+
+        REQUIRE( tokens[9].first.substr(source) == "}"); 
+        REQUIRE( tokens[9].second.name() == "source.ruby string.quoted.other.literal.upper.ruby meta.embedded.line.ruby punctuation.section.embedded.end.ruby" );
+
+        // below is not a bug
+        // in meta.embedded.line.ruby rule, the author specifies
+        // endCaptures: {
+        //  0: {name: punctuation.section.embedded.end.ruby}, 
+        //  1: {name: source.ruby}}
+        //  SO this source.ruby is actually child of punctuation.section.embedded.end.ruby
+        REQUIRE( tokens[10].first.substr(source) == "}"); 
+        REQUIRE( tokens[10].second.name() == "source.ruby string.quoted.other.literal.upper.ruby meta.embedded.line.ruby punctuation.section.embedded.end.ruby source.ruby" );
+
+        REQUIRE( tokens[11].first.substr(source) == "+"); 
+        REQUIRE( tokens[11].second.name() == "source.ruby string.quoted.other.literal.upper.ruby punctuation.definition.string.end.ruby" );
+
+        REQUIRE( tokens[12].first.substr(source) == "# damn.\n"); 
+        REQUIRE( tokens[12].second.name() == "source.ruby comment.line.number-sign.ruby" );
+
+        REQUIRE( tokens[13].first.substr(source) == "#"); 
+        REQUIRE( tokens[13].second.name() == "source.ruby comment.line.number-sign.ruby punctuation.definition.comment.ruby" );
+    }
     // TODO test external grammar
     // TODO test $base $self
+    // TODO hen containing rule has a name
 }
