@@ -516,6 +516,29 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[5].first.substr(source) == "{ some }" ); 
         REQUIRE( tokens[5].second.name() == "source.apply-end-pattern-last normal-env scope" );
     }
+
+    SECTION("the back reference in end pattern will refer to matches in begin pattern") {
+        string source = "%w|oh|,";
+        Grammar g = registry.get_grammar("source.ruby");
+        auto tokens = tokenizer.tokenize(g, source); 
+
+        REQUIRE( tokens.size() == 5 );
+
+        REQUIRE( tokens[0].first.substr(source) == source ); 
+        REQUIRE( tokens[0].second.name() == "source.ruby" );
+
+        REQUIRE( tokens[1].first.substr(source) == "%w|oh|" ); 
+        REQUIRE( tokens[1].second.name() == "source.ruby string.quoted.other.literal.lower.ruby" );
+
+        REQUIRE( tokens[2].first.substr(source) == "%w|" ); 
+        REQUIRE( tokens[2].second.name() == "source.ruby string.quoted.other.literal.lower.ruby punctuation.definition.string.begin.ruby" );
+
+        REQUIRE( tokens[3].first.substr(source) == "|" ); 
+        REQUIRE( tokens[3].second.name() == "source.ruby string.quoted.other.literal.lower.ruby punctuation.definition.string.end.ruby" );
+
+        REQUIRE( tokens[4].first.substr(source) == "," ); 
+        REQUIRE( tokens[4].second.name() == "source.ruby punctuation.separator.object.ruby" );
+    }
     // TODO test external grammar
     // TODO test $base $self
 }
