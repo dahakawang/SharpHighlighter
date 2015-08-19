@@ -599,6 +599,73 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[13].second.name() == "source.ruby comment.line.number-sign.ruby punctuation.definition.comment.ruby" );
     }
  
+    SECTION("include another grammar will work") {
+        shared_ptr<TestGrammarSource> grammar_source(new TestGrammarSource({
+                "text.html.ruby", "fixture/html-rails.json",
+                "source.ruby.rails", "fixture/ruby-on-rails.json",
+                "source.ruby", "fixture/ruby.json",
+                "text.html.basic", "fixture/html.json"}));
+        GrammarRegistry registry(grammar_source);
+        Grammar g= registry.get_grammar("text.html.ruby");
+        string source = "<div class='name'><%= User.find(2).full_name %></div>";
+        auto tokens = tokenizer.tokenize(g, source);
+
+
+        REQUIRE( tokens[0].first.substr(source) == source ); 
+        REQUIRE( tokens[0].second.name() == "text.html.ruby" );
+
+        REQUIRE( tokens[1].first.substr(source) == "<div class='name'>" ); 
+        REQUIRE( tokens[1].second.name() == "text.html.ruby text.html.basic meta.tag.block.any.html" );
+
+        REQUIRE( tokens[2].first.substr(source) == "<" ); 
+        REQUIRE( tokens[2].second.name() == "text.html.ruby text.html.basic meta.tag.block.any.html punctuation.definition.tag.begin.html" );
+
+        REQUIRE( tokens[3].first.substr(source) == "div" ); 
+        REQUIRE( tokens[3].second.name() == "text.html.ruby text.html.basic meta.tag.block.any.html entity.name.tag.block.any.html" );
+
+        REQUIRE( tokens[4].first.substr(source) == "class" ); 
+        REQUIRE( tokens[4].second.name() == "text.html.ruby text.html.basic meta.tag.block.any.html entity.other.attribute-name.html" );
+
+        REQUIRE( tokens[5].first.substr(source) == "'name'" ); 
+        REQUIRE( tokens[5].second.name() == "text.html.ruby text.html.basic meta.tag.block.any.html string.quoted.single.html" );
+
+        REQUIRE( tokens[6].first.substr(source) == "'" ); 
+        REQUIRE( tokens[6].second.name() == "text.html.ruby text.html.basic meta.tag.block.any.html string.quoted.single.html punctuation.definition.string.begin.html" );
+
+        REQUIRE( tokens[7].first.substr(source) == "'" ); 
+        REQUIRE( tokens[7].second.name() == "text.html.ruby text.html.basic meta.tag.block.any.html string.quoted.single.html punctuation.definition.string.end.html" );
+
+        REQUIRE( tokens[8].first.substr(source) == ">" ); 
+        REQUIRE( tokens[8].second.name() == "text.html.ruby text.html.basic meta.tag.block.any.html punctuation.definition.tag.end.html" );
+
+        REQUIRE( tokens[9].first.substr(source) == "<%= User.find(2).full_name %>" ); 
+        REQUIRE( tokens[9].second.name() == "text.html.ruby source.ruby.rails.embedded.html" );
+
+        REQUIRE( tokens[10].first.substr(source) == "<%=" ); 
+        REQUIRE( tokens[10].second.name() == "text.html.ruby source.ruby.rails.embedded.html punctuation.section.embedded.ruby" );
+
+        REQUIRE( tokens[11].first.substr(source) == "User" ); 
+        REQUIRE( tokens[11].second.name() == "text.html.ruby source.ruby.rails.embedded.html source.ruby.rails source.ruby support.class.ruby" );
+
+        REQUIRE( tokens[12].first.substr(source) == "." ); 
+        REQUIRE( tokens[12].second.name() == "text.html.ruby source.ruby.rails.embedded.html source.ruby.rails source.ruby punctuation.separator.method.ruby" );
+
+        REQUIRE( tokens[13].first.substr(source) == "(" ); 
+        REQUIRE( tokens[13].second.name() == "text.html.ruby source.ruby.rails.embedded.html source.ruby.rails source.ruby punctuation.section.function.ruby" );
+
+        REQUIRE( tokens[14].first.substr(source) == "2" ); 
+        REQUIRE( tokens[14].second.name() == "text.html.ruby source.ruby.rails.embedded.html source.ruby.rails source.ruby constant.numeric.ruby" );
+
+        REQUIRE( tokens[15].first.substr(source) == ")" ); 
+        REQUIRE( tokens[15].second.name() == "text.html.ruby source.ruby.rails.embedded.html source.ruby.rails source.ruby punctuation.section.function.ruby" );
+
+        REQUIRE( tokens[16].first.substr(source) == "." ); 
+        REQUIRE( tokens[16].second.name() == "text.html.ruby source.ruby.rails.embedded.html source.ruby.rails source.ruby punctuation.separator.method.ruby" );
+
+        REQUIRE( tokens[17].first.substr(source) == "%>" ); 
+        REQUIRE( tokens[17].second.name() == "text.html.ruby source.ruby.rails.embedded.html punctuation.section.embedded.ruby" );
+    }
+
     // TODO test external grammar
     // TODO test $base $self
     // TODO hen containing rule has a name
