@@ -393,6 +393,21 @@ TEST_CASE("Tokenizer Tests") {
         string source = "%w|oh \\look|";
         Grammar g = registry.get_grammar("source.ruby");
         auto tokens = tokenizer.tokenize(g, source); 
+
+        REQUIRE( tokens.size() == 4 );
+
+
+        REQUIRE( tokens[0].first.substr(source) == source ); 
+        REQUIRE( tokens[0].second.name() == "source.ruby" );
+
+        REQUIRE( tokens[1].first.substr(source) == source ); 
+        REQUIRE( tokens[1].second.name() == "source.ruby string.quoted.other.literal.lower.ruby" );
+
+        REQUIRE( tokens[2].first.substr(source) == "%w|" ); 
+        REQUIRE( tokens[2].second.name() == "source.ruby string.quoted.other.literal.lower.ruby punctuation.definition.string.begin.ruby" );
+
+        REQUIRE( tokens[3].first.substr(source) == "|" ); 
+        REQUIRE( tokens[3].second.name() == "source.ruby string.quoted.other.literal.lower.ruby punctuation.definition.string.end.ruby" );
     }
 
     
