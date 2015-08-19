@@ -34,25 +34,28 @@ static const Rule& resolve_include(const Rule& rule, vector<const Rule*>& stack)
     }
 }
 
-static void for_all_subrules(const Rule& rule, set<const Rule*>& visited, vector<const Rule*>& stack, function<void(const Rule&)> callback) {
+static void for_all_subrules(const Rule& rule, set<const Rule*>& visited, vector<const Rule*>& collapsed_rules, vector<const Rule*>& stack, function<void(const Rule&, const vector<const Rule*>&)> callback) {
     const Rule& real_rule = resolve_include(rule, stack);
     if (visited.count(&real_rule) > 0) return;
     visited.insert(&real_rule);
 
     if (real_rule.begin.empty()) {
         for (auto& subrule : real_rule.patterns) {
-            for_all_subrules(subrule, visited, stack, callback);
+            collapsed_rules.push_back(&real_rule);
+            for_all_subrules(subrule, visited, collapsed_rules, stack, callback);
+            collapsed_rules.pop_back();
         }
     } else {
         // we don't need to look at it's subrule at this time
-        callback(real_rule);
+        callback(real_rule, collapsed_rules);
     }
 }
 
-static void for_all_subrules(const vector<Rule>& rules, vector<const Rule*>& stack, function<void(const Rule&)> callback) {
+static void for_all_subrules(const vector<Rule>& rules, vector<const Rule*>& stack, function<void(const Rule&, const vector<const Rule*>&)> callback) {
     set<const Rule*> visited;
+    vector<const Rule*> collapsed_rules;
     for (auto& rule : rules) {
-        for_all_subrules(rule, visited, stack, callback);
+        for_all_subrules(rule, visited, collapsed_rules, stack, callback);
     }
 }
 
@@ -87,14 +90,16 @@ bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const
     int pos = last_lexeme[0].end();
     const Rule* found_rule = nullptr;
     Match first_match;
+    vector<const Rule*> extra_rules;
     bool is_close = false;
 
     // first find pattern or end pattern, whichever comes first
-    for_all_subrules(rule.patterns, stack, [&found_rule , &first_match, pos, &text, begin_end_pos](const Rule& sub_rule) {
+    for_all_subrules(rule.patterns, stack, [&extra_rules, &found_rule , &first_match, pos, &text, begin_end_pos](const Rule& sub_rule, const vector<const Rule*>& collapsed_rules) {
         Match tmp = sub_rule.begin.match(text, pos, begin_end_pos);
         if (tmp != Match::NOT_MATCHED) {
             if( found_rule == nullptr || tmp[0].position < first_match[0].position) {
                 first_match = std::move(tmp); 
+                extra_rules = collapsed_rules;
                 found_rule = &sub_rule;
             }
         }
@@ -104,6 +109,7 @@ bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const
         if (end_match != Match::NOT_MATCHED) {
             if( found_rule == nullptr || is_end_match_first(rule, end_match, first_match)) {
                 first_match = std::move(end_match); 
+                extra_rules.clear();
                 found_rule= &rule;
                 is_close = true;
             }
@@ -112,6 +118,7 @@ bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const
     if ( found_rule != nullptr) {
         *found = found_rule;
         match = first_match;
+        move(extra_rules.begin(), extra_rules.end(), std::back_inserter(stack));
         return !is_close;
     }
 
@@ -201,6 +208,7 @@ Match Tokenizer::tokenize(const string& text, const Rule& rule, const Match& beg
     const Rule* found_rule = nullptr;
     Match last_lexeme, match;
     last_lexeme = begin_lexeme;
+    size_t original_size = stack.size();
     while(next_lexeme(text, begin_lexeme, last_lexeme, rule, &found_rule, match, stack)) {
         if (found_rule->is_match_rule) {
             add_scope(tokens, match[0], stack, found_rule->name);
@@ -229,6 +237,8 @@ Match Tokenizer::tokenize(const string& text, const Rule& rule, const Match& beg
                 last_lexeme = end_match;
             }
         }
+
+        stack.resize(original_size); // remove all collapsed rules
     }
 
     stack.pop_back();
