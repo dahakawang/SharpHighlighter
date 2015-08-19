@@ -433,6 +433,27 @@ TEST_CASE("Tokenizer Tests") {
     }
 
     
+    SECTION("mutli-line desen't affect us") {
+        string data = load_string("fixture/coffee-script.json");
+        string source = "'''content\n of\n heredoc'''";
+        Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
+        auto tokens = tokenizer.tokenize(g, source); 
+
+        REQUIRE( tokens.size() == 4 );
+
+        REQUIRE( tokens[0].first.substr(source) == source ); 
+        REQUIRE( tokens[0].second.name() == "source.coffee" );
+
+        REQUIRE( tokens[1].first.substr(source) == source ); 
+        REQUIRE( tokens[1].second.name() == "source.coffee string.quoted.heredoc.coffee" );
+
+        REQUIRE( tokens[2].first.substr(source) == "'''" ); 
+        REQUIRE( tokens[2].second.name() == "source.coffee string.quoted.heredoc.coffee punctuation.definition.string.begin.coffee" );
+
+        REQUIRE( tokens[3].first.substr(source) == "'''" ); 
+        REQUIRE( tokens[3].second.name() == "source.coffee string.quoted.heredoc.coffee punctuation.definition.string.end.coffee" );
+    }
     // TODO test external grammar
     // TODO test $base $self
 }
