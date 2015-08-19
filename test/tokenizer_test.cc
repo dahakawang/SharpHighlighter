@@ -360,7 +360,7 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[2].second.name() == "source.test pre nested" );
 
 
-        source = "test";
+        source = "testfin";
         tokens = tokenizer.tokenize(g, source);
 
         REQUIRE( tokens.size() == 3 );
@@ -371,10 +371,10 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[1].first.substr(source) == source ); 
         REQUIRE( tokens[1].second.name() == "source.test all" );
 
-        REQUIRE( tokens[1].first.substr(source) == source ); 
-        REQUIRE( tokens[1].second.name() == "source.test all middle" );
+        REQUIRE( tokens[2].first.substr(source) == "test" ); 
+        REQUIRE( tokens[2].second.name() == "source.test all middle" );
 
-        source = "  test";
+        source = "  test fin";
         tokens = tokenizer.tokenize(g, source);
 
         REQUIRE( tokens.size() == 3 );
@@ -385,8 +385,8 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[1].first.substr(source) == source ); 
         REQUIRE( tokens[1].second.name() == "source.test all" );
 
-        REQUIRE( tokens[1].first.substr(source) == "test" ); 
-        REQUIRE( tokens[1].second.name() == "source.test all middle" );
+        REQUIRE( tokens[2].first.substr(source) == "test " ); 
+        REQUIRE( tokens[2].second.name() == "source.test all middle" );
     }
 
     SECTION("scope will be ignored if the pattern contains no name or contentName") {
@@ -432,7 +432,6 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[3].second.name() == "source.coffee string.quoted.heredoc.coffee punctuation.definition.string.end.coffee" );
     }
 
-    
     SECTION("mutli-line desen't affect us") {
         string data = load_string("fixture/coffee-script.json");
         string source = "'''content\n of\n heredoc'''";
@@ -457,7 +456,7 @@ TEST_CASE("Tokenizer Tests") {
 
     SECTION("the sub-patterns will capture scopes") {
         string data = load_string("fixture/coffee-script.json");
-        string source = "'''content \nof\\t h\neredoc'''";
+        string source = "\"\"\"content \nof\\t h\neredoc\"\"\"";
         Grammar g = compiler.compile(data);
         compiler.resolve_include(g, nullptr);
         auto tokens = tokenizer.tokenize(g, source); 
@@ -468,16 +467,54 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[0].second.name() == "source.coffee" );
 
         REQUIRE( tokens[1].first.substr(source) == source ); 
-        REQUIRE( tokens[1].second.name() == "source.coffee string.quoted.heredoc.coffee" );
+        REQUIRE( tokens[1].second.name() == "source.coffee string.quoted.double.heredoc.coffee" );
 
-        REQUIRE( tokens[2].first.substr(source) == "'''" ); 
-        REQUIRE( tokens[2].second.name() == "source.coffee string.quoted.heredoc.coffee punctuation.definition.string.begin.coffee" );
+        REQUIRE( tokens[2].first.substr(source) == "\"\"\"" ); 
+        REQUIRE( tokens[2].second.name() == "source.coffee string.quoted.double.heredoc.coffee punctuation.definition.string.begin.coffee" );
 
         REQUIRE( tokens[3].first.substr(source) == "\\t" ); 
-        REQUIRE( tokens[3].second.name() == "source.coffee string.quoted.heredoc.coffee constant.character.escape.coffee" );
+        REQUIRE( tokens[3].second.name() == "source.coffee string.quoted.double.heredoc.coffee constant.character.escape.coffee" );
 
-        REQUIRE( tokens[4].first.substr(source) == "'''" ); 
-        REQUIRE( tokens[4].second.name() == "source.coffee string.quoted.heredoc.coffee punctuation.definition.string.end.coffee" );
+        REQUIRE( tokens[4].first.substr(source) == "\"\"\"" ); 
+        REQUIRE( tokens[4].second.name() == "source.coffee string.quoted.double.heredoc.coffee punctuation.definition.string.end.coffee" );
+    }
+
+    SECTION("applyEndPatternLast will make end rule less important when a begin pattern and end pattern all matches at the same position") {
+        string data = load_string("fixture/apply-end-pattern-last.json");
+        string source = 
+        "last\n"
+        "{ some }excentricSyntax }\n"
+        "\n"
+        "first\n"
+        "{ some }excentricSyntax }\n"
+        "\n";
+        Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
+        auto tokens = tokenizer.tokenize(g, source); 
+
+        REQUIRE( tokens.size() == 6 );
+
+        REQUIRE( tokens[0].first.substr(source) == source ); 
+        REQUIRE( tokens[0].second.name() == "source.apply-end-pattern-last" );
+
+        REQUIRE( tokens[1].first.substr(source) == 
+        "last\n"
+        "{ some }excentricSyntax }\n");
+        REQUIRE( tokens[1].second.name() == "source.apply-end-pattern-last end-pattern-last-env" );
+
+        REQUIRE( tokens[2].first.substr(source) == "{ some }excentricSyntax }" ); 
+        REQUIRE( tokens[2].second.name() == "source.apply-end-pattern-last end-pattern-last-env scope" );
+
+        REQUIRE( tokens[3].first.substr(source) == "}excentricSyntax" ); 
+        REQUIRE( tokens[3].second.name() == "source.apply-end-pattern-last end-pattern-last-env scope excentric" );
+
+        REQUIRE( tokens[4].first.substr(source) == 
+        "first\n"
+        "{ some }excentricSyntax }\n"); 
+        REQUIRE( tokens[4].second.name() == "source.apply-end-pattern-last normal-env" );
+
+        REQUIRE( tokens[5].first.substr(source) == "{ some }" ); 
+        REQUIRE( tokens[5].second.name() == "source.apply-end-pattern-last normal-env scope" );
     }
     // TODO test external grammar
     // TODO test $base $self
