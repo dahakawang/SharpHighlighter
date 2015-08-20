@@ -189,7 +189,7 @@ string EndPatternRegex::expand_backref(const Match& match, const string& target)
                 pos += (size - 1);
 
                 if (capture_num >= match.size()) throw InvalidRegexException("trying to back reference a not existed group");
-                expanded_regex += match[capture_num].substr(target);
+                expanded_regex += escape_regex(match[capture_num].substr(target));
             } else if (escaped) {
                 expanded_regex += '\\';
                 expanded_regex += ch;
@@ -200,7 +200,7 @@ string EndPatternRegex::expand_backref(const Match& match, const string& target)
         }
     }
 
-    return escape_regex(expanded_regex);
+    return expanded_regex;
 }
 
 }
