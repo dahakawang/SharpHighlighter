@@ -296,4 +296,20 @@ TEST_CASE("EndPatternRegex Test") {
         REQUIRE( end.size() == 1 );
         REQUIRE( end[0].substr(str) == "[hey" );
     }
+
+    SECTION("the expanded end rule will only escape the inserted string") {
+        Regex r1("\\[");
+        EndPatternRegex r2("\\[\\0hey");
+        string str = "[thisis[[hey";
+
+        REQUIRE( r2.has_backref() );
+
+        auto begin = r1.match(str, 0);
+        REQUIRE( begin == Match::MATCHED );
+
+        auto end = r2.match(begin, str, 0);
+        REQUIRE( end == Match::MATCHED );
+        REQUIRE( end.size() == 1 );
+        REQUIRE( end[0].substr(str) == "[[hey" );
+    }
 }
