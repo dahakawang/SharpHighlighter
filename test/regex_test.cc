@@ -154,6 +154,14 @@ TEST_CASE("Regex can find matchs") {
         REQUIRE_THROWS_AS(regex.match("hello world", 0), InvalidRegexException);
     }
 
+    SECTION("\"\" as regex will match anything") {
+        Regex regex("");
+        auto result = regex.match("abcdefg", 0);
+
+        REQUIRE( result == Match::MATCHED );
+        REQUIRE( result[0] == Range(0,0) );
+    }
+
     SECTION("regex can search from a position") {
         Regex r("abc");
 
