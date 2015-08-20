@@ -666,6 +666,73 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[17].second.name() == "text.html.ruby source.ruby.rails.embedded.html punctuation.section.embedded.ruby" );
     }
 
+    SECTION("external grammar can be optional, if it not exists, we just not tokenize the embeded string") {
+        shared_ptr<TestGrammarSource> grammar_source(new TestGrammarSource({
+                "source.ruby", "fixture/ruby.json"}));
+        GrammarRegistry registry(grammar_source);
+        Grammar g= registry.get_grammar("source.ruby");
+        string source = "<<-SQL select * from users; SQL";
+        auto tokens = tokenizer.tokenize(g, source);
+
+        REQUIRE( tokens.size() == 6 );
+
+        REQUIRE( tokens[0].first.substr(source) == source ); 
+        REQUIRE( tokens[0].second.name() == "source.ruby" );
+
+        REQUIRE( tokens[1].first.substr(source) == source ); 
+        REQUIRE( tokens[1].second.name() == "source.ruby meta.embedded.block.sql" );
+
+        REQUIRE( tokens[2].first.substr(source) == source ); 
+        REQUIRE( tokens[2].second.name() == "source.ruby meta.embedded.block.sql string.unquoted.heredoc.ruby" );
+
+        REQUIRE( tokens[3].first.substr(source) == "<<-SQL" ); 
+        REQUIRE( tokens[3].second.name() == "source.ruby meta.embedded.block.sql string.unquoted.heredoc.ruby punctuation.definition.string.begin.ruby" );
+
+        REQUIRE( tokens[4].first.substr(source) == " select * from users;" ); 
+        REQUIRE( tokens[4].second.name() == "source.ruby meta.embedded.block.sql string.unquoted.heredoc.ruby source.sql" );
+
+        REQUIRE( tokens[5].first.substr(source) == " SQL" ); 
+        REQUIRE( tokens[5].second.name() == "source.ruby meta.embedded.block.sql string.unquoted.heredoc.ruby punctuation.definition.string.end.ruby" );
+
+
+        shared_ptr<TestGrammarSource> grammar_source1(new TestGrammarSource({
+                "source.sql", "fixture/sql.json",
+                "source.ruby", "fixture/ruby.json"}));
+        GrammarRegistry registry1(grammar_source1);
+        Grammar g1 = registry1.get_grammar("source.ruby");
+        string source1 = "<<-SQL select * from users; SQL";
+        tokens = tokenizer.tokenize(g1, source);
+
+        REQUIRE( tokens.size() == 9 );
+
+        REQUIRE( tokens[0].first.substr(source) == source ); 
+        REQUIRE( tokens[0].second.name() == "source.ruby" );
+
+        REQUIRE( tokens[1].first.substr(source) == source ); 
+        REQUIRE( tokens[1].second.name() == "source.ruby meta.embedded.block.sql" );
+
+        REQUIRE( tokens[2].first.substr(source) == source ); 
+        REQUIRE( tokens[2].second.name() == "source.ruby meta.embedded.block.sql string.unquoted.heredoc.ruby" );
+
+        REQUIRE( tokens[3].first.substr(source) == "<<-SQL" ); 
+        REQUIRE( tokens[3].second.name() == "source.ruby meta.embedded.block.sql string.unquoted.heredoc.ruby punctuation.definition.string.begin.ruby" );
+
+        REQUIRE( tokens[4].first.substr(source) == " select * from users;" ); 
+        REQUIRE( tokens[4].second.name() == "source.ruby meta.embedded.block.sql string.unquoted.heredoc.ruby source.sql" );
+
+        REQUIRE( tokens[5].first.substr(source) == "select" ); 
+        REQUIRE( tokens[5].second.name() == "source.ruby meta.embedded.block.sql string.unquoted.heredoc.ruby source.sql source.sql keyword.other.DML.sql" );
+
+        REQUIRE( tokens[6].first.substr(source) == "*" ); 
+        REQUIRE( tokens[6].second.name() == "source.ruby meta.embedded.block.sql string.unquoted.heredoc.ruby source.sql source.sql keyword.operator.star.sql" );
+
+        REQUIRE( tokens[7].first.substr(source) == "from" ); 
+        REQUIRE( tokens[7].second.name() == "source.ruby meta.embedded.block.sql string.unquoted.heredoc.ruby source.sql source.sql keyword.other.DML.sql" );
+
+        REQUIRE( tokens[8].first.substr(source) == " SQL" ); 
+        REQUIRE( tokens[8].second.name() == "source.ruby meta.embedded.block.sql string.unquoted.heredoc.ruby punctuation.definition.string.end.ruby" );
+    }
+
     // TODO test external grammar
     // TODO test $base $self
     // TODO hen containing rule has a name
