@@ -80,7 +80,7 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[0].second.name() == "text.plain" );
     }
 
-    SECTION("it will loop infinitely") {
+    SECTION("it will not loop infinitely") {
         string data = load_string("fixture/text.json");
         string source = "hoo";
         Grammar g = compiler.compile(data);
