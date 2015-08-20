@@ -58,7 +58,7 @@ public:
     Regex(const string& regex);
     Regex(const string& regex, OnigOptionType option);
     const string& source() const;
-    bool empty() const { return _source.empty(); };
+    bool empty() const { return _regex == nullptr; };
     const Match match(const string& target, int start, int last_end = -1) const;
 
 private:

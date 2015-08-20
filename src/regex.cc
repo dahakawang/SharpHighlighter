@@ -79,7 +79,7 @@ Regex::Regex(const string& regex, OnigOptionType option) {
  *
  */
 const Match Regex::match(const string& target, int start_offset, int last_end) const {
-    if (_regex == nullptr) throw InvalidRegexException("can't match using an empty regex");
+    if (empty()) throw InvalidRegexException("can't match using an empty regex");
 
     UChar* str = (UChar*) target.c_str();
     UChar* start = (UChar*) (target.c_str() + start_offset);
