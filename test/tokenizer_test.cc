@@ -733,6 +733,26 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[8].second.name() == "source.ruby meta.embedded.block.sql string.unquoted.heredoc.ruby punctuation.definition.string.end.ruby" );
     }
 
+    SECTION("the grammar can deal with nested c clock") {
+        string data = load_string("fixture/c.json");
+        string source = "if(1){if(1){m()}}";
+        Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
+        auto tokens = tokenizer.tokenize(g, source);
+
+        REQUIRE( tokens[10].first.substr(source) == "m" );
+        REQUIRE( tokens[10].second.name() == "source.c meta.block.c meta.block.c meta.function-call.c support.function.any-method.c" );
+        
+    }
+
+    SECTION("the back reference in begin/match rule has the normal semantics") {
+        string data = load_string("fixture/scss.json");
+        string source = "@mixin x() { -moz-selector: whatever; }";
+        Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
+        auto tokens = tokenizer.tokenize(g, source);
+    }
+
     // TODO test external grammar
     // TODO test $base $self
     // TODO hen containing rule has a name
