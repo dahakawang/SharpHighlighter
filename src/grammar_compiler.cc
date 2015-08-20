@@ -47,7 +47,7 @@ void GrammarCompiler::compile_grammar(const JsonObject& object, Rule& rule) {
         rule.begin_captures = get_captures(object.begin_captures);
         if (rule.begin_captures.empty()) rule.begin_captures = get_captures(object.captures);
 
-        if(object.end.empty()) throw InvalidGrammarException("should have end for a begin/end pattern");
+        if(object.end.empty()) throw InvalidGrammarException("should have end for a begin/end pattern " + object.name);
         rule.end = EndPatternRegex(object.end);
         rule.end_captures = get_captures(object.end_captures);
         if (rule.end_captures.empty()) rule.end_captures = get_captures(object.captures);
