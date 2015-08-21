@@ -751,6 +751,15 @@ TEST_CASE("Tokenizer Tests") {
         Grammar g = compiler.compile(data);
         compiler.resolve_include(g, nullptr);
         auto tokens = tokenizer.tokenize(g, source);
+
+
+        REQUIRE( tokens.size() == 12 );
+
+        REQUIRE( tokens[0].first.substr(source) == source ); 
+        REQUIRE( tokens[0].second.name() == "source.css.scss" );
+
+        REQUIRE( tokens[7].first.substr(source) == "-moz-selector"); 
+        REQUIRE( tokens[7].second.name() == "source.css.scss meta.property-list.scss meta.property-name.scss" );
     }
 
     // TODO test external grammar
