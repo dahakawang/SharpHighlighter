@@ -1,5 +1,5 @@
+#include <shl_exception.h>
 #include "structured_scope.h"
-#include "shl_exception.h"
 
 namespace shl {
 

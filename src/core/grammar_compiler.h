@@ -2,9 +2,9 @@
 #define __GRAMMAR_COMPILER__
 
 #include <string>
-#include "grammar.h"
-#include "json_object.h"
-#include "grammar_registry.h"
+#include <grammar.h>
+#include <json_object.h>
+#include <grammar_registry.h>
 
 namespace shl {
 

@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 #include <utility>
-#include "scope.h"
-#include "regex.h"
+#include <scope.h>
+#include <shl_regex.h>
 
 using std::string;
 using std::vector;

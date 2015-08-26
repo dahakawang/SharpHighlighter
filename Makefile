@@ -13,3 +13,4 @@ clean:
 	@for target in $(TARGET); do \
 		(cd $$target; make clean); \
 	done
+	-@rm -rf lib

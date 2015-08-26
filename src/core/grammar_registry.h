@@ -1,10 +1,10 @@
 #ifndef __GRAMMAR_REGISTRY_H__
 #define __GRAMMAR_REGISTRY_H__
 
-#include "grammar.h"
 #include <string>
 #include <map>
 #include <vector>
+#include <grammar.h>
 
 namespace shl {
 

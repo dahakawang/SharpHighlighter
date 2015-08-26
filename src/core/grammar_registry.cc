@@ -1,9 +1,9 @@
-#include "grammar_registry.h"
-#include "grammar_compiler.h"
-#include "shl_exception.h"
 #include <string>
 #include <map>
 #include <iterator>
+#include <grammar_compiler.h>
+#include <shl_exception.h>
+#include "grammar_registry.h"
 
 using std::string;
 

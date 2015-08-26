@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "regex.h"
+#include <shl_regex.h>
 
 using std::string;
 using std::map;

@@ -3,9 +3,9 @@
 
 #include <utility>
 #include <stack>
-#include "grammar.h"
-#include "regex.h"
-#include "scope.h"
+#include <grammar.h>
+#include <shl_regex.h>
+#include <scope.h>
 
 using std::pair;
 using std::stack;

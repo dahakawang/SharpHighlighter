@@ -4,8 +4,8 @@
 #include <functional>
 #include <unordered_set>
 #include <set>
+#include <shl_exception.h>
 #include "tokenizer.h"
-#include "shl_exception.h"
 
 using std::stack;
 using std::function;

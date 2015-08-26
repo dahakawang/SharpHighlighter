@@ -1,6 +1,6 @@
 //#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
-#include <regex.h>
+#include <shl_regex.h>
 #include <shl_exception.h>
 
 using namespace shl;

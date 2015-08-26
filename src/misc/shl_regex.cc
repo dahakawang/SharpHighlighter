@@ -1,8 +1,8 @@
 #include <iostream>
 #include <memory>
 #include <cstring>
-#include "regex.h"
-#include "shl_exception.h"
+#include <shl_exception.h>
+#include "shl_regex.h"
 
 using std::shared_ptr;
 

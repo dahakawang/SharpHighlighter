@@ -1,9 +1,9 @@
 #include <algorithm>
+#include <grammar.h>
+#include <json_object.h>
+#include <json_loader.h>
+#include <shl_exception.h>
 #include "grammar_compiler.h"
-#include "grammar.h"
-#include "json_object.h"
-#include "json_loader.h"
-#include "shl_exception.h"
 
 namespace shl {
 
