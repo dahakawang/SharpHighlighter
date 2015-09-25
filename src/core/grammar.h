@@ -43,6 +43,7 @@ public:
     string desc;
     vector<string> file_types;
     map<string, Rule> repository;
+    map<string, Rule> injections;
 
     bool empty() { return name.empty() && patterns.empty() && repository.empty(); };
 };
