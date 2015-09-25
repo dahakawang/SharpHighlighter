@@ -1162,12 +1162,7 @@
           "begin": "(?x)\\s*\n\t\t\t\t\t    ((?:(?:final|abstract|public|private|protected|static)\\s+)*)\n\t\t\t\t        (function)\n\t\t\t\t        (?:\\s+|(\\s*&\\s*))\n\t\t\t\t        (?:\n\t\t\t\t            (__(?:call|construct|destruct|get|set|isset|unset|tostring|clone|set_state|sleep|wakeup|autoload|invoke|callStatic))\n\t\t\t\t            |([a-zA-Z0-9_]+)\n\t\t\t\t        )\n\t\t\t\t        \\s*\n\t\t\t\t        (\\()",
           "beginCaptures": {
             "1": {
-              "patterns": [
-                {
-                  "match": "final|abstract|public|private|protected|static",
-                  "name": "storage.modifier.php"
-                }
-              ]
+              "name": "storage.modifier.php"
             },
             "2": {
               "name": "storage.type.function.php"
