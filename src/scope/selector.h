@@ -1,28 +1,34 @@
 #ifndef __SELECTOR__
 #define __SELECTOR__
 
+#include <vector>
+
+using std::vector;
+
 namespace shl {
 namespace selector {
 
-class Selector {
+struct Selector {
+    vector<CompositeSelctor> composites;
 };
 
-class CompositeSelctor {
+struct CompositeSelctor {
+    enum CompositionType { OR, AND, MINUS };
 };
 
-class ExpressionSelector {
+struct ExpressionSelector {
 };
 
-class FilterSelector {
+struct FilterSelector {
 };
 
-class GroupSelector {
+struct GroupSelector {
 };
 
-class ScopeSelector {
+struct ScopeSelector {
 };
 
-class ScopeNameSelector {
+struct ScopeNameSelector {
 };
 
 }
