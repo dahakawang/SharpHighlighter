@@ -4,52 +4,13 @@
 #include <sstream>
 #include <cctype>
 #include "scope.h"
+#include "str_util.h"
 
 using std::string;
 using std::vector;
 using std::ostringstream;
 
 namespace shl {
-
-template<typename T>
-vector<string> strtok(const string& str, T predicator) {
-    const char* s = str.c_str();
-    auto length = str.size();
-    vector<string> tokens;
-
-    bool in_separator = true;
-    string::size_type start, index;
-    for(index = 0; index < length; index++) {
-        if (in_separator) {
-            if (!predicator(s[index])) {
-                in_separator = false;
-                start = index;
-            }
-        } else {
-            if (predicator(s[index])) {
-                in_separator = true;
-                tokens.push_back(str.substr(start, index - start));
-            }
-        }
-    }
-    if (!in_separator) {
-        tokens.push_back(str.substr(start));
-    }
-
-    return tokens;
-}
-
-string trim(const string& str) {
-    const char* s = str.c_str();
-    string::size_type start, end;
-    start = 0;
-    end = str.size();
-
-    while(start < end && isblank(s[start])) start++;
-    while(end > start && isblank(s[end-1])) end--;
-
-    return str.substr(start, end - start);
-}
 
 ScopeName::ScopeName(const string& scope_name) {
     _name = scope_name;
