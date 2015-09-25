@@ -72,11 +72,6 @@ TEST_CASE("GrammarCompiler Test") {
     }
 
     SECTION("will load the injection rule") {
-        string data = load_string("fixture/php.json");
-        GrammarCompiler compiler;
-        Grammar g = compiler.compile(data);
-        compiler.resolve_include(g, nullptr); // do not check external grammar include here
-
         REQUIRE( g.injections.size() == 1 );
     }
 }
