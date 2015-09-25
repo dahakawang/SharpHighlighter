@@ -18,6 +18,7 @@ public:
     vector<string> file_types;
     vector<JsonObject> patterns;
     map<string, JsonObject> repository;
+    map<string, JsonObject> injections;
 
     string include;
     string begin;
