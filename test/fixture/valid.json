@@ -5,6 +5,18 @@
     "h"
   ],
   "name": "C",
+  "injections": {
+    "hello": {
+        "patterns":[
+            {
+                "patterns": [
+                    { "include" : "#preprocessor-rule-enabled" },
+                    { "include" : "#hello" }
+                ]
+            }
+        ]
+    },
+  },
   "patterns": [
     {
       "include": "#preprocessor-rule-enabled"
