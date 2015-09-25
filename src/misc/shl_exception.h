@@ -31,6 +31,11 @@ public:
     explicit InvalidRegexException(const string& msg):ShlException(msg){};
 };
 
+class InvalidScopeSelector : public ShlException {
+public:
+    explicit InvalidScopeSelector(const string& msg):ShlException(msg){};
+};
+
 
 }
 
