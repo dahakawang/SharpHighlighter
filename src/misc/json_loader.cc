@@ -125,7 +125,15 @@ void JsonLoader::process(JsonObject& root, const json_value* value) {
                 root.repository[key] = repo_item;
             });
 
-        } else if (key == "match") {
+        } else if (key == "injections") {
+            ensure_object(value, "injections should be a key-value map");
+            for_fields(value, [&root](const string& key, const json_value* value){
+                ensure_object(value, "injections item can only be an object");
+                JsonObject repo_item;
+                process(repo_item, value);
+                root.injections[key] = repo_item;
+            });
+        }else if (key == "match") {
             ensure_string(value, "match should be a regex");
             root.match = get_string(value);
         } else if (key == "captures") {
