@@ -28,6 +28,13 @@ void GrammarCompiler::process(const JsonObject& object, Grammar& grammar) {
         grammar.repository[repo_name] = Rule();
         compile_grammar(root, grammar.repository[repo_name]);
     }
+    for ( auto& stocked : object.injections ) {
+        const string& repo_name = stocked.first;
+        const JsonObject& root = stocked.second;
+
+        grammar.injections[repo_name] = Rule();
+        compile_grammar(root, grammar.repository[repo_name]);
+    }
 
     swap(grammar.desc, grammar.name);
 }
