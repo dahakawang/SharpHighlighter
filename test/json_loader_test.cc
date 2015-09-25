@@ -35,5 +35,8 @@ TEST_CASE("JsonLoader Test") {
         REQUIRE(obj.repository.size() == 3);
         REQUIRE(obj.repository["preprocessor-rule-enabled"].begin == "^\\s*(#(if)\\s+(0*1)\\b)");
         REQUIRE(obj.repository["preprocessor-rule-enabled"].patterns[0].content_name == "comment.block.preprocessor.else-branch");
+
+        REQUIRE(obj.injections.size() == 1);
+        REQUIRE(obj.injections["hello"].patterns.size() == 1);
     }
 }
