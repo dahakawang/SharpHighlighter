@@ -29,9 +29,6 @@ struct ScopeSelector : public AbstractSelector {
     bool anchor_begin, anchor_end;
 };
 
-struct GroupSelector : public AbstractSelector  {
-    unique_ptr<AbstractSelector> selector;
-};
 
 struct FilterSelector : public AbstractSelector {
     enum Side { Left = 'L', Right = 'R', Both = 'B' };
@@ -58,6 +55,10 @@ struct CompositeSelctor : public AbstractSelector {
 
 struct Selector : public AbstractSelector {
     vector<CompositeSelctor> selectors;
+};
+
+struct GroupSelector : public AbstractSelector  {
+    Selector selector;
 };
 
 }
