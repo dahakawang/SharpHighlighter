@@ -16,16 +16,16 @@ struct AbstractSelector {
 
 
 struct ScopeNameSelector : public AbstractSelector {
+    ScopeNameSelector(): anchor_prev(false) {};
+
+    bool anchor_prev;
     vector<string> components;
 };
 
 struct ScopeSelector : public AbstractSelector {
-    enum AffinityType { DIRECT, NONDIRECT };
-
     ScopeSelector(): anchor_begin(false), anchor_end(false) {};
 
-    vector<ScopeNameSelector> selectors;
-    vector<AffinityType> affinities;
+    vector<ScopeNameSelector> atoms;
     bool anchor_begin, anchor_end;
 };
 
