@@ -8,11 +8,9 @@ namespace shl {
 
 class Selector {
 public:
-    typedef selector::Side Side;
-
     Selector() = default;
     Selector(const string& selector);
-    bool match(const Scope& scope, Side side, int& rank) const;
+    //bool match(const Scope& scope, Side side, int& rank) const;
 
 private:
     selector::Selector selector;
