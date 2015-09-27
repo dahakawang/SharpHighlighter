@@ -8,9 +8,9 @@ namespace shl {
 namespace selector {
 
 /*
-    atom:         «string» | '*'
-    scope:        «atom» ('.' «atom»)*
-    path:         '^'? «scope» ('>'? «scope»)* '$'?
+    component:         «alnum» | '*'
+    scope_name:        «component» ('.' «component»)*
+    scope:         '^'? «scope_name» ('>'? «scope_name»)* '$'?
     group:        '(' «selector» ')'
     filter:       ("L:"|"R:"|"B:") («group» | «path»)
     expression:   '-'? («filter» | «group» | «path»)
