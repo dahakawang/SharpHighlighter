@@ -1,4 +1,5 @@
 #include <memory>
+#include <cstring>
 #include <shl_exception.h>
 #include "selector_parser.h"
 
@@ -22,6 +23,14 @@ Parser::Parser(const string& str):_selector_str(str), _pos(0) {
 }
 
 Parser::Parser(const char* str):_selector_str(str), _pos(0) {
+}
+
+
+AbstractSelector Parser::parse() {
+    Selector instance;
+    if (!parse_selector(instance)) throw InvalidScopeSelector("invalid scope selector");
+
+    return instance;
 }
 
 bool Parser::ws() {
