@@ -9,6 +9,6 @@ TEST_CASE("Selector Parser Test") {
     SECTION("parse a simple selector") {
         selector::Parser parser("source.c storage.modifier.c keyword.core.control.if highlight.*");
 
-        parser.parse_selector();
+        parser.parse();
     }
 }
