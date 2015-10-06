@@ -129,6 +129,7 @@ bool Parser::parse_scope(unique_ptr<AbstractSelector>& selector) {
         scope->atoms.push_back(std::move(scope_name));
         first_atom = false;
     }
+    ws();
     scope->anchor_end = parse_char("$");
 
     if (scope->atoms.empty()) {
@@ -144,20 +145,20 @@ bool Parser::parse_scope_name(ScopeNameSelector& selector, bool is_first) {
     ws();
     if (!is_first) selector.anchor_prev = parse_char(">");
     ws();
+
+    if(_pos > _selector_str.size() || (!isalnum(_selector_str[_pos]) && _selector_str[_pos] != '*')) return false;
     while(_pos < _selector_str.size()) {
         int start = _pos;
         while(_pos < _selector_str.size() && (isalnum(_selector_str[_pos]) || _selector_str[_pos] == '*')) ++_pos;
         
-        if (_pos >= _selector_str.size() || isblank(_selector_str[_pos])) {
-            if (_pos - start <= 0) throw InvalidScopeSelector("0 length scope component");
-            selector.components.push_back(_selector_str.substr(start, _pos - start));
-            break;
-        } else if (_selector_str[_pos] == '.') {
+        if (_selector_str[_pos] == '.') {
             if (_pos - start <= 0) throw InvalidScopeSelector("0 length scope component");
             selector.components.push_back(_selector_str.substr(start, _pos - start));
             ++_pos;
         } else {
-            throw InvalidScopeSelector("invalid charactor");
+            if (_pos - start <= 0) throw InvalidScopeSelector("0 length scope component");
+            selector.components.push_back(_selector_str.substr(start, _pos - start));
+            break;
         }
     }
 
