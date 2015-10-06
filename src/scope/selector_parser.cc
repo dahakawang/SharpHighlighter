@@ -26,7 +26,7 @@ Parser::Parser(const char* str):_selector_str(str), _pos(0) {
 }
 
 
-AbstractSelector Parser::parse() {
+Selector Parser::parse() {
     Selector instance;
     if (!parse_selector(instance)) throw InvalidScopeSelector("invalid scope selector");
 
@@ -68,7 +68,7 @@ bool Parser::parse_composite(CompositeSelctor& selector) {
         ws();
         selector.operators.push_back((CompositeSelctor::CompositionType)op);
         ExpressionSelector tmp;
-        if (parse_expression(tmp)) return false;
+        if (!parse_expression(tmp)) return false;
         selector.selectors.push_back(std::move(tmp));
         ws();
     } while (parse_char("&|-", &op));
@@ -142,7 +142,7 @@ bool Parser::parse_scope(unique_ptr<AbstractSelector>& selector) {
 
 bool Parser::parse_scope_name(ScopeNameSelector& selector, bool is_first) {
     ws();
-    if (is_first) selector.anchor_prev = parse_char(">");
+    if (!is_first) selector.anchor_prev = parse_char(">");
     ws();
     while(_pos < _selector_str.size()) {
         int start = _pos;
@@ -155,12 +155,13 @@ bool Parser::parse_scope_name(ScopeNameSelector& selector, bool is_first) {
         } else if (_selector_str[_pos] == '.') {
             if (_pos - start <= 0) throw InvalidScopeSelector("0 length scope component");
             selector.components.push_back(_selector_str.substr(start, _pos - start));
+            ++_pos;
         } else {
             throw InvalidScopeSelector("invalid charactor");
         }
     }
 
-    return true;
+    return !selector.components.empty();
 }
 
 }

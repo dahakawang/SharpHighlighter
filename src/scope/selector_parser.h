@@ -13,7 +13,7 @@ class Parser {
 public:
     Parser(const string& str);
     Parser(const char* str);
-    AbstractSelector parse();
+    Selector parse();
 
 private:
     string _selector_str;
