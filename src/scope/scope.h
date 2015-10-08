@@ -33,6 +33,8 @@ public:
     bool is_prefix_of(const Scope& other) const;
     unsigned size() const { return _scope.size(); };
     const ScopeName& operator[](unsigned pos) const { return _scope[pos]; };
+    const ScopeName& back() const { return _scope.back(); };
+    const ScopeName& front() const { return _scope.front(); };
     bool operator==(const Scope& other) const;
     bool operator!=(const Scope& other) const;
     const Scope subscope(unsigned pos) const;
