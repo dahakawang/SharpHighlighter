@@ -9,7 +9,7 @@ bool Selector::match(const Scope& scope, double* rank) const {
     if (rank) {
         double max_rank = 0;
         bool matched = false;
-        for(CompositeSelctor selector : selectors) {
+        for(const CompositeSelctor& selector : selectors) {
             if (selector.match(scope, rank)) {
                 max_rank = std::max(max_rank, *rank);
                 matched = true;
@@ -20,7 +20,7 @@ bool Selector::match(const Scope& scope, double* rank) const {
         return matched;
 
     } else {
-        for (CompositeSelctor selector : selectors) {
+        for (const CompositeSelctor& selector : selectors) {
             if (selector.match(scope, rank)) return true;
         }
 
