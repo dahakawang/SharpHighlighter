@@ -136,12 +136,12 @@ bool ScopeSelector::match(const Scope& scope, char side, double* rank) const {
     if (it_sel >= atoms.size()) {
         depth_score = atoms.size();
     } else {
-        *rank = 0;
+        if (rank) *rank = 0;
         return false;
     }
 
 
-    *rank = specific_core * 1000 + atom_score * 100 + depth_score;
+    if (rank) *rank = specific_core * 1000 + atom_score * 100 + depth_score;
     return true;
 }
 
