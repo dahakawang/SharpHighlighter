@@ -103,7 +103,7 @@ bool match(const ScopeNameSelector& selector, const ScopeName& atom, double* ran
 
 bool ScopeSelector::match(const Scope& scope, char side, double* rank) const {
     using shl::selector::match;
-    double specific_core = 0, atom_score = 0, depth_score = 0;
+    double specific_score = 0, atom_score = 0, depth_score = 0;
     double tmp_score;
 
     // greedy algorithm
@@ -141,7 +141,7 @@ bool ScopeSelector::match(const Scope& scope, char side, double* rank) const {
     }
 
 
-    if (rank) *rank = specific_core * 1000 + atom_score * 100 + depth_score;
+    if (rank) *rank = specific_score * 1000 + atom_score * 100 + depth_score;
     return true;
 }
 
