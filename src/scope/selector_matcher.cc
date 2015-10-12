@@ -83,7 +83,7 @@ bool GroupSelector::match(const Scope& scope, char side, double* rank) const {
     return selector.match(scope, side, rank);
 }
 
-bool match_atom_prefix(const ScopeNameSelector& selector, const ScopeName& atom, double* rank) {
+bool match(const ScopeNameSelector& selector, const ScopeName& atom, double* rank) {
     double score = 0;
 
     auto& _selector = selector.components;
@@ -102,28 +102,34 @@ bool match_atom_prefix(const ScopeNameSelector& selector, const ScopeName& atom,
 }
 
 bool ScopeSelector::match(const Scope& scope, char side, double* rank) const {
+    using shl::selector::match;
     double specific_core = 0, atom_score = 0, depth_score = 0;
     double tmp_score;
 
-    if( match_atom_prefix(atoms.back(), scope.back(), &tmp_score)) {
-        specific_core = tmp_score;
-    } else {
-        if (anchor_end) {
-            *rank = 0;
-            return false;
-        }
-    }
-    if (anchor_begin && !match_atom_prefix(atoms.front(), scope.front(), &tmp_score)) {
-        *rank = 0;
-        return false;
-    }
-
     // greedy algorithm
-    size_t it_sel = 0;
-    for (size_t it_scope = 0; it_scope < scope.size(); it_scope++) {
-        if (it_sel < atoms.size() && match_atom_prefix(atoms[it_sel], scope[it_scope], &tmp_score)) {
+    vector<int> matched_pos(atoms.size(), 0);
+    size_t it_sel = 0, it_scope = 0;
+    while(it_sel < atoms.size() && it_scope < scope.size()) {
+        bool backtrace = false;
+        for(; it_scope < scope.size() && !match(atoms[it_sel], scope[it_scope], &tmp_score); it_scope++);
+        if (it_scope < scope.size()) { //matched
+            if (anchor_begin && it_sel == 0 && it_scope != 0) break;
+            if (anchor_end && it_sel == atoms.size() - 1 && it_scope != scope.size() - 1) backtrace = true;
+            if (atoms[it_sel].anchor_prev && it_sel > 0 && it_scope != matched_pos[it_sel - 1] + 1) backtrace = true;
+        } else {
+            break;
+        }
+        if (backtrace) {
+            if (it_sel != 0) {
+                it_sel--;
+                it_scope = matched_pos[it_sel] + 1;
+            } else {
+                it_scope++;
+            }
+        } else {
+            matched_pos[it_sel] = it_scope;
             it_sel++;
-            atom_score += tmp_score;
+            it_scope++;
         }
     }
 
