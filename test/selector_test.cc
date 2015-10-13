@@ -83,4 +83,84 @@ TEST_CASE("Selector Parser Test") {
         REQUIRE( nest_nest_second.atoms[0].anchor_prev == false );
         REQUIRE( nest_nest_second.atoms[1].anchor_prev == true );
     }
+
+    SECTION("simpile selector can select scopes") {
+        selector::Parser p1("source.ruby.structure.*");
+        Selector s1 = p1.parse();
+        Scope scope1("source.ruby.structure.if");
+        Scope scope2("source.ruby.structure");
+        Scope scope3("source.ruby.structure.for.additional");
+
+        REQUIRE( s1.match(scope1, ' ', nullptr) );
+        REQUIRE( s1.match(scope2, ' ', nullptr) == false );
+        REQUIRE( s1.match(scope3, ' ', nullptr) );
+        
+
+
+        selector::Parser p2("source.ruby.structure");
+        Selector s2 = p2.parse();
+        Scope scope4("source.ruby.structure.if");
+
+        REQUIRE( s2.match(scope4, ' ', nullptr) );
+
+
+
+        selector::Parser p3("source.*.structure");
+        Selector s3 = p3.parse();
+        Scope scope5("source.cpp.structure.if");
+
+        REQUIRE( s3.match(scope5, ' ', nullptr) );
+    }
+
+    SECTION("path selector can selector scopes") {
+        selector::Parser p1("source.ruby control.flow if");
+        Selector s1 = p1.parse();
+        Scope scope1("source.ruby control.flow if");
+        Scope scope2("source.ruby block control.flow if embeded");
+        Scope scope3("source.ruby block if embeded");
+
+        REQUIRE( s1.match(scope1, ' ', nullptr ) );
+        REQUIRE( s1.match(scope2, ' ', nullptr ) );
+        REQUIRE( s1.match(scope3, ' ', nullptr ) == false );
+        
+    }
+
+    SECTION("anchors will work") {
+        selector::Parser p1("A > B");
+        Selector s1 = p1.parse();
+        Scope scope1("A S B C A B");
+        Scope scope2("A S B C A");
+
+        REQUIRE( s1.match(scope1, ' ', nullptr) );
+        REQUIRE( s1.match(scope2, ' ', nullptr) == false );
+
+        selector::Parser p2("^ A > B");
+        Selector s2 = p2.parse();
+        Scope scope3("A S B C A B");
+        Scope scope4("A B C A B");
+        Scope scope5("B C A B");
+
+        REQUIRE( s2.match(scope3, ' ', nullptr) == false );
+        REQUIRE( s2.match(scope4, ' ', nullptr));
+        REQUIRE( s2.match(scope5, ' ', nullptr) == false );
+
+        selector::Parser p3(" A > B $");
+        Selector s3 = p3.parse();
+        Scope scope6("A C A B B");
+
+        REQUIRE( s3.match(scope3, ' ', nullptr) );
+        REQUIRE( s3.match(scope4, ' ', nullptr));
+        REQUIRE( s3.match(scope6, ' ', nullptr) == false );
+
+        selector::Parser p4(" ^ A $");
+        Selector s4 = p4.parse();
+        Scope scope7("A");
+        Scope scope8("A B");
+        Scope scope9("A A");
+
+        REQUIRE( s4.match(scope7, ' ', nullptr) );
+        REQUIRE( s4.match(scope8, ' ', nullptr) == false );
+        REQUIRE( s4.match(scope9, ' ', nullptr) == false );
+
+    }
 }
