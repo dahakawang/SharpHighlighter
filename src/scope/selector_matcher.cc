@@ -83,35 +83,59 @@ bool GroupSelector::match(const Scope& scope, char side, double* rank) const {
     return selector.match(scope, side, rank);
 }
 
-bool match(const ScopeNameSelector& selector, const ScopeName& atom, double* rank) {
+bool match(const ScopeNameSelector& selector, const ScopeName& atom) {
     double score = 0;
 
     auto& _selector = selector.components;
     auto& _atom = atom.breakdown();
     for(size_t it = 0; it < _selector.size(); it++) {
-        if(it < _atom.size() && (_selector[it] == "*" || _selector[it] == _atom[it])) {
-            score += ((_selector[it] == "*")? 0.5 : 1);
-        } else {
-            *rank = 0;
+        if(! (it < _atom.size() && (_selector[it] == "*" || _selector[it] == _atom[it])) ) {
             return false;
         }
     }
 
-    *rank = score;
     return true;
+}
+
+double get_depth_score(const vector<ScopeNameSelector>& selector) {
+    return selector.size();
+}
+
+double get_atom_score(const vector<ScopeNameSelector>& selector) {
+    double score = 0;
+    for(auto& scopeName : selector) {
+        for(auto& component : scopeName.components) {
+            score += ((component == "*")? 0.5 : 1);
+        }
+    }
+    return score;
+}
+
+double get_specific_score(const vector<ScopeNameSelector>& selector, const Scope& scope) {
+    int it_sel = selector.size() - 1, it_scope = scope.size() - 1;
+
+    if(!match(selector[it_sel], scope[it_scope])) {
+        return 0;
+    }
+
+    
+    return ;
 }
 
 bool ScopeSelector::match(const Scope& scope, char side, double* rank) const {
     using shl::selector::match;
     double specific_score = 0, atom_score = 0, depth_score = 0;
-    double tmp_score;
+
+    specific_score = get_specific_score(atoms, scope);
+    atom_score = get_atom_score(atoms);
+    depth_score = get_depth_score(atoms);
 
     // greedy algorithm
     vector<int> matched_pos(atoms.size(), 0);
     size_t it_sel = 0, it_scope = 0;
     while(it_sel < atoms.size() && it_scope < scope.size()) {
         bool backtrace = false;
-        for(; it_scope < scope.size() && !match(atoms[it_sel], scope[it_scope], &tmp_score); it_scope++);
+        for(; it_scope < scope.size() && !match(atoms[it_sel], scope[it_scope]); it_scope++);
         if (it_scope < scope.size()) { //matched
             if (anchor_begin && it_sel == 0 && it_scope != 0) break;
             if (anchor_end && it_sel == atoms.size() - 1 && it_scope != scope.size() - 1) backtrace = true;
@@ -133,9 +157,7 @@ bool ScopeSelector::match(const Scope& scope, char side, double* rank) const {
         }
     }
 
-    if (it_sel >= atoms.size()) {
-        depth_score = atoms.size();
-    } else {
+    if (it_sel < atoms.size()) {
         if (rank) *rank = 0;
         return false;
     }
