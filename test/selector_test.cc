@@ -3,12 +3,14 @@
 #include <iostream>
 #include <selector_parser.h>
 #include <selector.h>
+#include <scope_selector.h>
 
 using namespace shl;
 using namespace shl::selector;
 
 TEST_CASE("Selector Parser Test") {
     SECTION("parse a simple selector") {
+        using shl::selector::Selector;
         selector::Parser parser("R:source.ruby ruby.* | - L:pic.a pic b, source.c storage.modifier.c keyword.core.control.if highlight.*, L:(man.kind man.hello man.last $, B:( ^ test.n test.g, test.a > test.b > test.c $))");
 
         Selector s = parser.parse();
@@ -85,6 +87,7 @@ TEST_CASE("Selector Parser Test") {
     }
 
     SECTION("simpile selector can select scopes") {
+        using shl::selector::Selector;
         selector::Parser p1("source.ruby.structure.*");
         Selector s1 = p1.parse();
         Scope scope1("source.ruby.structure.if");
@@ -113,6 +116,7 @@ TEST_CASE("Selector Parser Test") {
     }
 
     SECTION("path selector can selector scopes") {
+        using shl::selector::Selector;
         selector::Parser p1("source.ruby control.flow if");
         Selector s1 = p1.parse();
         Scope scope1("source.ruby control.flow if");
@@ -126,6 +130,7 @@ TEST_CASE("Selector Parser Test") {
     }
 
     SECTION("anchors will work") {
+        using shl::selector::Selector;
         selector::Parser p1("A > B");
         Selector s1 = p1.parse();
         Scope scope1("A S B C A B");
@@ -162,5 +167,71 @@ TEST_CASE("Selector Parser Test") {
         REQUIRE( s4.match(scope8, ' ', nullptr) == false );
         REQUIRE( s4.match(scope9, ' ', nullptr) == false );
 
+    }
+
+    SECTION("test selector") {
+        using shl::Selector;
+
+        REQUIRE( Selector("foo fud").match("foo bar fud") );
+        REQUIRE( Selector("foo > fud").match("foo bar fud") == false );
+        REQUIRE( Selector("foo > foo > fud").match("foo foo fud") );
+        REQUIRE( Selector("foo > foo > fud").match("foo foo fud baz") );
+        REQUIRE( Selector("foo > foo fud > fud").match("foo foo bar fud fud") );
+
+        REQUIRE( Selector("^ foo > bar").match("foo bar foo") );
+        REQUIRE( Selector("foo > bar $").match("foo bar foo") == false );
+        REQUIRE( Selector("bar > foo $").match("foo bar foo") );
+        REQUIRE( Selector("foo > bar > foo $").match("foo bar foo") );
+        REQUIRE( Selector("^ foo > bar > foo $").match("foo bar foo") );
+        REQUIRE( Selector("bar > foo $").match("foo bar foo") );
+        REQUIRE( Selector("^ foo > bar > baz").match("foo bar baz foo bar baz") );
+        REQUIRE( Selector("^ foo > bar > baz").match("foo foo bar baz foo bar baz") == false );
+
+        REQUIRE( Selector("foo bar").match("foo bar dyn.selection") );
+        REQUIRE( Selector("foo bar dyn").match("foo bar dyn.selection") );
+        REQUIRE( Selector("foo bar dyn").match("foo bar dyn.selection") );
+
+        REQUIRE( Selector("foo").match("foo.qux bar.quux.grault baz.corge.garply") );
+        REQUIRE( Selector("foo bar").match("foo.qux bar.quux.grault baz.corge.garply") );
+        REQUIRE( Selector("foo bar baz").match("foo.qux bar.quux.grault baz.corge.garply") );
+        REQUIRE( Selector("foo baz").match("foo.qux bar.quux.grault baz.corge.garply") );
+        REQUIRE( Selector("foo.*").match("foo.qux bar.quux.grault baz.corge.garply") );
+        REQUIRE( Selector("foo.qux").match("foo.qux bar.quux.grault baz.corge.garply") );
+        REQUIRE( Selector("foo.qux baz.*.garply").match("foo.qux bar.quux.grault baz.corge.garply") );
+        REQUIRE( Selector("bar").match("foo.qux bar.quux.grault baz.corge.garply") );
+        REQUIRE( Selector("foo qux").match("foo.qux bar.quux.grault baz.corge.garply") == false );
+        REQUIRE( Selector("foo.bar").match("foo.qux bar.quux.grault baz.corge.garply") == false );
+        REQUIRE( Selector("foo.qux baz.garply").match("foo.qux bar.quux.grault baz.corge.garply") == false );
+        REQUIRE( Selector("bar.*.baz").match("foo.qux bar.quux.grault baz.corge.garply") == false );
+        REQUIRE( Selector("foo > bar").match("foo bar baz bar baz") );
+        REQUIRE( Selector("bar > baz").match("foo bar baz bar baz") );
+        REQUIRE( Selector("foo > bar baz").match("foo bar baz bar baz") );
+        REQUIRE( Selector("foo bar > baz").match("foo bar baz bar baz") );
+        REQUIRE( Selector("foo > bar > baz").match("foo bar baz bar baz") );
+        REQUIRE( Selector("foo > bar bar > baz").match("foo bar baz bar baz") );
+        REQUIRE( Selector("foo > bar > bar > baz").match("foo bar baz bar baz") == false );
+        REQUIRE( Selector("baz $").match("foo bar baz bar baz") );
+        REQUIRE( Selector("bar > baz $").match("foo bar baz bar baz") );
+        REQUIRE( Selector("bar > baz $").match("foo bar baz bar baz") );
+        REQUIRE( Selector("foo bar > baz $").match("foo bar baz bar baz") );
+        REQUIRE( Selector("foo > bar > baz").match("foo bar baz bar baz") );
+        REQUIRE( Selector("foo > bar > baz $").match("foo bar baz bar baz") == false );
+        REQUIRE( Selector("bar $").match("foo bar baz bar baz") == false );
+        REQUIRE( Selector("baz $").match("foo bar baz bar baz ") );
+        REQUIRE( Selector("bar > baz $").match("foo bar baz bar baz") );
+        REQUIRE( Selector("bar > baz $").match("foo bar baz bar baz") );
+        REQUIRE( Selector("foo bar > baz $").match("foo bar baz bar baz") );
+        REQUIRE( Selector("foo > bar > baz $").match("foo bar baz bar baz") ==false );
+        REQUIRE( Selector("bar $").match("foo bar baz bar baz") == false );
+        REQUIRE( Selector("^ foo").match("foo bar foo bar baz") );
+        REQUIRE( Selector("^ foo > bar").match("foo bar foo bar baz") );
+        REQUIRE( Selector("^ foo bar > baz").match("foo bar foo bar baz") );
+        REQUIRE( Selector("^ foo > bar baz").match("foo bar foo bar baz") );
+        REQUIRE( Selector("^ foo > bar > baz").match("foo bar foo bar baz") == false );
+        REQUIRE( Selector("^ bar").match("foo bar foo bar baz") == false );
+        REQUIRE( Selector("foo > bar > baz").match("foo bar baz foo bar baz") );
+        REQUIRE( Selector("^ foo > bar > baz").match("foo bar baz foo bar baz") );
+        REQUIRE( Selector("foo > bar > baz $").match("foo bar baz foo bar baz") );
+        REQUIRE( Selector("^ foo > bar > baz $").match("foo bar baz foo bar baz") ==false );
     }
 }
