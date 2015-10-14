@@ -8,9 +8,11 @@ namespace shl {
 
 class Selector {
 public:
+    enum Side { LEFT = 'L', RIGHT = 'R', BOTH = 'B'};
     Selector() = default;
     Selector(const string& selector);
-    //bool match(const Scope& scope, Side side, int& rank) const;
+    bool match(const Scope& scope, Side side = BOTH, double* rank = nullptr) const;
+    bool match(const string& scope, Side side = BOTH, double* rank = nullptr) const;
 
 private:
     selector::Selector selector;
