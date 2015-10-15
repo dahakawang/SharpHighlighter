@@ -111,15 +111,27 @@ double get_atom_score(const vector<ScopeNameSelector>& selector) {
     return score;
 }
 
+double get_component_score(const ScopeNameSelector& atom) {
+    double score = 0;
+    for(auto& component : atom.components) {
+        score += ((component == "*")? 0.5 : 1);
+    }
+    return score;
+}
+
 double get_specific_score(const vector<ScopeNameSelector>& selector, const Scope& scope) {
     int it_sel = selector.size() - 1, it_scope = scope.size() - 1;
+    bool anchored = true;
 
-    if(!match(selector[it_sel], scope[it_scope])) {
-        return 0;
+    while(anchored && match(selector[it_sel], scope[it_scope])) {
+        anchored = selector[it_sel].anchor_prev;
+        --it_sel;
+        --it_scope;
     }
-
     
-    return ;
+    if (anchored) return 0;
+    
+    return get_component_score(selector.back());
 }
 
 bool ScopeSelector::match(const Scope& scope, char side, double* rank) const {
@@ -163,7 +175,7 @@ bool ScopeSelector::match(const Scope& scope, char side, double* rank) const {
     }
 
 
-    if (rank) *rank = specific_score * 1000 + atom_score * 100 + depth_score;
+    if (rank) *rank = specific_score * 10000 + atom_score * 100 + depth_score;
     return true;
 }
 
