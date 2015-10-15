@@ -1,6 +1,7 @@
 #include "catch.hpp"
 #include "util.h"
 #include <iostream>
+#include <limits>
 #include <selector_parser.h>
 #include <selector.h>
 #include <scope_selector.h>
@@ -241,5 +242,35 @@ TEST_CASE("Selector Parser Test") {
 
         REQUIRE_THROWS_AS( Selector(""), InvalidScopeSelector );
         REQUIRE_THROWS_AS( Selector("> A > B"), InvalidScopeSelector );
+    }
+
+    SECTION("selectors rank will work") {
+        using shl::Selector;
+        string scope("text.html.markdown meta.paragraph.markdown markup.bold.markdown");
+        string selectors[] = {
+            "text.* markup.bold",
+            "text markup.bold",
+            "markup.bold",
+            "text.html meta.*.markdown markup",
+            "text.html meta.* markup",
+            "text.html * markup",
+            "text.html markup",
+            "text markup",
+            "markup",
+            "text.html",
+            "text"
+        };
+
+        double lastRank = std::numeric_limits<double>::max(), rank = 0;
+        for(size_t i = 0; i < sizeof(selectors)/sizeof(selectors[0]); i++) {
+            REQUIRE( Selector(selectors[i]).match(scope, Selector::BOTH, &rank) );
+            if (rank >= lastRank ) {
+                std::cout << selectors[i] << std::endl;
+            }
+            REQUIRE( rank < lastRank );
+            lastRank =  rank;
+        }
+
+
     }
 }
