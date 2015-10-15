@@ -4,6 +4,7 @@
 #include <selector_parser.h>
 #include <selector.h>
 #include <scope_selector.h>
+#include <shl_exception.h>
 
 using namespace shl;
 using namespace shl::selector;
@@ -233,5 +234,12 @@ TEST_CASE("Selector Parser Test") {
         REQUIRE( Selector("^ foo > bar > baz").match("foo bar baz foo bar baz") );
         REQUIRE( Selector("foo > bar > baz $").match("foo bar baz foo bar baz") );
         REQUIRE( Selector("^ foo > bar > baz $").match("foo bar baz foo bar baz") ==false );
+    }
+
+    SECTION("throw when invalid selector") {
+        using shl::Selector;
+
+        REQUIRE_THROWS_AS( Selector(""), InvalidScopeSelector );
+        REQUIRE_THROWS_AS( Selector("> A > B"), InvalidScopeSelector );
     }
 }
