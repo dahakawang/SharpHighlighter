@@ -34,7 +34,7 @@ struct ScopeSelector : public AbstractSelector {
 
 
 struct FilterSelector : public AbstractSelector {
-    enum Side { Left = 'L', Right = 'R', Both = 'B' };
+    enum Side { Left = 'L', Right = 'R', Both = 'B', None = 'N' };
 
     FilterSelector(): side(Left) {};
     virtual bool match(const Scope& scope, char side, double* rank) const;
