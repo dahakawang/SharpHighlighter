@@ -13,8 +13,8 @@ namespace selector {
     scope_name:        «component» ('.' «component»)*
     scope:         '^'? «scope_name» ('>'? «scope_name»)* '$'?
     group:        '(' «selector» ')'
-    filter:       ("L:"|"R:"|"B:") («group» | «path»)
-    expression:   '-'? («filter» | «group» | «path»)
+    filter:       ("L:"|"R:"|"B:")? («group» | «path»)
+    expression:   '-'? «filter»
     composite:    «expression» ([|&-] «expression»)*
     selector:     «composite» (',' «composite»)*
 */
@@ -81,7 +81,7 @@ bool Parser::parse_expression(ExpressionSelector& selector) {
     if (parse_char("-")) selector.is_negative = true;
     ws();
 
-    return parse_filter(selector.selector) || parse_group(selector.selector) || parse_scope(selector.selector);
+    return parse_filter(selector.selector);
 
 }
 
@@ -91,8 +91,15 @@ bool Parser::parse_filter(unique_ptr<AbstractSelector>& selector) {
 
     ws();
     unique_ptr<FilterSelector> filter(new FilterSelector());
-    if (parse_char("LRB", &side) && parse_char(":") && ws() && (parse_group(filter->selector) || parse_scope(filter->selector))) {
+
+    if (parse_char("LRB", &side) && parse_char(":")) {
         filter->side = (FilterSelector::Side)side;
+    } else {
+        _pos = saved_pos;
+        filter->side = FilterSelector::None;
+    }
+
+    if (ws() && (parse_group(filter->selector) || parse_scope(filter->selector))) {
         selector = std::move(filter);
         return true;
     }
