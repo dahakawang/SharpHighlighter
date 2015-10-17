@@ -75,7 +75,11 @@ bool ExpressionSelector::match(const Scope& scope, char side, double* rank) cons
 }
 
 bool FilterSelector::match(const Scope& scope, char side, double* rank) const {
-    if (side == this->side) return selector->match(scope, side, rank);
+    if ((this->side == FilterSelector::None && side != FilterSelector::Left) ||
+            this->side == FilterSelector::Both || side == FilterSelector::Both || side == this->side) {
+        return selector->match(scope, side, rank);
+    }
+
     return false;
 }
 
