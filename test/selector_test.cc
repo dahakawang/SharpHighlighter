@@ -287,4 +287,17 @@ TEST_CASE("Selector Parser Test") {
         REQUIRE( Selector("source.c control if").match("source.c control if", Selector::LEFT) == false );
         REQUIRE( Selector("source.c control if").match("source.c control if", Selector::BOTH) );
     }
+
+    SECTION("ocmposite selector will work") {
+        using shl::Selector;
+
+        double rank1, rank2, rank3, rank4;
+        REQUIRE( Selector("A").match("A B", Selector::BOTH, &rank1) );
+        REQUIRE( Selector("C, A, B, C").match("A B", Selector::BOTH, &rank2) );
+        REQUIRE( Selector("C, A, B, C, A B").match("A B", Selector::BOTH, &rank3) );
+        REQUIRE( Selector("^ A B, C, A, B, C, A B").match("A B", Selector::BOTH, &rank4) );
+        REQUIRE( rank1 < rank2);
+        REQUIRE( rank2 < rank3);
+        REQUIRE( rank3 < rank4);
+    }
 }
