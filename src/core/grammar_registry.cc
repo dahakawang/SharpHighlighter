@@ -17,11 +17,10 @@ static void resolve_all_include(map<string, Grammar>& grammars, GrammarRegistry*
         compiler.resolve_include(grammar, registry);
     }
 }
-
 GrammarRegistry::GrammarRegistry(const std::shared_ptr<GrammarSource> data_source):_source(data_source) {
     auto list = _source->list_grammars();
 
-    for ( auto grammar_name : list ) {
+    for ( auto& grammar_name : list ) {
         string raw_grammar = _source->load_data(grammar_name);
         add_grammar(raw_grammar);
     }
@@ -32,7 +31,7 @@ Grammar& GrammarRegistry::add_grammar(const std::string& data) {
     if (data.empty()) return _empty;
     GrammarCompiler compiler;
     Grammar grammar = compiler.compile(data);
-    string& grammar_name = grammar.name;
+    string grammar_name = grammar.name;
     
     _grammars[grammar_name] = std::move(grammar);
     return _grammars[grammar_name];
