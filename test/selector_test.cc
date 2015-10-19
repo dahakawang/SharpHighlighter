@@ -309,4 +309,12 @@ TEST_CASE("Selector Parser Test") {
         REQUIRE( s.match("text.html.php other", Selector::LEFT) == false );
         REQUIRE( s.match("text.html.php other", Selector::RIGHT) );
     }
+
+    SECTION("str() will work") {
+        using shl::Selector;
+        Selector s("R:source.ruby ruby.* | - L:pic.a pic b, source.c storage.modifier.c keyword.core.control.if highlight.*, L:(man.kind man.hello man.last $, B:( ^ test.n test.g, test.a > test.b > test.c $))");
+        string expect = "R: source.ruby ruby.* | - L: pic.a pic b, source.c storage.modifier.c keyword.core.control.if highlight.*, L: (man.kind man.hello man.last $, B: (^ test.n test.g, test.a > test.b > test.c $))";
+
+        REQUIRE( s.str() == expect );
+    }
 }
