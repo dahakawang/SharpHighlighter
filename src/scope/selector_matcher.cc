@@ -69,7 +69,7 @@ bool CompositeSelctor::match(const Scope& scope, char side, double* rank) const 
 }
 
 bool ExpressionSelector::match(const Scope& scope, char side, double* rank) const {
-    bool matched = selector->match(scope, side, rank);
+    bool matched = selector.match(scope, side, rank);
     
     return is_negative? !matched : matched;
 }
