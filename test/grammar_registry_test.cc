@@ -62,6 +62,17 @@ TEST_CASE("GrammarRegistry Test") {
         REQUIRE( grammar.patterns[59].patterns[0].patterns[2].include.ptr == html_grammar_ptr );
     }
 
+    SECTION("local repository is resolved") {
+        shared_ptr<GrammarSource> source(new TestSource());
+        GrammarRegistry registry(source);
+
+        Grammar& php = registry.get_grammar("text.html.php");
+        REQUIRE( !php.empty() );
+        REQUIRE( !php.repository.empty() );
+        REQUIRE( !php.repository["heredoc"].repository.empty() );
+        REQUIRE( php.repository["heredoc"].patterns[0].patterns[0].include.ptr == &php.repository["heredoc"].repository["heredoc_interior"] );
+    }
+
     SECTION("all injections is loaded") {
         shared_ptr<GrammarSource> source(new TestSource());
         GrammarRegistry registry(source);
@@ -69,5 +80,6 @@ TEST_CASE("GrammarRegistry Test") {
         Grammar& php = registry.get_grammar("text.html.php");
         REQUIRE( !php.empty() );
         REQUIRE( !php.injections.empty() );
+        REQUIRE( !php.repository["heredoc"].patterns[0].injections.empty() );
     }
 }
