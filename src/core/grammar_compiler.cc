@@ -64,7 +64,7 @@ void GrammarCompiler::compile_grammar(const JsonObject& object, Rule& rule) {
         const JsonObject& root = stocked.second;
 
         rule.injections[repo_name] = Rule();
-        compile_grammar(root, rule.repository[repo_name]);
+        compile_grammar(root, rule.injections[repo_name]);
     }
 
     rule.patterns = vector<Rule>(object.patterns.size());
@@ -97,7 +97,21 @@ map<int, string> GrammarCompiler::get_captures(const map<string, map<string, str
     return captures;
 }
 
-static void find_include(GrammarRegistry* registry, Grammar& grammar, WeakIncludePtr& include_rule) {
+static Rule* find_repository_res(Rule& rule, const string& repo_name) {
+    Rule* it = &rule;
+    while (it != nullptr) {
+        auto resource = it->repository.find(repo_name);
+        if ( resource != it->repository.end() ) {
+            return &resource->second;
+        }
+        it = it->lex_parent;
+    }
+    
+    throw InvalidGrammarException(string("can't find the name in repository: ") + repo_name);
+}
+
+static void find_include(GrammarRegistry* registry, Grammar& grammar, Rule& rule) {
+    WeakIncludePtr& include_rule = rule.include;
     string include_name = include_rule.name;
     
     // base reference
@@ -111,13 +125,7 @@ static void find_include(GrammarRegistry* registry, Grammar& grammar, WeakInclud
     // repository reference
     } else if (include_name[0] == '#'){
         string repo_name = include_name.substr(1);
-
-        auto stock_res = grammar.repository.find(repo_name);
-        if (stock_res != grammar.repository.end()) {
-            include_rule.ptr = &stock_res->second;
-        } else {
-            throw InvalidGrammarException(string("can't find the name in repository: ") + repo_name);
-        }
+        include_rule.ptr = find_repository_res(rule, repo_name);
 
     // external grammar reference
     } else {
@@ -135,17 +143,20 @@ static void find_include(GrammarRegistry* registry, Grammar& grammar, WeakInclud
 static void _resolve_include(Grammar& grammar, Rule& rule, GrammarRegistry* registry) {
     if ( rule.include.name.empty() ) {
         for ( Rule& subrule : rule.patterns ) {
+            subrule.lex_parent = &rule;
             _resolve_include(grammar, subrule, registry);
         }
     } else {
-        find_include(registry, grammar, rule.include);
+        find_include(registry, grammar, rule);
     }
 }
 
 void GrammarCompiler::resolve_include(Grammar& grammar, GrammarRegistry* registry) { 
+    grammar.lex_parent = nullptr;
     _resolve_include(grammar, grammar, registry);
 
     for ( auto& stocked_rule : grammar.repository ) {
+        stocked_rule.second.lex_parent = &grammar;
         _resolve_include(grammar, stocked_rule.second, registry);
     }
 }
