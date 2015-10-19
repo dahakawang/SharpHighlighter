@@ -39,7 +39,7 @@ struct FilterSelector : public AbstractSelector {
     FilterSelector(): side(Left) {};
     virtual bool match(const Scope& scope, char side, double* rank) const;
 
-    unique_ptr<AbstractSelector> selector;
+    std::shared_ptr<AbstractSelector> selector;
     Side side;
 };
 
@@ -47,7 +47,7 @@ struct ExpressionSelector : public AbstractSelector {
     ExpressionSelector(): is_negative(false) {};
     virtual bool match(const Scope& scope, char side, double* rank) const;
 
-    unique_ptr<AbstractSelector> selector;
+    FilterSelector selector;
     bool is_negative;
 };
 
