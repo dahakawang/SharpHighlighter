@@ -25,7 +25,7 @@ public:
 
 class Rule {
 public:
-    Rule():is_match_rule(false), applyEndPatternLast(false) {};
+    Rule():is_match_rule(false), applyEndPatternLast(false), lex_parent(nullptr) {};
     bool is_match_rule;
     string name;
     Regex begin;
@@ -39,6 +39,7 @@ public:
 
     map<string, Rule> repository;
     map<string, Rule> injections;
+    Rule* lex_parent; // lexical parent
 };
 
 class Grammar : public Rule {
