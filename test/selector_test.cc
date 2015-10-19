@@ -291,13 +291,16 @@ TEST_CASE("Selector Parser Test") {
     SECTION("ocmposite selector will work") {
         using shl::Selector;
 
-        double rank1, rank2, rank3, rank4;
+        double rank1, rank2, rank3;
         REQUIRE( Selector("A").match("A B", Selector::BOTH, &rank1) );
         REQUIRE( Selector("C, A, B, C").match("A B", Selector::BOTH, &rank2) );
         REQUIRE( Selector("C, A, B, C, A B").match("A B", Selector::BOTH, &rank3) );
-        REQUIRE( Selector("^ A B, C, A, B, C, A B").match("A B", Selector::BOTH, &rank4) );
         REQUIRE( rank1 < rank2);
         REQUIRE( rank2 < rank3);
-        REQUIRE( rank3 < rank4);
+
+        REQUIRE( Selector("A B C").match("A B") == false );
+        REQUIRE( Selector("- A B C").match("A B") );
+
+        REQUIRE( Selector("source.ruby - source.ruby control").match("source.ruby control if") == false );
     }
 }
