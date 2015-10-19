@@ -4,11 +4,14 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <utility>
 #include <shl_regex.h>
+#include <scope_selector.h>
 
 using std::string;
 using std::map;
 using std::vector;
+using std::pair;
 
 namespace shl {
 
@@ -38,7 +41,7 @@ public:
     WeakIncludePtr include; // like a kind of weak pointer, only points to entries in repository
 
     map<string, Rule> repository;
-    map<string, Rule> injections;
+    vector<pair<Selector, Rule>> injections;
     Rule* lex_parent; // lexical parent
 };
 

@@ -1,9 +1,13 @@
 #include <algorithm>
+#include <utility>
 #include <grammar.h>
 #include <json_object.h>
 #include <json_loader.h>
 #include <shl_exception.h>
+#include <scope_selector.h>
 #include "grammar_compiler.h"
+
+using std::make_pair;
 
 namespace shl {
 
@@ -60,11 +64,11 @@ void GrammarCompiler::compile_grammar(const JsonObject& object, Rule& rule) {
         compile_grammar(root, rule.repository[repo_name]);
     }
     for ( auto& stocked : object.injections ) {
-        const string& repo_name = stocked.first;
+        const string& selector = stocked.first;
         const JsonObject& root = stocked.second;
 
-        rule.injections[repo_name] = Rule();
-        compile_grammar(root, rule.injections[repo_name]);
+        rule.injections.push_back(make_pair(Selector(selector),Rule()));
+        compile_grammar(root, rule.injections.back().second);
     }
 
     rule.patterns = vector<Rule>(object.patterns.size());
