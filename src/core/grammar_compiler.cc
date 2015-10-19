@@ -21,21 +21,6 @@ void GrammarCompiler::process(const JsonObject& object, Grammar& grammar) {
     grammar.file_types = object.file_types;
 
     compile_grammar(object, grammar);
-    for ( auto& stocked : object.repository ) {
-        const string& repo_name = stocked.first;
-        const JsonObject& root = stocked.second;
-
-        grammar.repository[repo_name] = Rule();
-        compile_grammar(root, grammar.repository[repo_name]);
-    }
-    for ( auto& stocked : object.injections ) {
-        const string& repo_name = stocked.first;
-        const JsonObject& root = stocked.second;
-
-        grammar.injections[repo_name] = Rule();
-        compile_grammar(root, grammar.repository[repo_name]);
-    }
-
     swap(grammar.desc, grammar.name);
 }
 
@@ -64,6 +49,22 @@ void GrammarCompiler::compile_grammar(const JsonObject& object, Rule& rule) {
         if (object.patterns.empty()) {
             // TODO warning if empty rule is met
         }
+    }
+
+    // compile repository & injections
+    for ( auto& stocked : object.repository ) {
+        const string& repo_name = stocked.first;
+        const JsonObject& root = stocked.second;
+
+        rule.repository[repo_name] = Rule();
+        compile_grammar(root, rule.repository[repo_name]);
+    }
+    for ( auto& stocked : object.injections ) {
+        const string& repo_name = stocked.first;
+        const JsonObject& root = stocked.second;
+
+        rule.injections[repo_name] = Rule();
+        compile_grammar(root, rule.repository[repo_name]);
     }
 
     rule.patterns = vector<Rule>(object.patterns.size());
