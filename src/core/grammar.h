@@ -36,14 +36,15 @@ public:
     vector<Rule> patterns;
     string content_name;
     WeakIncludePtr include; // like a kind of weak pointer, only points to entries in repository
+
+    map<string, Rule> repository;
+    map<string, Rule> injections;
 };
 
 class Grammar : public Rule {
 public:
     string desc;
     vector<string> file_types;
-    map<string, Rule> repository;
-    map<string, Rule> injections;
 
     bool empty() { return name.empty() && patterns.empty() && repository.empty(); };
 };
