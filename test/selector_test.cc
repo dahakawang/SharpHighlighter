@@ -25,7 +25,7 @@ TEST_CASE("Selector Parser Test") {
         REQUIRE( first.operators[1] == selector::CompositeSelctor::OR );
         REQUIRE( first.selectors.size() == 2 );
         REQUIRE( first.selectors[0].is_negative == false );
-        FilterSelector& first_filter = *(FilterSelector*)first.selectors[0].selector.get();
+        FilterSelector& first_filter = first.selectors[0].selector;
         REQUIRE( first_filter.side == FilterSelector::Right );
         ScopeSelector& first_filter_scope = *(ScopeSelector*)first_filter.selector.get();
         REQUIRE( first_filter_scope.atoms.size() == 2 );
@@ -38,7 +38,7 @@ TEST_CASE("Selector Parser Test") {
 
 
         REQUIRE( first.selectors[1].is_negative == true );
-        FilterSelector& first_filter2 = *(FilterSelector*)first.selectors[1].selector.get();
+        FilterSelector& first_filter2 = first.selectors[1].selector;
         REQUIRE( first_filter2.side == FilterSelector::Left );
         ScopeSelector& first_filter2_scope = *(ScopeSelector*)first_filter2.selector.get();
         REQUIRE( first_filter2_scope.atoms.size() == 3 );
@@ -54,33 +54,33 @@ TEST_CASE("Selector Parser Test") {
         REQUIRE( second.operators.size() == 1 );
         REQUIRE( second.operators[0] == CompositeSelctor::NONE );
         REQUIRE( second.selectors.size() == 1 );
-        ScopeSelector& second_scope = *((ScopeSelector*)(*(FilterSelector*)second.selectors[0].selector.get()).selector.get());
+        ScopeSelector& second_scope = *((ScopeSelector*)(second.selectors[0].selector).selector.get());
         REQUIRE( second_scope.atoms.size() == 4 );
 
         CompositeSelctor& third = s.selectors[2];
         REQUIRE( third.operators.size() == 1 );
-        FilterSelector& third_filter = *(FilterSelector*)third.selectors[0].selector.get();
+        FilterSelector& third_filter = third.selectors[0].selector;
         REQUIRE( third_filter.side == FilterSelector::Left );
         Selector& nest = ((GroupSelector*)third_filter.selector.get())->selector;
         REQUIRE( nest.selectors.size() == 2 );
         CompositeSelctor& nest_first = nest.selectors[0];
         REQUIRE( nest_first.selectors.size() == 1 );
-        ScopeSelector& nest_first_scope = *((ScopeSelector*)(*(FilterSelector*)nest_first.selectors[0].selector.get()).selector.get());
+        ScopeSelector& nest_first_scope = *((ScopeSelector*)(nest_first.selectors[0].selector).selector.get());
         REQUIRE( nest_first_scope.anchor_begin == false );
         REQUIRE( nest_first_scope.anchor_end == true );
         REQUIRE( nest_first_scope.atoms.size() == 3 );
 
-        FilterSelector& nest_second = *(FilterSelector*)nest.selectors[1].selectors[0].selector.get();
+        FilterSelector& nest_second = nest.selectors[1].selectors[0].selector;
         REQUIRE( nest_second.side == FilterSelector::Both );
         GroupSelector& nest_second_group = *(GroupSelector*)nest_second.selector.get();
         Selector& nest_nest = nest_second_group.selector;
         REQUIRE( nest_nest.selectors.size() == 2 );
-        ScopeSelector& nest_nest_first = *((ScopeSelector*)(*(FilterSelector*)nest_nest.selectors[0].selectors[0].selector.get()).selector.get());
+        ScopeSelector& nest_nest_first = *((ScopeSelector*)nest_nest.selectors[0].selectors[0].selector.selector.get());
         REQUIRE( nest_nest_first.atoms.size() == 2 );
         REQUIRE( nest_nest_first.anchor_begin == true );
         REQUIRE( nest_nest_first.anchor_end == false );
 
-        ScopeSelector& nest_nest_second = *((ScopeSelector*)(*(FilterSelector*)nest_nest.selectors[1].selectors[0].selector.get()).selector.get());
+        ScopeSelector& nest_nest_second = *((ScopeSelector*)nest_nest.selectors[1].selectors[0].selector.selector.get());
         REQUIRE( nest_nest_second.atoms.size() == 3 );
         REQUIRE( nest_nest_second.anchor_begin == false );
         REQUIRE( nest_nest_second.anchor_end == true );
