@@ -4,7 +4,7 @@
 #include <memory>
 #include <selector.h>
 
-using std::unique_ptr;
+using std::shared_ptr;
 
 namespace shl {
 namespace selector {
@@ -24,9 +24,9 @@ private:
     bool parse_selector(Selector& selector);
     bool parse_composite(CompositeSelctor& selector);
     bool parse_expression(ExpressionSelector& selector);
-    bool parse_filter(unique_ptr<AbstractSelector>& selector);
-    bool parse_group(unique_ptr<AbstractSelector>& selector);
-    bool parse_scope(unique_ptr<AbstractSelector>& selector);
+    bool parse_filter(FilterSelector& selector);
+    bool parse_group(shared_ptr<AbstractSelector>& selector);
+    bool parse_scope(shared_ptr<AbstractSelector>& selector);
     bool parse_scope_name(ScopeNameSelector& selector, bool is_first);
 
 };

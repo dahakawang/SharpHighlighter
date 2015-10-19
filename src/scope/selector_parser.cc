@@ -85,21 +85,21 @@ bool Parser::parse_expression(ExpressionSelector& selector) {
 
 }
 
-bool Parser::parse_filter(unique_ptr<AbstractSelector>& selector) {
+bool Parser::parse_filter(FilterSelector& selector) {
     char side;
     size_t saved_pos = _pos;
 
     ws();
-    unique_ptr<FilterSelector> filter(new FilterSelector());
+    FilterSelector filter;
 
     if (parse_char("LRB", &side) && parse_char(":")) {
-        filter->side = (FilterSelector::Side)side;
+        filter.side = (FilterSelector::Side)side;
     } else {
         _pos = saved_pos;
-        filter->side = FilterSelector::None;
+        filter.side = FilterSelector::None;
     }
 
-    if (ws() && (parse_group(filter->selector) || parse_scope(filter->selector))) {
+    if (ws() && (parse_group(filter.selector) || parse_scope(filter.selector))) {
         selector = std::move(filter);
         return true;
     }
@@ -109,7 +109,7 @@ bool Parser::parse_filter(unique_ptr<AbstractSelector>& selector) {
 }
 
 
-bool Parser::parse_group(unique_ptr<AbstractSelector>& selector) {
+bool Parser::parse_group(shared_ptr<AbstractSelector>& selector) {
     size_t saved_pos = _pos;
 
     ws();
@@ -123,7 +123,7 @@ bool Parser::parse_group(unique_ptr<AbstractSelector>& selector) {
     return false;
 }
 
-bool Parser::parse_scope(unique_ptr<AbstractSelector>& selector) {
+bool Parser::parse_scope(shared_ptr<AbstractSelector>& selector) {
     size_t saved_pos = _pos;
 
     ws();
