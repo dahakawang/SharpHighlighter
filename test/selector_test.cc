@@ -302,5 +302,11 @@ TEST_CASE("Selector Parser Test") {
         REQUIRE( Selector("- A B C").match("A B") );
 
         REQUIRE( Selector("source.ruby - source.ruby control").match("source.ruby control if") == false );
+
+        Selector s("text.html.php - (meta.embedded | meta.tag), L:text.html.php meta.tag, L:source.js.embedded.html");
+        REQUIRE( s.match("text.html.php meta.tag other", Selector::LEFT) );
+        REQUIRE( s.match("text.html.php meta.tag other", Selector::RIGHT) == false );
+        REQUIRE( s.match("text.html.php other", Selector::LEFT) == false );
+        REQUIRE( s.match("text.html.php other", Selector::RIGHT) );
     }
 }
