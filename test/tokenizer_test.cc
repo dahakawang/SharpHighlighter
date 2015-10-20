@@ -762,6 +762,24 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[7].second.name() == "source.css.scss meta.property-list.scss meta.property-name.scss" );
     }
 
+    SECTION("the injection grammar will work") {
+        shared_ptr<TestGrammarSource> grammar_source(new TestGrammarSource({
+                "text.html.php", "fixture/php.json",
+                "text.html.basic", "fixture/html.json"}));
+        GrammarRegistry registry(grammar_source);
+        Grammar g= registry.get_grammar("text.html.php");
+        string source = "<div><?php function hello() {} ?></div>";
+        auto tokens = tokenizer.tokenize(g, source);
+
+        REQUIRE( tokens[0].first.substr(source) == "<div><?php function hello() {} ?></div>" );
+        REQUIRE( tokens[0].second.name() == "text.html.php" );
+
+        REQUIRE( tokens[1].first.substr(source) == "<div>" );
+        REQUIRE( tokens[1].second.name() == "text.html.php meta.tag.block.any.html" );
+
+
+    }
+
     // TODO test external grammar
     // TODO test $base $self
     // TODO hen containing rule has a name
