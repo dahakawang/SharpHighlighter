@@ -150,6 +150,14 @@ static void _resolve_include(Grammar& grammar, Rule& rule, GrammarRegistry* regi
             subrule.lex_parent = &rule;
             _resolve_include(grammar, subrule, registry);
         }
+        for (auto& subrule : rule.repository) {
+            subrule.second.lex_parent = &rule;
+            _resolve_include(grammar, subrule.second, registry);
+        }
+        for (auto& subrule : rule.injections) {
+            subrule.second.lex_parent = &rule;
+            _resolve_include(grammar, subrule.second, registry);
+        }
     } else {
         find_include(registry, grammar, rule);
     }
@@ -158,10 +166,5 @@ static void _resolve_include(Grammar& grammar, Rule& rule, GrammarRegistry* regi
 void GrammarCompiler::resolve_include(Grammar& grammar, GrammarRegistry* registry) { 
     grammar.lex_parent = nullptr;
     _resolve_include(grammar, grammar, registry);
-
-    for ( auto& stocked_rule : grammar.repository ) {
-        stocked_rule.second.lex_parent = &grammar;
-        _resolve_include(grammar, stocked_rule.second, registry);
-    }
 }
 }
