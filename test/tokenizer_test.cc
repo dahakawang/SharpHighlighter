@@ -4,6 +4,9 @@
 #include <tokenizer.h>
 #include <grammar_compiler.h>
 #include <grammar_registry.h>
+#include <iostream>
+
+using namespace std;
 
 using namespace shl;
 
@@ -768,16 +771,78 @@ TEST_CASE("Tokenizer Tests") {
                 "text.html.basic", "fixture/html.json"}));
         GrammarRegistry registry(grammar_source);
         Grammar g= registry.get_grammar("text.html.php");
+        //string source = "<div><?php function hello() {} ?></div>";
         string source = "<div><?php function hello() {} ?></div>";
         auto tokens = tokenizer.tokenize(g, source);
+
+        REQUIRE( tokens.size() == 22 );
 
         REQUIRE( tokens[0].first.substr(source) == "<div><?php function hello() {} ?></div>" );
         REQUIRE( tokens[0].second.name() == "text.html.php" );
 
         REQUIRE( tokens[1].first.substr(source) == "<div>" );
-        REQUIRE( tokens[1].second.name() == "text.html.php meta.tag.block.any.html" );
+        REQUIRE( tokens[1].second.name() == "text.html.php text.html.basic meta.tag.block.any.html" );
 
+        REQUIRE( tokens[2].first.substr(source) == "<" );
+        REQUIRE( tokens[2].second.name() == "text.html.php text.html.basic meta.tag.block.any.html punctuation.definition.tag.begin.html" );
 
+        REQUIRE( tokens[3].first.substr(source) == "div" );
+        REQUIRE( tokens[3].second.name() == "text.html.php text.html.basic meta.tag.block.any.html entity.name.tag.block.any.html" );
+
+        REQUIRE( tokens[4].first.substr(source) == ">" );
+        REQUIRE( tokens[4].second.name() == "text.html.php text.html.basic meta.tag.block.any.html punctuation.definition.tag.end.html" );
+
+        REQUIRE( tokens[5].first.substr(source) == "<?php function hello() {} ?>" );
+        REQUIRE( tokens[5].second.name() == "text.html.php meta.embedded.line.php" );
+
+        REQUIRE( tokens[6].first.substr(source) == "<?php" );
+        REQUIRE( tokens[6].second.name() == "text.html.php meta.embedded.line.php punctuation.section.embedded.begin.php" );
+
+        REQUIRE( tokens[7].first.substr(source) == " function hello() {} " );
+        REQUIRE( tokens[7].second.name() == "text.html.php meta.embedded.line.php source.php" );
+
+        
+        REQUIRE( tokens[8].first.substr(source) == " function hello()" );
+        REQUIRE( tokens[8].second.name() == "text.html.php meta.embedded.line.php source.php meta.function.php" );
+
+        REQUIRE( tokens[9].first.substr(source) == "function" );
+        REQUIRE( tokens[9].second.name() == "text.html.php meta.embedded.line.php source.php meta.function.php storage.type.function.php" );
+
+        REQUIRE( tokens[10].first.substr(source) == "hello" );
+        REQUIRE( tokens[10].second.name() == "text.html.php meta.embedded.line.php source.php meta.function.php entity.name.function.php" );
+
+        REQUIRE( tokens[11].first.substr(source) == "(" );
+        REQUIRE( tokens[11].second.name() == "text.html.php meta.embedded.line.php source.php meta.function.php punctuation.definition.parameters.begin.php" );
+
+        REQUIRE( tokens[12].first.substr(source) == ")" );
+        REQUIRE( tokens[12].second.name() == "text.html.php meta.embedded.line.php source.php meta.function.php punctuation.definition.parameters.end.php" );
+
+        REQUIRE( tokens[13].first.substr(source) == "{" );
+        REQUIRE( tokens[13].second.name() == "text.html.php meta.embedded.line.php source.php punctuation.section.scope.begin.php" );
+
+        REQUIRE( tokens[14].first.substr(source) == "}" );
+        REQUIRE( tokens[14].second.name() == "text.html.php meta.embedded.line.php source.php punctuation.section.scope.end.php" );
+
+        REQUIRE( tokens[15].first.substr(source) == "?" );
+        REQUIRE( tokens[15].second.name() == "text.html.php meta.embedded.line.php punctuation.section.embedded.end.php" );
+
+        REQUIRE( tokens[16].first.substr(source) == "?" );
+        REQUIRE( tokens[16].second.name() == "text.html.php meta.embedded.line.php punctuation.section.embedded.end.php source.php" );
+
+        REQUIRE( tokens[17].first.substr(source) == ">" );
+        REQUIRE( tokens[17].second.name() == "text.html.php meta.embedded.line.php punctuation.section.embedded.end.php" );
+
+        REQUIRE( tokens[18].first.substr(source) == "</div>" );
+        REQUIRE( tokens[18].second.name() == "text.html.php text.html.basic meta.tag.block.any.html" );
+
+        REQUIRE( tokens[19].first.substr(source) == "</" );
+        REQUIRE( tokens[19].second.name() == "text.html.php text.html.basic meta.tag.block.any.html punctuation.definition.tag.begin.html" );
+
+        REQUIRE( tokens[20].first.substr(source) == "div" );
+        REQUIRE( tokens[20].second.name() == "text.html.php text.html.basic meta.tag.block.any.html entity.name.tag.block.any.html" );
+
+        REQUIRE( tokens[21].first.substr(source) == ">" );
+        REQUIRE( tokens[21].second.name() == "text.html.php text.html.basic meta.tag.block.any.html punctuation.definition.tag.end.html" );
     }
 
     // TODO test external grammar
