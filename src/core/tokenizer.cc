@@ -51,12 +51,36 @@ static void for_all_subrules(const Rule& rule, set<const Rule*>& visited, vector
     }
 }
 
-static void for_all_subrules(const vector<Rule>& rules, vector<const Rule*>& stack, function<void(const Rule&, const vector<const Rule*>&)> callback) {
+static void callback_injection_rules(const Rule& rule, const Scope& scope, set<const Rule*>& visited, vector<const Rule*>& collapsed_rules, vector<const Rule*>& stack, Selector::Side side, function<void(const Rule&, const vector<const Rule*>&)> callback) {
+    const Rule* current_rule = &rule;
+    while(current_rule != nullptr) {
+        for(auto& inject_rule : current_rule->injections) {
+            if (inject_rule.first.match(scope)) {
+                for_all_subrules(rule, visited, collapsed_rules, stack, callback);
+            }
+        }
+        current_rule = current_rule->lex_parent;
+    }
+}
+
+static Scope stack_to_scope(const vector<const Rule*>& stack) {
+    vector<string> scope;
+    for( int pos = 0; pos < stack.size(); ++pos) {
+        scope.push_back(stack[pos]->name);
+    }
+    return Scope(scope);
+}
+
+static void for_all_subrules(const Rule& rule, vector<const Rule*>& stack, function<void(const Rule&, const vector<const Rule*>&)> callback) {
     set<const Rule*> visited;
     vector<const Rule*> collapsed_rules;
-    for (auto& rule : rules) {
-        for_all_subrules(rule, visited, collapsed_rules, stack, callback);
+    Scope current_scope = stack_to_scope(stack);
+
+    callback_injection_rules(rule, current_scope, visited, collapsed_rules, stack, Selector::LEFT, callback);
+    for (auto& subrule : rule.patterns) {
+        for_all_subrules(subrule, visited, collapsed_rules, stack, callback);
     }
+    callback_injection_rules(rule, current_scope, visited, collapsed_rules, stack, Selector::RIGHT, callback);
 }
 
 static inline bool is_end_match_first(const Rule& rule, const Match& end_match, const Match& current_first_match) {
@@ -94,7 +118,7 @@ bool Tokenizer::next_lexeme(const string& text, const Match& begin_lexeme, const
     bool is_close = false;
 
     // first find pattern or end pattern, whichever comes first
-    for_all_subrules(rule.patterns, stack, [&extra_rules, &found_rule , &first_match, pos, &text, begin_end_pos](const Rule& sub_rule, const vector<const Rule*>& collapsed_rules) {
+    for_all_subrules(rule, stack, [&extra_rules, &found_rule , &first_match, pos, &text, begin_end_pos](const Rule& sub_rule, const vector<const Rule*>& collapsed_rules) {
         Match tmp = sub_rule.begin.match(text, pos, begin_end_pos);
         if (tmp != Match::NOT_MATCHED) {
             if( found_rule == nullptr || tmp[0].position < first_match[0].position) {
