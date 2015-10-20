@@ -55,8 +55,8 @@ static void callback_injection_rules(const Rule& rule, const Scope& scope, set<c
     const Rule* current_rule = &rule;
     while(current_rule != nullptr) {
         for(auto& inject_rule : current_rule->injections) {
-            if (inject_rule.first.match(scope)) {
-                for_all_subrules(rule, visited, collapsed_rules, stack, callback);
+            if (inject_rule.first.match(scope, side)) {
+                for_all_subrules(inject_rule.second, visited, collapsed_rules, stack, callback);
             }
         }
         current_rule = current_rule->lex_parent;
@@ -65,7 +65,7 @@ static void callback_injection_rules(const Rule& rule, const Scope& scope, set<c
 
 static Scope stack_to_scope(const vector<const Rule*>& stack) {
     vector<string> scope;
-    for( int pos = 0; pos < stack.size(); ++pos) {
+    for( size_t pos = 0; pos < stack.size(); ++pos) {
         scope.push_back(stack[pos]->name);
     }
     return Scope(scope);
