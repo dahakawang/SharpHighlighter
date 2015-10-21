@@ -845,6 +845,14 @@ TEST_CASE("Tokenizer Tests") {
         REQUIRE( tokens[21].second.name() == "text.html.php text.html.basic meta.tag.block.any.html punctuation.definition.tag.end.html" );
     }
 
+    SECTION("no infinite recursion when a grammar contains it self and its match rule consumes no characters") {
+        string data = load_string("fixture/forever.json");
+        string source = "forever and ever";
+        Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
+        auto tokens = tokenizer.tokenize(g, source);
+    }
+
     // TODO test external grammar
     // TODO test $base $self
     // TODO hen containing rule has a name
