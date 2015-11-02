@@ -17,9 +17,10 @@ namespace shl {
 vector<pair<Range, Scope> > Tokenizer::tokenize(const Grammar& grammar, const string& text) {
     vector<pair<Range, Scope> > tokens;
     vector<const Rule*> rule_stack;
+    vector<const Match*> begin_matches;
 
     tokens.push_back(std::make_pair(Range(0, text.size()), Scope(grammar.name)));
-    tokenize(text, grammar, Match::make_dummy(0,0), rule_stack, tokens);
+    tokenize(text, grammar, Match::make_dummy(0,0), rule_stack, begin_matches, tokens);
 
     return tokens;
 }
@@ -223,10 +224,25 @@ void Tokenizer::process_capture(vector<pair<Range, Scope> >& tokens, const Match
 // the last found lexeme will be the begin lexeme of current rule
 // In this case we should advance the parser pointer by 1 to avoid infinite loop
 inline static bool detect_infinite_loop(const Match& begin, Match& end) {
-    return (begin[0].end() >= end[0].end());
+    return (begin[0].position >= end[0].end());
 }
 
-Match Tokenizer::tokenize(const string& text, const Rule& rule, const Match& begin_lexeme, vector<const Rule*>& stack, vector<pair<Range, Scope> >& tokens) {
+inline static bool detect_infinite_loop(const Rule& rule, const Match& begin, const vector<const Rule*>& stack, const vector<const Match*>& begin_matches) {
+    if (begin[0].length != 0) return false;
+
+    for(int pos = begin_matches.size() - 1; pos >= 0 && (*begin_matches[pos])[0].length == 0; pos--) {
+        if (&rule == stack[pos]) return true;
+    }
+
+    return false;
+}
+
+Match Tokenizer::tokenize(const string& text, const Rule& rule, const Match& begin_lexeme, vector<const Rule*>& stack, vector<const Match*> begin_matches, vector<pair<Range, Scope> >& tokens) {
+    if (detect_infinite_loop(rule, begin_lexeme, stack, begin_matches)) {
+        return Match::make_dummy(begin_lexeme[0].position + 1,0);
+    }
+
+    begin_matches.push_back(&begin_lexeme);
     stack.push_back(&rule);
 
     const Rule* found_rule = nullptr;
@@ -242,7 +258,7 @@ Match Tokenizer::tokenize(const string& text, const Rule& rule, const Match& beg
         } else {
             vector<pair<Range, Scope> > child_tokens;
 
-            Match end_match = tokenize(text, *found_rule, match, stack, child_tokens);
+            Match end_match = tokenize(text, *found_rule, match, stack, begin_matches, child_tokens);
             if (detect_infinite_loop(match, end_match)) {
                 last_lexeme = end_match;
                 last_lexeme[0].length++;
@@ -266,6 +282,7 @@ Match Tokenizer::tokenize(const string& text, const Rule& rule, const Match& beg
     }
 
     stack.pop_back();
+    begin_matches.pop_back();
 
     if ( found_rule == nullptr) { //see comments for next_lexeme
         return last_lexeme; 
