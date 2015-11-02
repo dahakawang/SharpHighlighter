@@ -847,7 +847,7 @@ TEST_CASE("Tokenizer Tests") {
 
     SECTION("no infinite recursion when a grammar contains it self and its match rule consumes no characters") {
         string data = load_string("fixture/forever.json");
-        string source = "forever and ever";
+        string source = "forever and ever whatevs";
         Grammar g = compiler.compile(data);
         compiler.resolve_include(g, nullptr);
         auto tokens = tokenizer.tokenize(g, source);
