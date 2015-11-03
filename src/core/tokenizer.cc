@@ -178,7 +178,7 @@ vector<string> compile_scope_name(vector<const Rule*>& stack, const string& name
     return names;
 }
 
-void Tokenizer::add_scope(vector<pair<Range, Scope> >& tokens, const Range& range, vector<const Rule*>& stack, const string& name, const string& enclosing_name, const vector<string>& additional) {
+void Tokenizer::add_scope(const string& text, vector<pair<Range, Scope> >& tokens, const Range& range, const Match& match, vector<const Rule*>& stack, const string& name, const string& enclosing_name, const vector<string>& additional) {
     if (name.empty()) return;
     if (range.length == 0) return; // only captures can potentially has 0 length
 
@@ -203,13 +203,13 @@ vector<string> get_parent_capture_names(const Match& match, const map<int, strin
     return additional;
 }
 
-void Tokenizer::process_capture(vector<pair<Range, Scope> >& tokens, const Match& match, vector<const Rule*>& stack, const map<int, string>& capture, const string& enclosing_name) {
+void Tokenizer::process_capture(const string& text, vector<pair<Range, Scope> >& tokens, const Match& match, vector<const Rule*>& stack, const map<int, string>& capture, const string& enclosing_name) {
     for (auto& pair : capture) {
         unsigned int capture_num = pair.first;
         const string& name = pair.second;
         if (match.size() > capture_num) {
             if (match[0].contain(match[capture_num])) {
-                add_scope(tokens, match[capture_num], stack, name, enclosing_name, get_parent_capture_names(match, capture, capture_num));
+                add_scope(text, tokens, match[capture_num], match, stack, name, enclosing_name, get_parent_capture_names(match, capture, capture_num));
             }
         } else {
             if (_option & OPTION_STRICT) {
@@ -251,8 +251,8 @@ Match Tokenizer::tokenize(const string& text, const Rule& rule, const Match& beg
     size_t original_size = stack.size();
     while(next_lexeme(text, begin_lexeme, last_lexeme, rule, &found_rule, match, stack)) {
         if (found_rule->is_match_rule) {
-            add_scope(tokens, match[0], stack, found_rule->name);
-            process_capture(tokens, match, stack, found_rule->begin_captures, found_rule->name);
+            add_scope(text, tokens, match[0], match, stack, found_rule->name);
+            process_capture(text, tokens, match, stack, found_rule->begin_captures, found_rule->name);
             last_lexeme = match;
 
         } else {
@@ -265,14 +265,14 @@ Match Tokenizer::tokenize(const string& text, const Rule& rule, const Match& beg
 
             } else {
                 Range name_range = Range(match[0].position, end_match[0].end() - match[0].position);
-                add_scope(tokens, name_range, stack, found_rule->name);
-                process_capture(tokens, match, stack, found_rule->begin_captures, found_rule->name);
+                add_scope(text, tokens, name_range, match, stack, found_rule->name);
+                process_capture(text, tokens, match, stack, found_rule->begin_captures, found_rule->name);
 
                 Range content_range = Range(match[0].end(), end_match[0].position - match[0].end());
-                add_scope(tokens, content_range, stack, found_rule->content_name, found_rule->name);
+                add_scope(text, tokens, content_range, match, stack, found_rule->content_name, found_rule->name);
 
                 append_back(tokens, child_tokens);
-                process_capture(tokens, end_match, stack, found_rule->end_captures, found_rule->name);
+                process_capture(text, tokens, end_match, stack, found_rule->end_captures, found_rule->name);
 
                 last_lexeme = end_match;
             }
