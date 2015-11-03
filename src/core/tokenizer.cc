@@ -191,16 +191,16 @@ inline void append_back(vector<pair<Range, Scope> >& target, const vector<pair<R
 }
 
 vector<string> get_parent_capture_names(const Match& match, const map<int, string>& capture, size_t pos) {
-    vector<string> addictinal;
+    vector<string> additional;
 
     for (size_t it = 0; it < pos; it++) {
         auto it_name = capture.find(it);
         if (match[it].contain(match[pos]) && it_name != capture.end()) {
-            addictinal.push_back(it_name->second);
+            additional.push_back(it_name->second);
         }
     }
 
-    return addictinal;
+    return additional;
 }
 
 void Tokenizer::process_capture(vector<pair<Range, Scope> >& tokens, const Match& match, vector<const Rule*>& stack, const map<int, string>& capture, const string& enclosing_name) {
