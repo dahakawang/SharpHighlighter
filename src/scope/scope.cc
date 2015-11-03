@@ -3,6 +3,7 @@
 #include <vector>
 #include <sstream>
 #include <cctype>
+#include <scope_macro.h>
 #include "scope.h"
 #include "str_util.h"
 
@@ -12,23 +13,27 @@ using std::ostringstream;
 
 namespace shl {
 
-ScopeName::ScopeName(const string& scope_name) {
+ScopeName::ScopeName(const string& scope_name, const string& text, const Match& match) {
     _name = scope_name;
     _component = strtok(scope_name, [](char c) { return c == '.';});
+
+    for(size_t pos = 0; pos < _component.size(); pos++) {
+        _component[pos] = expand_macro(_component[pos], text, match);
+    }
 }
 
-Scope::Scope(const string& scope) {
+Scope::Scope(const string& scope, const string& text, const Match& match) {
     auto scope_str = strtok(scope, isblank);
 
     for(auto it = scope_str.begin(); it != scope_str.end(); it++) {
-        _scope.emplace_back(*it);
+        _scope.emplace_back(ScopeName(*it, text, match));
     }
 }
 
 
-Scope::Scope(const vector<string>& scope) {
+Scope::Scope(const vector<string>& scope, const string& text, const Match& match) {
     for (auto& name : scope) {
-        if(!trim(name).empty()) _scope.emplace_back(name);
+        if(!trim(name).empty()) _scope.emplace_back(ScopeName(name, text, match));
     }
 }
 
