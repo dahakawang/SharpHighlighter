@@ -14,11 +14,15 @@ using std::ostringstream;
 namespace shl {
 
 ScopeName::ScopeName(const string& scope_name, const string& text, const Match& match) {
-    _name = scope_name;
     _component = strtok(scope_name, [](char c) { return c == '.';});
 
     for(size_t pos = 0; pos < _component.size(); pos++) {
         _component[pos] = expand_macro(_component[pos], text, match);
+    }
+
+    for (size_t pos = 0; pos < _component.size(); pos++) {
+        if (pos != 0) _name += '.';
+        _name += _component[pos];
     }
 }
 
