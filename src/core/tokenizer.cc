@@ -182,7 +182,7 @@ void Tokenizer::add_scope(const string& text, vector<pair<Range, Scope> >& token
     if (name.empty()) return;
     if (range.length == 0) return; // only captures can potentially has 0 length
 
-    Scope scope(compile_scope_name(stack, name, enclosing_name, additional));
+    Scope scope(compile_scope_name(stack, name, enclosing_name, additional), text, match);
     tokens.push_back(std::make_pair(range, scope));
 }
 
