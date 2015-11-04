@@ -853,6 +853,14 @@ TEST_CASE("Tokenizer Tests") {
         auto tokens = tokenizer.tokenize(g, source);
     }
 
+    SECTION("scope name macro can be expanded") {
+        string data = load_string("fixture/makefile.json");
+        string source = "ifeq (";
+        Grammar g = compiler.compile(data);
+        compiler.resolve_include(g, nullptr);
+        auto tokens = tokenizer.tokenize(g, source);
+    }
+
     // TODO test external grammar
     // TODO test $base $self
     // TODO hen containing rule has a name
