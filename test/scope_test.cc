@@ -105,4 +105,22 @@ TEST_CASE("Scope Test") {
         REQUIRE(s.subscope(4) == Scope(""));
     }
 
+    SECTION("scope name can be expanded") {
+        string text("Hello");
+        Match m = Match::make_dummy(0, 5);
+        Scope s("source.makefile keyword.control.$0", text, m);
+
+        REQUIRE( s[1].name()== "keyword.control.Hello");
+
+        Scope s1("source.makefile keyword.control.${0}", text, m);
+        REQUIRE( s1[1].name()== "keyword.control.Hello");
+
+        Scope s2("source.makefile keyword.control.${0:/downcase}", text, m);
+        REQUIRE( s2[1].name()== "keyword.control.hello");
+
+        Scope s3("source.makefile keyword.control.${0:/upcase}", text, m);
+        REQUIRE( s3[1].name()== "keyword.control.HELLO");
+
+    }
+
 }
