@@ -1,9 +1,22 @@
-#include <locale>
 #include <scope_macro.h>
 #include <str_util.h>
 #include <shl_exception.h>
 
 namespace shl {
+
+static string lower(const string& str) {
+   string tmp = str;
+   for(size_t pos = 0; pos < tmp.size(); ++pos) tmp[pos] = tolower(tmp[pos]);
+
+   return tmp;
+}
+
+static string upper(const string& str) {
+   string tmp = str;
+   for(size_t pos = 0; pos < tmp.size(); ++pos) tmp[pos] = toupper(tmp[pos]);
+
+   return tmp;
+}
 
 string expand_macro(const string& token, const string& text, const Match& match) {
     if (token[0] != '$') return token;
@@ -17,12 +30,12 @@ string expand_macro(const string& token, const string& text, const Match& match)
         if (group_num >= match.size()) throw InvalidSourceException("capture group number in scope name out of range");
 
         string expanded = match[group_num].substr(text);
+        if (num_command_pair.size() == 1) return expanded;
 
-        std::locale loc;
         if (num_command_pair[1] == "/downcase") {
-            return tolower(expanded, loc);
+            return lower(expanded);
         } else if (num_command_pair[1] == "/upcase") {
-            return std::toupper(expanded, loc);
+            return upper(expanded);
         } else {
             throw InvalidSourceException("unknown expansion function " + num_command_pair[1]);
         }
